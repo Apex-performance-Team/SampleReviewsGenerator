@@ -1,8 +1,10 @@
 'use client';
 import{useEffect,useRef,useState}from'react';
 
+const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+
 export default function ReferenceBridge(){
-  const enabledRef=useRef(true),configuredRef=useRef(false),productsRef=useRef(new Map()),cacheRef=useRef(new Map()),originalRef=useRef(null);
+  const enabledRef=useRef(true),configuredRef=useRef(false),productsRef=useRef(new Map()),cacheRef=useRef(new Map()),originalRef=useRef(null),runsRef=useRef(new Map());
   const[enabled,setEnabledState]=useState(true),[products,setProducts]=useState([]),[active,setActive]=useState(''),[busy,setBusy]=useState(false),[info,setInfo]=useState({status:'checking',text:'Checking AI Gateway reference search…'}),[summary,setSummary]=useState(null);
   const setEnabled=v=>{enabledRef.current=v;setEnabledState(v)};
   const refreshProducts=()=>setProducts([...productsRef.current.values()]);
@@ -17,7 +19,30 @@ export default function ReferenceBridge(){
       const url=typeof input==='string'?input:(input instanceof URL?input.toString():input?.url||'');
       const isScan=/\/api\/scan(?:\?|$)/.test(url),isGenerate=/\/api\/generate(?:\?|$)/.test(url);
       if(isScan){const r=await original(input,init);try{const j=await r.clone().json();if(r.ok)remember(j)}catch{}return r}
-      if(isGenerate&&enabledRef.current&&configuredRef.current){try{const raw=init?.body;if(typeof raw==='string'){const body=JSON.parse(raw),set=cacheRef.current.get(String(body.productUrl||''));if(set?.references?.length)return original(input,{...init,body:JSON.stringify({...body,referenceCards:set.references})});if(productsRef.current.has(String(body.productUrl||'')))setInfo({status:'warning',text:`No external reference coverage scanned for ${body.productTitle||'this product'} · generation will be PDP-only unless you scan references first`})}}catch{} }
+      if(isGenerate){
+        try{
+          const raw=init?.body;if(typeof raw!=='string')return original(input,init);
+          const body=JSON.parse(raw),productUrl=String(body.productUrl||''),runKey=`${productUrl}|${body.reviewCount}|${body.targetAverage}`;
+          if(Number(body.offset)===0)runsRef.current.set(runKey,{seen:new Map(),lock:Promise.resolve()});
+          if(!runsRef.current.has(runKey))runsRef.current.set(runKey,{seen:new Map(),lock:Promise.resolve()});
+          const run=runsRef.current.get(runKey),set=cacheRef.current.get(productUrl),baseBody=enabledRef.current&&configuredRef.current&&set?.references?.length?{...body,referenceCards:set.references}:body;
+          if(enabledRef.current&&configuredRef.current&&!set?.references?.length&&productsRef.current.has(productUrl))setInfo({status:'warning',text:`No external reference coverage scanned for ${body.productTitle||'this product'} · generation will be PDP-only unless you scan references first`});
+          let release;const prev=run.lock;run.lock=new Promise(r=>{release=r});await prev;
+          try{
+            let response=null,json=null,attempt=0,avoid=[];
+            while(attempt<3){attempt++;
+              response=await original(input,{...init,body:JSON.stringify({...baseBody,avoidBodies:avoid,variationNonce:avoid.length?`${Date.now()}-${attempt}-${body.offset}`:undefined})});
+              if(!response.ok)return response;
+              try{json=await response.clone().json()}catch{return response}
+              const collisions=[];for(const review of json.reviews||[]){const k=norm(review.body);if(k&&run.seen.has(k))collisions.push(run.seen.get(k))}
+              if(!collisions.length){for(const review of json.reviews||[]){const k=norm(review.body);if(k)run.seen.set(k,review.body)}return response}
+              avoid=[...new Set(collisions)].slice(0,12);
+              setInfo({status:'warning',text:`Repairing ${collisions.length} cross-batch duplicate${collisions.length===1?'':'s'} before finalizing ${body.productTitle||'dataset'}…`});
+            }
+            return new Response(JSON.stringify({error:'Could not repair cross-batch duplicate bodies after 3 attempts.'}),{status:500,headers:{'content-type':'application/json'}})
+          }finally{release()}
+        }catch{return original(input,init)}
+      }
       return original(input,init)
     };
     return()=>{alive=false;window.fetch=original};
