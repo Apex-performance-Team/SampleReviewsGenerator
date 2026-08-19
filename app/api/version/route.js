@@ -2,7 +2,7 @@ export const runtime='nodejs';
 
 export async function GET(){
   return Response.json({
-    source:'github',
+    source:'github-auto',
     repository:'Apex-performance-Team/SampleReviewsGenerator',
     commit:process.env.VERCEL_GIT_COMMIT_SHA||null,
     branch:process.env.VERCEL_GIT_COMMIT_REF||null,
