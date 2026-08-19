@@ -12,35 +12,50 @@ export default function ReferenceBridge(){
   const aggregateSummary=()=>{const sets=[...cacheRef.current.values()].filter(Boolean),map=new Map();let total=0,aggregateOnly=0;for(const s of sets){total+=Number(s.totalIndividualReviews)||0;aggregateOnly+=(s.aggregateOnlySources||[]).length;for(const x of s.platformCounts||[]){const k=`${x.platform}|${x.provider||''}`,v=map.get(k)||{...x,reviewCount:0,pageCount:0};v.reviewCount+=Number(x.reviewCount)||0;v.pageCount+=Number(x.pageCount)||0;map.set(k,v)}}return{total,aggregateOnly,platformCounts:[...map.values()].sort((a,b)=>b.reviewCount-a.reviewCount),products:sets.length}};
   async function scanOne(p){const original=originalRef.current||window.fetch.bind(window);const r=await original('/api/reference-scan',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(p)}),j=await r.json();if(!r.ok)throw Error(j.error||'Reference scan failed');const set=j.referenceSet||null;if(set)cacheRef.current.set(p.productUrl,set);return set}
   async function scanReferences(all=false){const list=all?products:[productsRef.current.get(active)].filter(Boolean);if(!list.length)return;setBusy(true);setInfo({status:'scanning',text:`Scanning external references for ${list.length} product${list.length===1?'':'s'}…`});try{let cursor=0;async function worker(){while(true){const i=cursor++;if(i>=list.length)return;await scanOne(list[i])}}await Promise.all(Array.from({length:Math.min(2,list.length)},worker));const s=aggregateSummary();setSummary(s);setInfo({status:'ready',text:`Reference coverage ready · ${s.total.toLocaleString()} individual reviews across ${s.platformCounts.length} platform${s.platformCounts.length===1?'':'s'}`})}catch(e){setInfo({status:'error',text:`Reference scan failed · ${e.message}`})}finally{setBusy(false)}}
+  function responseFrom(json,status=200){return new Response(JSON.stringify(json),{status,headers:{'content-type':'application/json','cache-control':'no-store'}})}
+  async function finalizeRun(runKey,run,original){
+    if(run.finalizing)return;run.finalizing=true;
+    try{
+      const ordered=[...run.parts.values()].sort((a,b)=>a.offset-b.offset),allReviews=ordered.flatMap(x=>x.json.reviews||[]);
+      setInfo({status:'scanning',text:`Running corpus-wide uniqueness QA for ${run.productTitle||'dataset'}…`});
+      let reviews=allReviews,qa=null;
+      for(let pass=1;pass<=2;pass++){
+        const r=await original('/api/corpus-qa',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'repair',productTitle:run.productTitle,productDescription:run.productDescription,reviews})}),j=await r.json();
+        if(!r.ok)throw Error(j.error||'Corpus QA failed');
+        qa=j;reviews=j.reviews||reviews;
+        const exact=(j.diagnostics?.exactDuplicateGroups||[]).length,repairs=Number(j.repairCount)||0;
+        if(!exact||pass===2||!repairs)break;
+      }
+      const byId=new Map(reviews.map(x=>[x.id,x])),exactGroups=qa?.diagnostics?.exactDuplicateGroups||[];
+      if(exactGroups.length)throw Error(`Corpus QA still found ${exactGroups.length} exact duplicate group${exactGroups.length===1?'':'s'} after repair.`);
+      for(const part of ordered){const patched={...part.json,reviews:(part.json.reviews||[]).map(x=>byId.get(x.id)||x),corpusDiagnostics:qa?.diagnostics||null,corpusRepairCount:qa?.repairCount||0};part.resolve(responseFrom(patched,200))}
+      const d=qa?.diagnostics||{},score=Number(d.overallDiversityScore)||0,near=Number(d.semanticNearDuplicatePairs)||0,repTitles=Number(d.repeatedTitleCount)||0,top=d.topTopic?.share!=null?Math.round(d.topTopic.share*100):0;
+      setInfo({status:'ready',text:`Corpus QA complete · diversity ${score}/100 · semantic near-duplicates ${near} · repeated-title fixtures ${repTitles}${top?` · top topic ${top}%`:''}`});
+    }catch(e){for(const part of run.parts.values())part.resolve(responseFrom({error:e.message||'Corpus QA failed.'},500));setInfo({status:'error',text:`Corpus QA failed · ${e.message}`})}
+    finally{setTimeout(()=>runsRef.current.delete(runKey),30000)}
+  }
   useEffect(()=>{
     let alive=true;const original=window.fetch.bind(window);originalRef.current=original;
     original('/api/reference-health',{cache:'no-store'}).then(r=>r.json()).then(j=>{configuredRef.current=Boolean(j.configured);if(alive)setInfo(j.configured?{status:'ready',text:`Ready · ${j.provider||'AI Gateway reference search'} · scan before generation`}:{status:'missing',text:'Unavailable · AI Gateway authentication is not available in this deployment'})}).catch(e=>alive&&setInfo({status:'error',text:`Reference health check failed · ${e.message}`}));
     window.fetch=async(input,init)=>{
       const url=typeof input==='string'?input:(input instanceof URL?input.toString():input?.url||'');
-      const isScan=/\/api\/scan(?:\?|$)/.test(url),isGenerate=/\/api\/generate(?:\?|$)/.test(url);
+      const isScan=/\/api\/scan(?:\?|$)/.test(url),isGenerate=/\/api\/generate(?:\?|$)/.test(url),isCorpus=/\/api\/corpus-qa(?:\?|$)/.test(url);
       if(isScan){const r=await original(input,init);try{const j=await r.clone().json();if(r.ok)remember(j)}catch{}return r}
+      if(isCorpus)return original(input,init);
       if(isGenerate){
         try{
           const raw=init?.body;if(typeof raw!=='string')return original(input,init);
-          const body=JSON.parse(raw),productUrl=String(body.productUrl||''),runKey=`${productUrl}|${body.reviewCount}|${body.targetAverage}`;
-          if(Number(body.offset)===0)runsRef.current.set(runKey,{seen:new Map(),lock:Promise.resolve()});
-          if(!runsRef.current.has(runKey))runsRef.current.set(runKey,{seen:new Map(),lock:Promise.resolve()});
-          const run=runsRef.current.get(runKey),set=cacheRef.current.get(productUrl),baseBody=enabledRef.current&&configuredRef.current&&set?.references?.length?{...body,referenceCards:set.references}:body;
+          const body=JSON.parse(raw),productUrl=String(body.productUrl||''),total=Number(body.reviewCount)||0,offset=Number(body.offset)||0,batchSize=Math.max(1,Number(body.batchSize)||10),expected=Math.ceil(total/batchSize),runKey=`${productUrl}|${total}|${body.targetAverage}`;
+          const set=cacheRef.current.get(productUrl),sendBody=enabledRef.current&&configuredRef.current&&set?.references?.length?{...body,referenceCards:set.references}:body;
           if(enabledRef.current&&configuredRef.current&&!set?.references?.length&&productsRef.current.has(productUrl))setInfo({status:'warning',text:`No external reference coverage scanned for ${body.productTitle||'this product'} · generation will be PDP-only unless you scan references first`});
-          let release;const prev=run.lock;run.lock=new Promise(r=>{release=r});await prev;
-          try{
-            let response=null,json=null,attempt=0,avoid=[];
-            while(attempt<3){attempt++;
-              response=await original(input,{...init,body:JSON.stringify({...baseBody,avoidBodies:avoid,variationNonce:avoid.length?`${Date.now()}-${attempt}-${body.offset}`:undefined})});
-              if(!response.ok)return response;
-              try{json=await response.clone().json()}catch{return response}
-              const collisions=[];for(const review of json.reviews||[]){const k=norm(review.body);if(k&&run.seen.has(k))collisions.push(run.seen.get(k))}
-              if(!collisions.length){for(const review of json.reviews||[]){const k=norm(review.body);if(k)run.seen.set(k,review.body)}return response}
-              avoid=[...new Set(collisions)].slice(0,12);
-              setInfo({status:'warning',text:`Repairing ${collisions.length} cross-batch duplicate${collisions.length===1?'':'s'} before finalizing ${body.productTitle||'dataset'}…`});
-            }
-            return new Response(JSON.stringify({error:'Could not repair cross-batch duplicate bodies after 3 attempts.'}),{status:500,headers:{'content-type':'application/json'}})
-          }finally{release()}
+          const r=await original(input,{...init,body:JSON.stringify(sendBody)});if(!r.ok)return r;
+          let j;try{j=await r.clone().json()}catch{return r}
+          let run=runsRef.current.get(runKey);
+          if(!run||run.completed){run={expected,parts:new Map(),productTitle:String(body.productTitle||''),productDescription:String(body.productDescription||''),finalizing:false,completed:false};runsRef.current.set(runKey,run)}
+          return await new Promise(resolve=>{
+            run.parts.set(offset,{offset,json:j,resolve});
+            if(run.parts.size>=run.expected&&!run.finalizing){run.completed=true;finalizeRun(runKey,run,original)}
+          })
         }catch{return original(input,init)}
       }
       return original(input,init)
