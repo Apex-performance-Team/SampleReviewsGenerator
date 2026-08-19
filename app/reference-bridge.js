@@ -3,7 +3,7 @@ import{useEffect,useRef,useState}from'react';
 
 export default function ReferenceBridge(){
   const enabledRef=useRef(true),configuredRef=useRef(false),cache=useRef(new Map()),inflight=useRef(new Map());
-  const[enabled,setEnabledState]=useState(true),[info,setInfo]=useState({status:'checking',text:'Checking Google Vision…'});
+  const[enabled,setEnabledState]=useState(true),[info,setInfo]=useState({status:'checking',text:'Checking AI Gateway reference search…'});
   const setEnabled=v=>{enabledRef.current=v;setEnabledState(v)};
   useEffect(()=>{
     let alive=true;
@@ -11,7 +11,7 @@ export default function ReferenceBridge(){
     const setSafe=x=>{if(alive)setInfo(x)};
     original('/api/reference-health',{cache:'no-store'}).then(r=>r.json()).then(j=>{
       configuredRef.current=Boolean(j.configured);
-      setSafe(j.configured?{status:'ready',text:'Ready · runs once per SKU before generation'}:{status:'missing',text:`Unavailable · add ${j.env||'GOOGLE_CLOUD_VISION_API_KEY'} in Vercel`});
+      setSafe(j.configured?{status:'ready',text:`Ready · ${j.provider||'AI Gateway reference search'} · runs once per SKU`}:{status:'missing',text:'Unavailable · AI Gateway authentication is not available in this deployment'});
     }).catch(e=>setSafe({status:'error',text:`Reference health check failed · ${e.message}`}));
 
     async function ensureReference(body){

@@ -1,9 +1,12 @@
 export const runtime='nodejs';
-export async function GET(){
+import{gatewayToken,authMode}from'../../../lib/gateway';
+export async function GET(req){
+  const configured=Boolean(gatewayToken(req));
   return Response.json({
     ok:true,
-    provider:'Google Cloud Vision Web Detection',
-    configured:Boolean(process.env.GOOGLE_CLOUD_VISION_API_KEY),
-    env:'GOOGLE_CLOUD_VISION_API_KEY'
+    provider:'Vercel AI Gateway · GPT-5.6 Terra vision + web search',
+    configured,
+    auth:authMode(req),
+    env:null
   },{headers:{'cache-control':'no-store'}})
 }
