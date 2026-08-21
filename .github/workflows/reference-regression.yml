@@ -1,0 +1,45 @@
+name: Reference regression
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+jobs:
+  live-reference-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for production deployment
+        run: sleep 45
+      - name: Run production reference self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://synthetic-review-lab.vercel.app/api/reference-selftest'
+          ok=0
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt"
+            code=$(curl --silent --show-error --location --max-time 290 \
+              --output selftest.json --write-out '%{http_code}' "$URL" || true)
+            cat selftest.json || true
+            echo
+            echo "HTTP $code"
+            if [ "$code" = "200" ]; then
+              node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('selftest.json','utf8'));
+          console.log(JSON.stringify(j,null,2));
+          if(!j.ok) process.exit(1);
+          if(!j.checks?.corpusNeverShrank) throw new Error('Corpus shrank during enrichment');
+          if(!j.checks?.marketplaceBodiesExtracted) throw new Error('No Amazon/eBay individual review bodies extracted');
+          NODE
+              ok=1
+              break
+            fi
+            sleep 30
+          done
+          if [ "$ok" != "1" ]; then
+            echo 'Production reference regression failed after 3 attempts.' >&2
+            exit 1
+          fi
