@@ -110,7 +110,7 @@
             "error": null
           },
           "diagnostics": {
-            "elapsedMs": 812,
+            "elapsedMs": 1255,
             "authoritativePdpIdentity": {
               "title": "InstaBeam Premium Indoor HDTV Antenna",
               "descriptionLength": 183,
@@ -151,7 +151,7 @@
     "liveCorpusTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T15:08:59.055Z",
-    "commit": "93c673af0a11b4090fed6e85426703d5d18709e8"
+    "testedAt": "2026-08-21T15:11:39.161Z",
+    "commit": "b5767aa207d7b6a0e16aa69e95e4edf88afb707f"
   }
 }
