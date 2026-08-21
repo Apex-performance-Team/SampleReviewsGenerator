@@ -1,7 +1,19 @@
 {
   "ok": true,
-  "elapsedMs": 42126,
+  "elapsedMs": 67380,
   "results": [
+    {
+      "asin": "B089LMG6L4",
+      "ok": true,
+      "count": 249,
+      "aggregateRatingCount": 33151,
+      "aggregateRating": 4,
+      "rawRows": 250,
+      "reviewIdCount": 249,
+      "snapshotId": "sd_mt2lh1o02iuqh19n2e",
+      "elapsedMs": 67379,
+      "error": ""
+    },
     {
       "asin": "B0DZWZ3H6L",
       "ok": true,
@@ -10,8 +22,8 @@
       "aggregateRating": 4,
       "rawRows": 8,
       "reviewIdCount": 6,
-      "snapshotId": "sd_mt2lbeic4aptv3c69",
-      "elapsedMs": 42124,
+      "snapshotId": "sd_mt2lh1rk2iqjovrsj",
+      "elapsedMs": 27228,
       "error": ""
     },
     {
@@ -22,8 +34,8 @@
       "aggregateRating": 3.3,
       "rawRows": 6,
       "reviewIdCount": 6,
-      "snapshotId": "sd_mt2lbehy29l0zkqvg0",
-      "elapsedMs": 34669,
+      "snapshotId": "sd_mt2lh1pa2rcrc17g9c",
+      "elapsedMs": 45636,
       "error": ""
     },
     {
@@ -34,8 +46,8 @@
       "aggregateRating": null,
       "rawRows": 1,
       "reviewIdCount": 0,
-      "snapshotId": "sd_mt2lbeib1qjvihkuiz",
-      "elapsedMs": 13266,
+      "snapshotId": "sd_mt2lh1rg168gzlpv8x",
+      "elapsedMs": 11880,
       "error": "bright_data_amazon_zero_reviews"
     },
     {
@@ -46,8 +58,8 @@
       "aggregateRating": null,
       "rawRows": 0,
       "reviewIdCount": 0,
-      "snapshotId": "sd_mt2lbej51kvwu4ztmw",
-      "elapsedMs": 35947,
+      "snapshotId": "sd_mt2lh2dq1o97zd6ghw",
+      "elapsedMs": 29540,
       "error": "bright_data_amazon_zero_reviews"
     },
     {
@@ -58,8 +70,8 @@
       "aggregateRating": null,
       "rawRows": 0,
       "reviewIdCount": 0,
-      "snapshotId": "sd_mt2lbeig10sfneyq02",
-      "elapsedMs": 28796,
+      "snapshotId": "sd_mt2lh3eb1iwjs3bs39",
+      "elapsedMs": 20050,
       "error": "bright_data_amazon_zero_reviews"
     },
     {
@@ -70,13 +82,13 @@
       "aggregateRating": null,
       "rawRows": 1,
       "reviewIdCount": 0,
-      "snapshotId": "sd_mt2lbei0hzdlm1oku",
-      "elapsedMs": 13500,
+      "snapshotId": "sd_mt2lh2f9da6hzrdw4",
+      "elapsedMs": 12689,
       "error": "bright_data_amazon_zero_reviews"
     }
   ],
   "workflow": {
-    "testedAt": "2026-08-21T06:51:16.372Z",
-    "commit": "28e948d19dd0cd83b01673c7fe6ccef791353c6d"
+    "testedAt": "2026-08-21T06:56:04.876Z",
+    "commit": "2bb19406a34cfdfef41fa773e880cc7f1592d890"
   }
 }
