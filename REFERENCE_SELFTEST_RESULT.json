@@ -110,7 +110,7 @@
             "error": null
           },
           "diagnostics": {
-            "elapsedMs": 1079,
+            "elapsedMs": 318,
             "authoritativePdpIdentity": {
               "title": "InstaBeam Premium Indoor HDTV Antenna",
               "descriptionLength": 183,
@@ -130,7 +130,7 @@
             ],
             "providerFallback": {
               "diagnostics": {
-                "error": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+                "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
               },
               "candidates": []
             },
@@ -151,7 +151,7 @@
     "liveCorpusTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T15:03:12.837Z",
-    "commit": "b4726f75602ad00f720940fe1207b735c982a0d0"
+    "testedAt": "2026-08-21T15:05:46.826Z",
+    "commit": "63d9168e8f39bb91d7409f8eadc2433a9b60a7dd"
   }
 }
