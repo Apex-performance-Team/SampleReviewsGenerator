@@ -27,6 +27,17 @@ export async function GET(req){
     ok:true,
     checkedAt:new Date().toISOString(),
     vercel:{provider:'Vercel AI Gateway',...vercel},
-    brightData:{provider:'Bright Data',configured:brightData.configured,ok:brightData.ok,balance:brightData.balance,pendingBalance:brightData.pendingBalance,noCredits:brightData.noCredits,error:brightData.error||null}
+    brightData:{
+      provider:'Bright Data',
+      configured:brightData.configured,
+      ok:brightData.ok,
+      balance:brightData.balance,
+      pendingBalance:brightData.pendingBalance,
+      noCredits:brightData.noCredits,
+      permissionRequired:Boolean(brightData.permissionRequired),
+      errorCode:brightData.errorCode||null,
+      error:brightData.error||null,
+      permissionsUrl:'https://brightdata.com/cp/setting/users'
+    }
   },{headers:{'cache-control':'no-store'}})
 }
