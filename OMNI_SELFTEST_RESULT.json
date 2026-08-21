@@ -15,15 +15,15 @@
     },
     "sourceImages": 3,
     "lensRequests": 9,
-    "lensRequestsSucceeded": 8,
-    "rawResults": 200,
-    "uniqueCandidates": 24,
+    "lensRequestsSucceeded": 9,
+    "rawResults": 0,
+    "uniqueCandidates": 0,
     "acceptedCandidates": 0,
-    "rejectedCandidates": 24,
-    "verifierCandidates": 24,
+    "rejectedCandidates": 0,
+    "verifierCandidates": 0,
     "verifierAccepted": 0,
-    "verifierRejected": 24,
-    "amazonCandidates": 3,
+    "verifierRejected": 0,
+    "amazonCandidates": 0,
     "amazonAccepted": 0,
     "amazonFallback": {
       "status": "no_verified_candidate",
@@ -39,7 +39,7 @@
         "error": null
       },
       "diagnostics": {
-        "elapsedMs": 50742,
+        "elapsedMs": 32113,
         "queryMode": "deterministic",
         "authoritativePdpIdentity": {
           "title": "InstaBeam OmniReach Extended Range TV Antenna",
@@ -56,29 +56,71 @@
           {
             "keyword": "omnireach extended range antenna",
             "ok": true,
-            "rawRows": 55,
+            "rawRows": 59,
             "error": "",
-            "resultCount": 49
+            "resultCount": 54
           },
           {
             "keyword": "antenna instabeam hdtv antennas reception helping",
             "ok": true,
             "rawRows": 48,
             "error": "",
-            "resultCount": 38
+            "resultCount": 36
           }
         ],
         "providerFallback": null,
         "publicSearchRuns": [],
         "shortlist": [
           {
+            "asin": "B0H7HKLTWV",
+            "title": "Digital TV Antennas, Antenna for Local Channels, Portable HDTV Indoor Antenna Support 4K 1080p, 360° Signal Range Reception with 10.5ft Coaxial Cable,Amplifier Signal Booster for HDTVs",
+            "ratingCount": 42,
+            "lexicalOverlap": 0.4117647058823529,
+            "rankOnPage": 4,
+            "pageNumber": 1,
+            "discoveryScore": 3.197124733418036,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": null
+          },
+          {
             "asin": "B0G4CS1RZR",
             "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
             "ratingCount": 278,
             "lexicalOverlap": 0.3684210526315789,
-            "rankOnPage": 8,
+            "rankOnPage": 7,
             "pageNumber": 1,
-            "discoveryScore": 3.0413730400290824,
+            "discoveryScore": 3.0510952622513043,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": null
+          },
+          {
+            "asin": "B0H6X4GNPC",
+            "title": "2026 TV Antenna Indoor,TV Antenna for Smart TV with 360° Signal Booster Reception,Digital Antennas 3500+ Miles Long Range Support 8K 4K 1080p TVs,Portable HD Antenna for Local Channels-25ft Coax Cable",
+            "ratingCount": 16,
+            "lexicalOverlap": 0.38095238095238093,
+            "rankOnPage": 13,
+            "pageNumber": 1,
+            "discoveryScore": 2.9180918294579983,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": null
+          },
+          {
+            "asin": "B0H5PRNV45",
+            "title": "TV Antenna for Smart TV, Indoor Antenna for Local Channels, Long Range Reception, Supports 4K 1080p HD, Amplified Signal Booster, 9.84FT Coax Cable, Easy Installation",
+            "ratingCount": 27,
+            "lexicalOverlap": 0.375,
+            "rankOnPage": 16,
+            "pageNumber": 1,
+            "discoveryScore": 2.9095712245060126,
             "webSearchConfidence": null,
             "publicSignals": null,
             "publicEngineCount": null,
@@ -100,13 +142,27 @@
             "localVisual": null
           },
           {
+            "asin": "B0FRFKZ27J",
+            "title": "TV Antenna Outdoor,360° Omni-Directional Reception Long 200+ Miles Range Enhance VHF&UHF 4K 1080p Ready HDTV Antenna with Added Stability for Outdoor/Attic,RG6 Coax Cable",
+            "ratingCount": 176,
+            "lexicalOverlap": 0.3,
+            "rankOnPage": 2,
+            "pageNumber": 1,
+            "discoveryScore": 2.864329991628559,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": null
+          },
+          {
             "asin": "B0F542J65B",
             "title": "TV Antenna for Local Channels, TV Antenna for Smart TV Indoor -18ft Cable | Support 4K 1080p with Signal Booster for Local Channels, Long Range Reception(Dark Grey)",
             "ratingCount": 85,
             "lexicalOverlap": 0.3333333333333333,
-            "rankOnPage": 9,
+            "rankOnPage": 12,
             "pageNumber": 1,
-            "discoveryScore": 2.811812306405446,
+            "discoveryScore": 2.7956584602515995,
             "webSearchConfidence": null,
             "publicSignals": null,
             "publicEngineCount": null,
@@ -118,9 +174,9 @@
             "title": "TV Antenna Indoor for Local Channels,Digital HDTV Antenna for Smart/Old TVs | 5000+ Mile Long Range Reception, Indoor & Outdoor Easy Setup, Built-in Signal Booster, Supports 8K 4K 1080p, 38ft Coax Cable",
             "ratingCount": 13,
             "lexicalOverlap": 0.35,
-            "rankOnPage": 7,
+            "rankOnPage": 9,
             "pageNumber": 1,
-            "discoveryScore": 2.8057660044597794,
+            "discoveryScore": 2.78826600445978,
             "webSearchConfidence": null,
             "publicSignals": null,
             "publicEngineCount": null,
@@ -135,20 +191,6 @@
             "rankOnPage": 3,
             "pageNumber": 1,
             "discoveryScore": 2.77585654617729,
-            "webSearchConfidence": null,
-            "publicSignals": null,
-            "publicEngineCount": null,
-            "publicQueryCount": null,
-            "localVisual": null
-          },
-          {
-            "asin": "B0FRFKZ27J",
-            "title": "TV Antenna Outdoor,360° Omni-Directional Reception Long 200+ Miles Range Enhance VHF&UHF 4K 1080p Ready HDTV Antenna with Added Stability for Outdoor/Attic,RG6 Coax Cable",
-            "ratingCount": 176,
-            "lexicalOverlap": 0.3,
-            "rankOnPage": 4,
-            "pageNumber": 1,
-            "discoveryScore": 2.7709966582952257,
             "webSearchConfidence": null,
             "publicSignals": null,
             "publicEngineCount": null,
@@ -184,55 +226,13 @@
             "localVisual": null
           },
           {
-            "asin": "B0GHW74WX8",
-            "title": "Digital TV Antenna for Smart TV Indoor, HDTV Antenna for Local Channels, Long Range Reception with Signal Booster, 4K 1080P, Magnetic Base",
-            "ratingCount": 5,
-            "lexicalOverlap": 0.3333333333333333,
-            "rankOnPage": 4,
-            "pageNumber": 1,
-            "discoveryScore": 2.737268906297955,
-            "webSearchConfidence": null,
-            "publicSignals": null,
-            "publicEngineCount": null,
-            "publicQueryCount": null,
-            "localVisual": null
-          },
-          {
-            "asin": "B0G9GVR9GS",
-            "title": "Outdoor Digital Antenna for Smart TV, Long Range HDTV Antenna Indoor | Digital TV Antenna for Local Channels with Amplifier Signal Booste, 4K 1080p Reception for All Smart TVs (Black A)",
-            "ratingCount": 30,
-            "lexicalOverlap": 0.3333333333333333,
-            "rankOnPage": 13,
-            "pageNumber": 1,
-            "discoveryScore": 2.7364202117292837,
-            "webSearchConfidence": null,
-            "publicSignals": null,
-            "publicEngineCount": null,
-            "publicQueryCount": null,
-            "localVisual": null
-          },
-          {
             "asin": "B0HC3WD486",
             "title": "TV Antenna Indoor, 2026 Digital TV Antenna for Local Channels, HDTV Antenna for TV Without Cable for Smart/Old TV Long Range Reception Support 4K 1080p A41",
             "ratingCount": 23,
             "lexicalOverlap": 0.42857142857142855,
-            "rankOnPage": 5,
+            "rankOnPage": 4,
             "pageNumber": 2,
-            "discoveryScore": 2.717764500452046,
-            "webSearchConfidence": null,
-            "publicSignals": null,
-            "publicEngineCount": null,
-            "publicQueryCount": null,
-            "localVisual": null
-          },
-          {
-            "asin": "B0DRN8DPQV",
-            "title": "2026 Digital TV Antenna for Smart TV Indoor, Long Range HD TV Antenna for Local Channels with Signal Booster, 360° Reception Supports 4K 1080P All Smart TVs, Strong Magnetic Base & 10FT Long Cable",
-            "ratingCount": 60,
-            "lexicalOverlap": 0.3157894736842105,
-            "rankOnPage": 16,
-            "pageNumber": 1,
-            "discoveryScore": 2.685395331543529,
+            "discoveryScore": 2.7410978337853793,
             "webSearchConfidence": null,
             "publicSignals": null,
             "publicEngineCount": null,
@@ -275,23 +275,24 @@
         "amazon": 0
       },
       "image3:exact_matches": {
-        "ok": false,
-        "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
+        "ok": true,
+        "results": 0,
+        "amazon": 0
       },
       "image3:products": {
         "ok": true,
-        "results": 100,
-        "amazon": 6
+        "results": 0,
+        "amazon": 0
       },
       "image3:visual_matches": {
         "ok": true,
-        "results": 100,
-        "amazon": 6
+        "results": 0,
+        "amazon": 0
       }
     },
     "transport": [
       {
-        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
+        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
         "tab": "exact_matches",
         "upload": {
           "keys": [
@@ -318,7 +319,7 @@
         }
       },
       {
-        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
+        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
         "tab": "products",
         "upload": {
           "keys": [
@@ -345,7 +346,7 @@
         }
       },
       {
-        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
+        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
         "tab": "visual_matches",
         "upload": {
           "keys": [
@@ -453,102 +454,92 @@
         }
       },
       {
-        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
+        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
+        "tab": "exact_matches",
+        "upload": {
+          "keys": [
+            "general"
+          ],
+          "generalType": "all",
+          "images": null,
+          "exactMatches": null,
+          "products": null,
+          "visualMatches": null,
+          "tabs": []
+        },
+        "result": {
+          "keys": [
+            "general",
+            "exact_matches"
+          ],
+          "generalType": "all",
+          "images": null,
+          "exactMatches": 0,
+          "products": null,
+          "visualMatches": null,
+          "tabs": []
+        }
+      },
+      {
+        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
         "tab": "products",
         "upload": {
           "keys": [
-            "general",
-            "tabs",
-            "images",
-            "offers",
-            "organic"
+            "general"
           ],
           "generalType": "all",
-          "images": 50,
+          "images": null,
           "exactMatches": null,
           "products": null,
           "visualMatches": null,
-          "tabs": [
-            "all",
-            "exact_matches",
-            "visual_matches"
-          ]
+          "tabs": []
         },
         "result": {
           "keys": [
             "general",
-            "tabs",
-            "images",
-            "offers",
-            "organic",
             "products"
           ],
           "generalType": "all",
-          "images": 50,
+          "images": null,
           "exactMatches": null,
-          "products": 50,
+          "products": 0,
           "visualMatches": null,
-          "tabs": [
-            "all",
-            "exact_matches",
-            "visual_matches"
-          ]
+          "tabs": []
         }
       },
       {
-        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
+        "image": "instabeamtv.com/cdn/shop/files/omni1.png",
         "tab": "visual_matches",
         "upload": {
           "keys": [
-            "general",
-            "tabs",
-            "images",
-            "offers",
-            "organic"
+            "general"
           ],
           "generalType": "all",
-          "images": 50,
+          "images": null,
           "exactMatches": null,
           "products": null,
           "visualMatches": null,
-          "tabs": [
-            "all",
-            "exact_matches",
-            "visual_matches"
-          ]
+          "tabs": []
         },
         "result": {
           "keys": [
             "general",
-            "tabs",
-            "images",
-            "offers",
-            "organic",
             "visual_matches"
           ],
           "generalType": "all",
-          "images": 50,
+          "images": null,
           "exactMatches": null,
           "products": null,
-          "visualMatches": 50,
-          "tabs": [
-            "all",
-            "exact_matches",
-            "visual_matches"
-          ]
+          "visualMatches": 0,
+          "tabs": []
         }
-      },
-      {
-        "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
-        "tab": "exact_matches",
-        "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
       }
     ]
   },
-  "elapsedMs": 52195,
+  "elapsedMs": 40301,
   "workflow": {
     "httpStatus": null,
-    "testedAt": "2026-08-21T18:00:00.561Z",
-    "commit": "990f81695020ec1509e20d45c6da9cf75854c813"
+    "testedAt": "2026-08-21T18:02:35.144Z",
+    "commit": "ba47081af31ae0ada300986cca849bbe0e99f624"
   }
 }
