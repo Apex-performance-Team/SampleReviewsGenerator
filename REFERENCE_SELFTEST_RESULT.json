@@ -1,11 +1,218 @@
 {
-  "ok": false,
-  "stage": "pdp_scan",
-  "status": 400,
-  "error": "No AI Gateway credential is available in this deployment.",
-  "elapsedMs": 137,
+  "ok": true,
+  "stage": "pass",
+  "baseline": {
+    "totalReferences": 0,
+    "marketplaceReferences": 0,
+    "amazonReferences": 0,
+    "ebayReferences": 0,
+    "referenceHosts": [],
+    "amazonSources": [
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
+        "asin": "B0CKYX98FX",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com/dp/B0F66HDCYW",
+        "asin": "B0F66HDCYW",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+        "asin": "B0F5W3XRJS",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
+        "asin": "B0D8HZ89MY",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
+        "asin": "B0CFVM3K4G",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
+        "asin": "B0CKYX98FX",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com/dp/B0F66HDCYW",
+        "asin": "B0F66HDCYW",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+        "asin": "B0F5W3XRJS",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
+        "asin": "B0D8HZ89MY",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
+        "asin": "B0CFVM3K4G",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      }
+    ],
+    "ebaySources": [],
+    "marketplaceIngestion": null
+  },
+  "enriched": {
+    "totalReferences": 5,
+    "marketplaceReferences": 5,
+    "amazonReferences": 5,
+    "ebayReferences": 0,
+    "referenceHosts": [
+      "amazon.com.mx"
+    ],
+    "amazonSources": [
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
+        "asin": "B0CKYX98FX",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com/dp/B0F66HDCYW",
+        "asin": "B0F66HDCYW",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+        "asin": "B0F5W3XRJS",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
+        "asin": "B0D8HZ89MY",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
+        "asin": "B0CFVM3K4G",
+        "publicReviewCount": null,
+        "aggregateOnly": true
+      },
+      {
+        "url": "https://www.amazon.com/dp/B0F66HDCYW",
+        "asin": "B0F66HDCYW",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+        "asin": "B0F5W3XRJS",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
+        "asin": "B0D8HZ89MY",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      },
+      {
+        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
+        "asin": "B0CFVM3K4G",
+        "publicReviewCount": null,
+        "aggregateOnly": false
+      }
+    ],
+    "ebaySources": [],
+    "marketplaceIngestion": {
+      "attemptedSources": 5,
+      "appendedReviews": 5,
+      "sources": [
+        {
+          "sourceUrl": "https://www.amazon.com.mx/dp/B0CKYX98FX",
+          "platform": "amazon.com.mx",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2jl44xe109jls06",
+          "extracted": 5,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.amazon.com/dp/B0F66HDCYW",
+          "platform": "amazon.com",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": true,
+          "snapshotId": "sd_mt2jl1tr2hltxapdtx",
+          "extracted": 0,
+          "error": "bright_data_snapshot_running"
+        },
+        {
+          "sourceUrl": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+          "platform": "amazon.com.mx",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 4,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews"
+        },
+        {
+          "sourceUrl": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
+          "platform": "amazon.com.tr",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 4,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews"
+        },
+        {
+          "sourceUrl": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
+          "platform": "amazon.com.mx",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 4,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews"
+        }
+      ]
+    }
+  },
+  "enrichmentResponseError": null,
+  "checks": {
+    "corpusNeverShrank": true,
+    "marketplaceBodiesExtracted": true,
+    "amazonBodiesExtracted": true,
+    "ebayBodiesExtracted": false
+  },
   "workflow": {
-    "testedAt": "2026-08-21T05:55:56.446Z",
-    "commit": "b06cf16344e56217f4acbf0619e9f37e213fcd25"
+    "testedAt": "2026-08-21T06:02:42.738Z",
+    "commit": "7060c9aec2082332f83022747c0b1a099a4a64f1"
   }
 }
