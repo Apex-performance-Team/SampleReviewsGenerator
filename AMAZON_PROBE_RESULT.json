@@ -6,7 +6,7 @@
     "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup"
   ],
   "diagnostics": {
-    "elapsedMs": 663,
+    "elapsedMs": 1831,
     "authoritativePdpIdentity": {
       "title": "InstaBeam Premium Indoor HDTV Antenna",
       "descriptionLength": 183,
@@ -26,7 +26,7 @@
     ],
     "providerFallback": {
       "diagnostics": {
-        "error": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+        "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
       },
       "candidates": []
     },
@@ -34,7 +34,7 @@
     "verified": []
   },
   "workflow": {
-    "testedAt": "2026-08-21T15:02:03.705Z",
-    "commit": "b4726f75602ad00f720940fe1207b735c982a0d0"
+    "testedAt": "2026-08-21T15:04:30.956Z",
+    "commit": "63d9168e8f39bb91d7409f8eadc2433a9b60a7dd"
   }
 }
