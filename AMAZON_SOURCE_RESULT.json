@@ -1,0 +1,203 @@
+{
+  "ok": true,
+  "error": null,
+  "amazonSources": [
+    {
+      "url": "https://www.amazon.sg/dp/B0BNTY8SX9",
+      "asin": "B0BNTY8SX9",
+      "platform": "amazon.sg",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 3,
+      "matchConfidence": 0.87
+    },
+    {
+      "url": "https://www.amazon.ca/dp/B0CKYX98FX",
+      "asin": "B0CKYX98FX",
+      "platform": "amazon.ca",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 4,
+      "matchConfidence": 0.91
+    },
+    {
+      "url": "https://www.amazon.sg/dp/B0D73PDXQP",
+      "asin": "B0D73PDXQP",
+      "platform": "amazon.sg",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 7,
+      "matchConfidence": 0.96
+    },
+    {
+      "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+      "asin": "B0F5W3XRJS",
+      "platform": "amazon.com.mx",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 17,
+      "matchConfidence": 0.96
+    },
+    {
+      "url": "https://www.amazon.ca/dp/B0DD6W87QF",
+      "asin": "B0DD6W87QF",
+      "platform": "amazon.ca",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 44,
+      "matchConfidence": 0.88
+    },
+    {
+      "url": "https://us.amazon.com/dp/B0DZWZ3H6L",
+      "asin": "B0DZWZ3H6L",
+      "platform": "us.amazon.com",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": 0,
+      "aggregateOnly": true,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": 45,
+      "matchConfidence": 0.96
+    },
+    {
+      "url": "https://www.amazon.sg/dp/B0BNTY8SX9",
+      "asin": "B0BNTY8SX9",
+      "platform": "amazon.sg",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    },
+    {
+      "url": "https://www.amazon.ca/dp/B0CKYX98FX",
+      "asin": "B0CKYX98FX",
+      "platform": "amazon.ca",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    },
+    {
+      "url": "https://www.amazon.sg/dp/B0D73PDXQP",
+      "asin": "B0D73PDXQP",
+      "platform": "amazon.sg",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    },
+    {
+      "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
+      "asin": "B0F5W3XRJS",
+      "platform": "amazon.com.mx",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    },
+    {
+      "url": "https://www.amazon.ca/dp/B0DD6W87QF",
+      "asin": "B0DD6W87QF",
+      "platform": "amazon.ca",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    },
+    {
+      "url": "https://us.amazon.com/dp/B0DZWZ3H6L",
+      "asin": "B0DZWZ3H6L",
+      "platform": "us.amazon.com",
+      "publicReviewCount": null,
+      "reviewCountEstimate": null,
+      "reviewCount": null,
+      "individualExtractedCount": null,
+      "aggregateOnly": false,
+      "lensTabs": [
+        "products",
+        "visual_matches"
+      ],
+      "lensRank": null,
+      "matchConfidence": null
+    }
+  ],
+  "allSourceCount": 20,
+  "workflow": {
+    "testedAt": "2026-08-21T06:47:13.600Z",
+    "commit": "8479ae076a1b54a0a60e42a5e0357d6b65f16714"
+  }
+}
