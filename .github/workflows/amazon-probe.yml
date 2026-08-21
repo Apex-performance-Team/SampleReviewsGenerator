@@ -1,0 +1,42 @@
+name: Amazon review probe
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    if: ${{ !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wait for Vercel
+        run: sleep 40
+      - name: Call production Amazon probe
+        shell: bash
+        run: |
+          set +e
+          code=$(curl --silent --show-error --location --max-time 240 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-review-probe')
+          status=$?
+          echo "curl=$status HTTP=$code"
+          cat probe.json || true
+          if [ ! -f probe.json ]; then echo '{"ok":false,"error":"no response"}' > probe.json; fi
+          node - <<'NODE'
+          const fs=require('fs');let raw=fs.readFileSync('probe.json','utf8'),j;try{j=JSON.parse(raw)}catch(e){j={ok:false,error:'invalid_json',raw:raw.slice(0,6000)}};j.workflow={testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA};fs.writeFileSync('AMAZON_PROBE_RESULT.json',JSON.stringify(j,null,2)+'\n');
+          NODE
+      - name: Publish probe result
+        run: |
+          git config user.name 'amazon-probe-bot'
+          git config user.email 'amazon-probe-bot@users.noreply.github.com'
+          git add AMAZON_PROBE_RESULT.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update Amazon probe result [probe-result]'
+            git push origin HEAD:main
+          fi
