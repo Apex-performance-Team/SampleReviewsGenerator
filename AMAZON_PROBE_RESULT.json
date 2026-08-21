@@ -18,7 +18,7 @@
     "error": null
   },
   "diagnostics": {
-    "elapsedMs": 32768,
+    "elapsedMs": 41248,
     "queryMode": "deterministic",
     "authoritativePdpIdentity": {
       "title": "InstaBeam Premium Indoor HDTV Antenna",
@@ -29,27 +29,29 @@
     "referenceImageUsed": false,
     "referenceImageUrl": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
     "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+    "localVisualFallbackUsed": false,
+    "localVisual": [],
     "searchRuns": [
       {
         "keyword": "indoor hdtv antenna",
         "ok": true,
-        "rawRows": 46,
+        "rawRows": 51,
         "error": "",
-        "resultCount": 35
+        "resultCount": 40
       },
       {
         "keyword": "indoor hdtv antenna instabeam antennas reception helping you",
         "ok": true,
         "rawRows": 52,
         "error": "",
-        "resultCount": 43
+        "resultCount": 45
       },
       {
         "keyword": "indoor hdtv antenna reception",
         "ok": true,
-        "rawRows": 54,
+        "rawRows": 60,
         "error": "",
-        "resultCount": 46
+        "resultCount": 49
       }
     ],
     "providerFallback": null,
@@ -60,26 +62,42 @@
         "title": "Digital TV Antenna for Smart TV Indoor, HDTV Antenna with Magnetic Base | Strong Magnetic Base 360°&Long Range Reception,Easy Setup Antenna for TV Without Cable",
         "ratingCount": 12,
         "lexicalOverlap": 0.4,
-        "rankOnPage": 14,
+        "rankOnPage": 13,
         "pageNumber": 1,
-        "discoveryScore": 2.9859095857050213,
+        "discoveryScore": 2.9892429190383547,
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0D5MC9MSX",
         "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
         "ratingCount": 36,
         "lexicalOverlap": 0.35714285714285715,
-        "rankOnPage": 18,
+        "rankOnPage": 16,
         "pageNumber": 1,
-        "discoveryScore": 2.8400101779143894,
+        "discoveryScore": 2.844344543239467,
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
+      },
+      {
+        "asin": "B0D5MDBVD3",
+        "title": "Digital TV Antenna for Smart TV Indoor,TV Antenna with 3M Stick Base | Support 4K 1080p&Long Range Reception,HDTV Antenna for Local Channels,Easy Installation Antenna For TV without Cable",
+        "ratingCount": 36,
+        "lexicalOverlap": 0.2857142857142857,
+        "rankOnPage": 0,
+        "pageNumber": 1,
+        "discoveryScore": 2.515072834555993,
+        "webSearchConfidence": null,
+        "publicSignals": null,
+        "publicEngineCount": null,
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0D5YH3R5C",
@@ -92,7 +110,8 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B07YJ4TKFM",
@@ -105,7 +124,8 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0D5MCGGXL",
@@ -118,33 +138,36 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0CVW14368",
         "title": "TV Antennas, HD Digital Antenna for Smart TV Indoor, 360°Signal Reception-Digital tv Antenna Indoor for Local Channels-Support 4K 1080p for All Type of HDTV Digital TV's",
         "ratingCount": 21,
         "lexicalOverlap": 0.25,
-        "rankOnPage": 8,
+        "rankOnPage": 6,
         "pageNumber": 1,
-        "discoveryScore": 2.3705806128805533,
+        "discoveryScore": 2.392802835102776,
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0G4CS1RZR",
         "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
         "ratingCount": 278,
         "lexicalOverlap": 0.21052631578947367,
-        "rankOnPage": 12,
+        "rankOnPage": 13,
         "pageNumber": 1,
-        "discoveryScore": 2.306915100307985,
+        "discoveryScore": 2.3030689464618312,
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0F542J65B",
@@ -157,7 +180,8 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B087KDM3Z6",
@@ -170,20 +194,8 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
-      },
-      {
-        "asin": "B0GXCHV48T",
-        "title": "Indoor Digital TV Antenna for Smart TV, HD Antenna for All Tvs Supports 4K 1080P with 9.86FT Cable,Enjoy Local Channels 115 Miles and Strong Magnetic Base",
-        "ratingCount": 3,
-        "lexicalOverlap": 0.2,
-        "rankOnPage": 4,
-        "pageNumber": 1,
-        "discoveryScore": 2.1152574989159953,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
         "asin": "B0FQ5C6MTP",
@@ -196,26 +208,28 @@
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       },
       {
-        "asin": "B0H5PRNV45",
-        "title": "TV Antenna for Smart TV, Indoor Antenna for Local Channels, Long Range Reception, Supports 4K 1080p HD, Amplified Signal Booster, 9.84FT Coax Cable, Easy Installation",
-        "ratingCount": 27,
-        "lexicalOverlap": 0.1875,
-        "rankOnPage": 16,
-        "pageNumber": 1,
-        "discoveryScore": 2.0658212245060126,
+        "asin": "B0HC3WD486",
+        "title": "TV Antenna Indoor, 2026 Digital TV Antenna for Local Channels, HDTV Antenna for TV Without Cable for Smart/Old TV Long Range Reception Support 4K 1080p A41",
+        "ratingCount": 23,
+        "lexicalOverlap": 0.2857142857142857,
+        "rankOnPage": 6,
+        "pageNumber": 2,
+        "discoveryScore": 2.0582406909282365,
         "webSearchConfidence": null,
         "publicSignals": null,
         "publicEngineCount": null,
-        "publicQueryCount": null
+        "publicQueryCount": null,
+        "localVisual": null
       }
     ],
     "verified": []
   },
   "workflow": {
-    "testedAt": "2026-08-21T17:50:19.275Z",
-    "commit": "691db2a1607df52ca39b5bee00f3844e5b1bbdb5"
+    "testedAt": "2026-08-21T17:52:18.628Z",
+    "commit": "5f4e884a837b3a9b5406ddfe3c8bbe655efe68cb"
   }
 }
