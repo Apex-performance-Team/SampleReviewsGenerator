@@ -1,19 +1,19 @@
 {
   "ok": false,
-  "stage": "reference_scan",
-  "externalProviderUnavailable": false,
+  "stage": "external_provider_unavailable",
+  "externalProviderUnavailable": true,
   "providerHealth": {
     "ok": true,
-    "provider": "Bright Data Google Lens + AI same-product verification",
+    "provider": "Degraded reference discovery with deterministic/public fallbacks",
     "configured": true,
     "credentialsConfigured": true,
-    "healthy": true,
-    "degraded": false,
+    "healthy": false,
+    "degraded": true,
     "canAttemptReferenceSourcing": true,
     "fallbackDiscoveryAvailable": true,
-    "reason": null,
+    "reason": "Bright Data account is not operational. Fallback discovery is available.",
     "lensConfigured": true,
-    "lensHealthy": true,
+    "lensHealthy": false,
     "brightDataHttpStatus": 200,
     "brightDataError": null,
     "brightDataNoCredits": false,
@@ -29,11 +29,11 @@
     "env": null
   },
   "deterministic": {
-    "ok": true,
-    "providerUnavailable": false,
+    "ok": false,
+    "providerUnavailable": true,
     "providerCode": null,
-    "amazonReferences": 219,
-    "totalReferences": 219,
+    "amazonReferences": 0,
+    "totalReferences": 0,
     "targetSource": {
       "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "platform": "amazon.com",
@@ -42,31 +42,22 @@
       "discoveryOrigin": "amazon_high_volume",
       "attempted": 1,
       "blocked": 0,
-      "failed": 0,
+      "failed": 1,
       "pending": false,
-      "snapshotId": "sd_mt39aq9dixe5euwvm",
+      "snapshotId": null,
       "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "requested": 220,
-      "aggregateRatingCount": 33154,
-      "rawRows": 220,
-      "parsedBodies": 219,
-      "reviewIdCount": 219,
-      "extracted": 219,
-      "error": ""
+      "aggregateRatingCount": null,
+      "rawRows": 0,
+      "parsedBodies": 0,
+      "reviewIdCount": 0,
+      "extracted": 0,
+      "error": "bright_data_trigger_http_400:Customer is not active"
     },
-    "sampleAmazon": [
-      {
-        "id": "RYKSCLG2RTDYQ",
-        "body": "I was very skeptical about this antenna but saw it for a good price, and plus they do offer a 30 day money back guarantee if you are not satisfied. I decided to buy two, one for myself, and as a present to my parents for the new tv my brother and I got them fo"
-      },
-      {
-        "id": "R3TOH74XRVPF7R",
-        "body": "Excellent VHF/UHF HD antenna with optional signal amplifier. Long 20 feet of coaxial cable should be enough to reach window. You can use on a stand indoors but placing it between the window and screen works well for me. I live about 6 miles from Manhattan. My "
-      }
-    ],
+    "sampleAmazon": [],
     "marketplaceIngestion": {
       "attemptedSources": 1,
-      "appendedReviews": 219,
+      "appendedReviews": 0,
       "sources": [
         {
           "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
@@ -76,17 +67,17 @@
           "discoveryOrigin": "amazon_high_volume",
           "attempted": 1,
           "blocked": 0,
-          "failed": 0,
+          "failed": 1,
           "pending": false,
-          "snapshotId": "sd_mt39aq9dixe5euwvm",
+          "snapshotId": null,
           "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
           "requested": 220,
-          "aggregateRatingCount": 33154,
-          "rawRows": 220,
-          "parsedBodies": 219,
-          "reviewIdCount": 219,
-          "extracted": 219,
-          "error": ""
+          "aggregateRatingCount": null,
+          "rawRows": 0,
+          "parsedBodies": 0,
+          "reviewIdCount": 0,
+          "extracted": 0,
+          "error": "bright_data_trigger_http_400:Customer is not active"
         }
       ],
       "amazonVolumeDiscovery": {
@@ -102,19 +93,19 @@
     "providerUnavailable": false,
     "providerCode": null,
     "stage": "reference_scan",
-    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback.",
+    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. Provider diagnostic: Bright Data account is not active.",
     "response": {
-      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback.",
+      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. Provider diagnostic: Bright Data account is not active.",
       "brightData": {
         "stage": "empty_verified_source_set",
-        "zone": "synthetic_review_lens",
-        "zoneSource": "cache",
-        "imageTransport": "bright_data_native_file_upload",
+        "zone": null,
+        "zoneSource": "not_resolved",
+        "imageTransport": "lens_skipped",
         "providerPreflight": {
-          "ok": true,
+          "ok": false,
           "configured": true,
           "httpStatus": 200,
-          "error": null,
+          "error": "Bright Data account is not active.",
           "noCredits": false,
           "balance": null,
           "pendingBalance": null
@@ -122,29 +113,29 @@
       },
       "diagnostics": {
         "providerPreflight": {
-          "ok": true,
+          "ok": false,
           "configured": true,
           "httpStatus": 200,
-          "error": null,
+          "error": "Bright Data account is not active.",
           "noCredits": false,
           "balance": null,
           "pendingBalance": null
         },
-        "sourceImages": 3,
-        "lensRequests": 9,
-        "lensRequestsSucceeded": 6,
-        "rawResults": 552,
-        "uniqueCandidates": 24,
-        "acceptedCandidates": 0,
-        "rejectedCandidates": 24,
-        "verifierCandidates": 24,
-        "verifierAccepted": 0,
-        "verifierRejected": 24,
-        "amazonCandidates": 7,
-        "amazonAccepted": 0,
+        "sourceImages": null,
+        "lensRequests": null,
+        "lensRequestsSucceeded": null,
+        "rawResults": null,
+        "uniqueCandidates": null,
+        "acceptedCandidates": null,
+        "rejectedCandidates": null,
+        "verifierCandidates": null,
+        "verifierAccepted": null,
+        "verifierRejected": null,
+        "amazonCandidates": null,
+        "amazonAccepted": null,
         "amazonFallback": {
           "status": "no_verified_candidate",
-          "baseLensError": null,
+          "baseLensError": "Bright Data account is not active.",
           "queries": [
             "omnireach extended range antenna",
             "antenna instabeam hdtv antennas reception helping"
@@ -156,7 +147,7 @@
             "error": null
           },
           "diagnostics": {
-            "elapsedMs": 37194,
+            "elapsedMs": 1666,
             "queryMode": "deterministic",
             "authoritativePdpIdentity": {
               "title": "InstaBeam OmniReach Extended Range TV Antenna",
@@ -165,664 +156,84 @@
               "error": null
             },
             "referenceImageUsed": false,
-            "localReferenceImageUsed": true,
-            "referenceImageUrl": "http://instabeamtv.com/cdn/shop/files/omni1.png?v=1786849009",
-            "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+            "referenceImageUrl": null,
+            "verificationError": null,
             "localVisualFallbackUsed": false,
-            "localVisual": [
-              {
-                "index": 2,
-                "ok": true,
-                "score": 0.5807,
-                "averageHash": 0.6055,
-                "differenceHash": 0.4902,
-                "silhouetteIou": 0.639,
-                "pixelCorrelation": 0.5961,
-                "error": null
-              },
-              {
-                "index": 11,
-                "ok": true,
-                "score": 0.5785,
-                "averageHash": 0.6475,
-                "differenceHash": 0.5156,
-                "silhouetteIou": 0.556,
-                "pixelCorrelation": 0.6043,
-                "error": null
-              },
-              {
-                "index": 3,
-                "ok": true,
-                "score": 0.5541,
-                "averageHash": 0.6133,
-                "differenceHash": 0.5371,
-                "silhouetteIou": 0.4748,
-                "pixelCorrelation": 0.6104,
-                "error": null
-              },
-              {
-                "index": 8,
-                "ok": true,
-                "score": 0.541,
-                "averageHash": 0.5166,
-                "differenceHash": 0.5107,
-                "silhouetteIou": 0.6154,
-                "pixelCorrelation": 0.5126,
-                "error": null
-              },
-              {
-                "index": 1,
-                "ok": true,
-                "score": 0.5335,
-                "averageHash": 0.5537,
-                "differenceHash": 0.542,
-                "silhouetteIou": 0.4817,
-                "pixelCorrelation": 0.5683,
-                "error": null
-              },
-              {
-                "index": 0,
-                "ok": true,
-                "score": 0.5317,
-                "averageHash": 0.6045,
-                "differenceHash": 0.5615,
-                "silhouetteIou": 0.424,
-                "pixelCorrelation": 0.5337,
-                "error": null
-              },
-              {
-                "index": 10,
-                "ok": true,
-                "score": 0.5295,
-                "averageHash": 0.5381,
-                "differenceHash": 0.5439,
-                "silhouetteIou": 0.5077,
-                "pixelCorrelation": 0.5262,
-                "error": null
-              },
-              {
-                "index": 4,
-                "ok": true,
-                "score": 0.5075,
-                "averageHash": 0.5713,
-                "differenceHash": 0.5332,
-                "silhouetteIou": 0.4218,
-                "pixelCorrelation": 0.4966,
-                "error": null
-              },
-              {
-                "index": 5,
-                "ok": true,
-                "score": 0.4966,
-                "averageHash": 0.5537,
-                "differenceHash": 0.5156,
-                "silhouetteIou": 0.3919,
-                "pixelCorrelation": 0.5374,
-                "error": null
-              },
-              {
-                "index": 7,
-                "ok": true,
-                "score": 0.493,
-                "averageHash": 0.5234,
-                "differenceHash": 0.5508,
-                "silhouetteIou": 0.3877,
-                "pixelCorrelation": 0.5147,
-                "error": null
-              },
-              {
-                "index": 9,
-                "ok": true,
-                "score": 0.4926,
-                "averageHash": 0.5186,
-                "differenceHash": 0.5371,
-                "silhouetteIou": 0.4254,
-                "pixelCorrelation": 0.4836,
-                "error": null
-              },
-              {
-                "index": 6,
-                "ok": true,
-                "score": 0.4411,
-                "averageHash": 0.4678,
-                "differenceHash": 0.5088,
-                "silhouetteIou": 0.3726,
-                "pixelCorrelation": 0.3942,
-                "error": null
-              }
-            ],
+            "localVisual": [],
             "searchRuns": [
               {
-                "keyword": "omnireach extended range antenna",
-                "ok": true,
-                "rawRows": 52,
-                "error": "",
-                "resultCount": 51
+                "ok": false,
+                "rawRows": 0,
+                "error": "trigger_http_400:Customer is not active",
+                "resultCount": 0
               },
               {
-                "keyword": "antenna instabeam hdtv antennas reception helping",
-                "ok": true,
-                "rawRows": 59,
-                "error": "",
-                "resultCount": 44
+                "ok": false,
+                "rawRows": 0,
+                "error": "trigger_http_400:Customer is not active",
+                "resultCount": 0
               }
             ],
-            "providerFallback": null,
-            "publicSearchRuns": [],
-            "shortlist": [
+            "providerFallback": {
+              "diagnostics": {
+                "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+              },
+              "candidates": []
+            },
+            "publicSearchRuns": [
               {
-                "asin": "B0CT2RZ3K3",
-                "title": "Omni Directional Tv Antenna Outdoor, Antop Digital Amplified Antenna Built in 5G LTE Filter, 65 Miles Range",
-                "ratingCount": 41,
-                "lexicalOverlap": 0.3,
-                "rankOnPage": 15,
-                "pageNumber": 1,
-                "discoveryScore": 2.5966561612997374,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5317
+                "query": "omnireach extended range antenna",
+                "ok": false,
+                "error": null,
+                "resultCount": 0,
+                "diagnostics": {
+                  "bing": {
+                    "ok": true,
+                    "status": 200,
+                    "error": null
+                  },
+                  "duckduckgo": {
+                    "ok": false,
+                    "status": 403,
+                    "error": null
+                  },
+                  "rawResults": 0
+                }
               },
               {
-                "asin": "B0HDN2C3JS",
-                "title": "5000+ Miles Range TV Antenna, 2026 Upgraded HD Antenna for Local Channels | Premium Design Digital Antenna with Signal Booster, Indoor & Outdoor Use, Works with All 8K 4K 1080P TVs, 40ft Coaxial Cable",
-                "ratingCount": 66,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 1,
-                "pageNumber": 1,
-                "discoveryScore": 2.4782593503376034,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5335
-              },
-              {
-                "asin": "B0H864BNQJ",
-                "title": "2026 Upgraded TV Antenna for Smart TV Indoor/Outdoor, Amplified HD Digital Antenna for Free Local Channels, Long Range Reception with Signal Booster, Supports 4K 1080p, 16.5ft Cable & Magnetic Base",
-                "ratingCount": 23,
-                "lexicalOverlap": 0.25,
-                "rankOnPage": 4,
-                "pageNumber": 1,
-                "discoveryScore": 2.4375264052139505,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5807
-              },
-              {
-                "asin": "B089LMG6L4",
-                "title": "1byone Outdoor TV Antenna, 360°Omni-Directional Reception, 100+ Miles Range | 4K Ready HDTV Antenna with Enhanced VHF/UHF Reception, Added Stability for Outdoor/Attic/RV, Includes 39ft RG6 Coax Cable",
-                "ratingCount": 331,
-                "lexicalOverlap": 0.19047619047619047,
-                "rankOnPage": 2,
-                "pageNumber": 1,
-                "discoveryScore": 2.405618450939195,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5541
-              },
-              {
-                "asin": "B0856VTG4W",
-                "title": "Five Star HDTV Antenna Amplified Digital Outdoor Antenna 150 Miles Range, 360 Degree Rotation Wireless Remote, with 40FT RG6 Coax Cable Installation Kit Supports 5 TVs",
-                "ratingCount": 2918,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 0,
-                "pageNumber": 1,
-                "discoveryScore": 2.366487595206835,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5075
-              },
-              {
-                "asin": "B0FRFKZ27J",
-                "title": "TV Antenna Outdoor,360° Omni-Directional Reception Long 200+ Miles Range Enhance VHF&UHF 4K 1080p Ready HDTV Antenna with Added Stability for Outdoor/Attic,RG6 Coax Cable",
-                "ratingCount": 176,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 4,
-                "pageNumber": 1,
-                "discoveryScore": 2.320996658295226,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.4966
-              },
-              {
-                "asin": "B0G4CS1RZR",
-                "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
-                "ratingCount": 278,
-                "lexicalOverlap": 0.21052631578947367,
-                "rankOnPage": 11,
-                "pageNumber": 1,
-                "discoveryScore": 2.3114022797951645,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.4411
-              },
-              {
-                "asin": "B0F542J65B",
-                "title": "TV Antenna for Local Channels, TV Antenna for Smart TV Indoor -18ft Cable | Support 4K 1080p with Signal Booster for Local Channels, Long Range Reception(Dark Grey)",
-                "ratingCount": 85,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 13,
-                "pageNumber": 1,
-                "discoveryScore": 2.191812306405446,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.493
-              },
-              {
-                "asin": "B0H5PK5T18",
-                "title": "2026 TV Antenna Indoor, Long Range TV Antenna for Smart TV Indoor, Digital Antenna for Smart TV with Upgraded Amplifier, Outdoor Antenna Support 8K 4K 1080p All TVs -38FT Coax Cable",
-                "ratingCount": 34,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 22,
-                "pageNumber": 1,
-                "discoveryScore": 2.12344328815248,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.541
-              },
-              {
-                "asin": "B0G9GVR9GS",
-                "title": "Outdoor Digital Antenna for Smart TV, Long Range HDTV Antenna Indoor | Digital TV Antenna for Local Channels with Amplifier Signal Booste, 4K 1080p Reception for All Smart TVs (Black A)",
-                "ratingCount": 30,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 19,
-                "pageNumber": 1,
-                "discoveryScore": 2.121420211729284,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.4926
-              },
-              {
-                "asin": "B0HCB826KD",
-                "title": "TV Antenna Indoor for Local Channels,Digital HDTV Antenna for Smart/Old TVs | 5000+ Mile Long Range Reception, Indoor & Outdoor Easy Setup, Built-in Signal Booster, Supports 8K 4K 1080p, 38ft Coax Cable",
-                "ratingCount": 13,
-                "lexicalOverlap": 0.2,
-                "rankOnPage": 10,
-                "pageNumber": 1,
-                "discoveryScore": 2.1069023680961436,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5295
-              },
-              {
-                "asin": "B0HC3WD486",
-                "title": "TV Antenna Indoor, 2026 Digital TV Antenna for Local Channels, HDTV Antenna for TV Without Cable for Smart/Old TV Long Range Reception Support 4K 1080p A41",
-                "ratingCount": 23,
-                "lexicalOverlap": 0.2857142857142857,
-                "rankOnPage": 7,
-                "pageNumber": 2,
-                "discoveryScore": 2.0457406909282363,
-                "webSearchConfidence": null,
-                "publicSignals": null,
-                "publicEngineCount": null,
-                "publicQueryCount": null,
-                "localVisual": 0.5785
+                "query": "antenna instabeam hdtv antennas reception helping",
+                "ok": false,
+                "error": null,
+                "resultCount": 0,
+                "diagnostics": {
+                  "bing": {
+                    "ok": true,
+                    "status": 200,
+                    "error": null
+                  },
+                  "duckduckgo": {
+                    "ok": false,
+                    "status": 403,
+                    "error": null
+                  },
+                  "rawResults": 0
+                }
               }
             ],
-            "verified": []
+            "shortlist": [],
+            "verified": [],
+            "deterministicRescueAttempted": true,
+            "deterministicRescueCandidates": 0
           }
         },
-        "tabs": {
-          "image1:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          },
-          "image1:products": {
-            "ok": true,
-            "results": 84,
-            "amazon": 12
-          },
-          "image1:visual_matches": {
-            "ok": true,
-            "results": 84,
-            "amazon": 12
-          },
-          "image2:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          },
-          "image2:products": {
-            "ok": true,
-            "results": 90,
-            "amazon": 8
-          },
-          "image2:visual_matches": {
-            "ok": true,
-            "results": 90,
-            "amazon": 8
-          },
-          "image3:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          },
-          "image3:products": {
-            "ok": true,
-            "results": 102,
-            "amazon": 8
-          },
-          "image3:visual_matches": {
-            "ok": true,
-            "results": 102,
-            "amazon": 8
-          }
-        },
-        "transport": [
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 42,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 42,
-              "exactMatches": null,
-              "products": 42,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 42,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 42,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 42,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 45,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 45,
-              "exactMatches": null,
-              "products": 45,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 45,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 45,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 45,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 51,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Režim AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 51,
-              "exactMatches": null,
-              "products": 51,
-              "visualMatches": null,
-              "tabs": [
-                "Režim AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 51,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Režim AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "offers",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 51,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 51,
-              "tabs": [
-                "Režim AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1_2048x.png",
-            "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/omni1.png",
-            "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
-          }
-        ]
+        "tabs": null,
+        "transport": []
       }
     }
   },
   "checks": {
     "brightDataFunded": true,
-    "collectorFixtureExtracted": true,
+    "collectorFixtureExtracted": false,
     "liveSameProductSourceDiscovered": false,
     "liveCorpusNeverShrank": false,
     "liveMarketplaceBodiesExtracted": false,
@@ -830,7 +241,7 @@
     "liveAmazonTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T18:06:26.858Z",
-    "commit": "ba47081af31ae0ada300986cca849bbe0e99f624"
+    "testedAt": "2026-08-21T18:13:06.680Z",
+    "commit": "62e61931c0d33aeca7adc7724dc15afaa9aa9e5e"
   }
 }
