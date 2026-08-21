@@ -19,9 +19,11 @@ async function vercelCredits(req){
   return{configured:true,ok:true,balance:findBalance(j),httpStatus:r.status,error:null,authMode:mode};
 }
 export async function GET(req){
+  const balanceKey=process.env.BRIGHT_DATA_BALANCE_API_KEY||process.env.BRIGHT_DATA_API_KEY||'';
+  const balanceKeyMode=process.env.BRIGHT_DATA_BALANCE_API_KEY?'finance-key':'scraping-key';
   const [vercel,brightData]=await Promise.all([
     vercelCredits(req),
-    getBrightDataBalance(process.env.BRIGHT_DATA_API_KEY||'',{force:true})
+    getBrightDataBalance(balanceKey,{force:true})
   ]);
   return Response.json({
     ok:true,
@@ -37,6 +39,8 @@ export async function GET(req){
       permissionRequired:Boolean(brightData.permissionRequired),
       errorCode:brightData.errorCode||null,
       error:brightData.error||null,
+      balanceKeyMode,
+      dedicatedBalanceKeyConfigured:Boolean(process.env.BRIGHT_DATA_BALANCE_API_KEY),
       permissionsUrl:'https://brightdata.com/cp/setting/users'
     }
   },{headers:{'cache-control':'no-store'}})
