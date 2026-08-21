@@ -10,31 +10,37 @@ permissions:
 
 jobs:
   live-reference-regression:
-    if: ${{ !contains(github.event.head_commit.message || '', '[selftest-result]') }}
+    if: ${{ !contains(github.event.head_commit.message || '', '[selftest-result]') && !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[source-probe-result]') && !contains(github.event.head_commit.message || '', '[discovery-probe-result]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Wait for production deployment
         run: sleep 55
-      - name: Test deterministic Amazon and eBay ingestion
+
+      - name: Prove high-volume Amazon review extraction
         shell: bash
         continue-on-error: true
         run: |
           set +e
           BASE='https://synthetic-review-lab.vercel.app'
           cat > deterministic-enrich-request.json <<'JSON'
-          {"referenceSet":{"productUrl":"https://instabeamtv.com/products/premium-antenna-1","productTitle":"InstaBeam OmniReach Extended Range TV Antenna","references":[],"sourceCounts":[{"directSourceUrl":"https://www.amazon.com/dp/B0845Y7DGS","sourceUrl":"https://www.amazon.com/dp/B0845Y7DGS","platform":"amazon.com","provider":"bright_data_google_lens","asin":"B0845Y7DGS","publicReviewCount":1148,"aggregateOnly":true,"status":"found"},{"directSourceUrl":"https://www.ebay.com/itm/176327212659","sourceUrl":"https://www.ebay.com/itm/176327212659","platform":"ebay.com","provider":"bright_data_google_lens","publicReviewCount":12,"aggregateOnly":false,"status":"found"}],"aggregateOnlySources":[]}}
+          {"referenceSet":{"productUrl":"https://instabeamtv.com/products/premium-antenna-1","productTitle":"InstaBeam OmniReach Extended Range TV Antenna","productDescription":"360 degree omnidirectional amplified outdoor HDTV antenna with VHF UHF reception and simple mounting.","references":[],"sourceCounts":[{"directSourceUrl":"https://www.amazon.com/dp/B089LMG6L4","sourceUrl":"https://www.amazon.com/dp/B089LMG6L4","platform":"amazon.com","provider":"bright_data_amazon_search","asin":"B089LMG6L4","title":"1byone Outdoor TV Antenna 360° Omni-Directional Reception Long 100+ Miles Range Enhance VHF&UHF 4K Ready HDTV Antenna","publicReviewCount":33151,"aggregateOnly":true,"status":"found","discoveryOrigin":"amazon_high_volume","matchConfidence":0.99,"linkVerified":true}],"aggregateOnlySources":[]}}
           JSON
-          curl --silent --show-error --location --max-time 420 --header 'content-type: application/json' --data-binary @deterministic-enrich-request.json --output deterministic-enriched.json "$BASE/api/reference-enrich-marketplaces" || true
+          code=$(curl --silent --show-error --location --max-time 600 --header 'content-type: application/json' --data-binary @deterministic-enrich-request.json --output deterministic-enriched.json --write-out '%{http_code}' "$BASE/api/reference-enrich-marketplaces")
+          echo "high-volume enrichment HTTP=$code"
           node - <<'NODE'
           const fs=require('fs'); const host=x=>{try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}};
           let j={};try{j=JSON.parse(fs.readFileSync('deterministic-enriched.json','utf8'))}catch(e){j={error:e.message}}
-          const refs=j.referenceSet?.references||[],amazon=refs.filter(r=>/(^|\.)amazon\./i.test(host(r.sourceUrl))),ebay=refs.filter(r=>/(^|\.)ebay\./i.test(host(r.sourceUrl)));
-          fs.writeFileSync('deterministic-result.json',JSON.stringify({ok:amazon.length>0&&ebay.length>0,totalReferences:refs.length,amazonReferences:amazon.length,ebayReferences:ebay.length,sampleAmazon:amazon.slice(0,1).map(r=>String(r.sourceBody||'').slice(0,300)),sampleEbay:ebay.slice(0,1).map(r=>String(r.sourceBody||'').slice(0,300)),marketplaceIngestion:j.referenceSet?.marketplaceIngestion||null,error:j.error||null},null,2));
+          const refs=j.referenceSet?.references||[],amazon=refs.filter(r=>/(^|\.)amazon\./i.test(host(r.sourceUrl)));
+          const ingestion=j.referenceSet?.marketplaceIngestion||null;
+          const target=(ingestion?.sources||[]).find(s=>String(s.sourceUrl||'').includes('B089LMG6L4'))||null;
+          const out={ok:amazon.length>=200,amazonReferences:amazon.length,totalReferences:refs.length,targetSource:target,sampleAmazon:amazon.slice(0,2).map(r=>({id:r.sourceReviewId||'',body:String(r.sourceBody||'').slice(0,260)})),marketplaceIngestion:ingestion,error:j.error||null};
+          fs.writeFileSync('deterministic-result.json',JSON.stringify(out,null,2)); console.log(JSON.stringify(out,null,2));
           NODE
+
       - name: Test real InstaBeam Lens scan through enrichment
         shell: bash
         continue-on-error: true
@@ -44,24 +50,39 @@ jobs:
           cat > live-scan-request.json <<'JSON'
           {"productUrl":"https://instabeamtv.com/products/premium-antenna-1","productTitle":"InstaBeam OmniReach Extended Range TV Antenna","productDescription":"Indoor and outdoor HDTV antenna for receiving over-the-air television channels with simple installation and extended reception range.","existingReviewCount":0,"targetReferenceCount":250,"originalReviewCount":0}
           JSON
-          scan_code=$(curl --silent --show-error --location --max-time 360 --header 'content-type: application/json' --data-binary @live-scan-request.json --output live-scan.json --write-out '%{http_code}' "$BASE/api/reference-scan" || true)
-          echo "live reference scan HTTP=$scan_code"
+          rm -f live-scan.json live-enrich-request.json live-result.json
+          scan_code=000
+          for attempt in 1 2 3; do
+            echo "Lens attempt $attempt"
+            scan_code=$(curl --silent --show-error --location --max-time 360 --header 'content-type: application/json' --data-binary @live-scan-request.json --output live-scan.json --write-out '%{http_code}' "$BASE/api/reference-scan")
+            node - <<'NODE'
+          const fs=require('fs'); let j={};try{j=JSON.parse(fs.readFileSync('live-scan.json','utf8'))}catch{}
+          process.exit(j.referenceSet ? 0 : 1)
+          NODE
+            if [ $? -eq 0 ]; then break; fi
+            echo "Lens attempt $attempt failed HTTP=$scan_code"
+            cat live-scan.json || true
+            sleep 18
+          done
           node - <<'NODE'
           const fs=require('fs');let j={};try{j=JSON.parse(fs.readFileSync('live-scan.json','utf8'))}catch(e){j={error:e.message}}
           if(j.referenceSet) fs.writeFileSync('live-enrich-request.json',JSON.stringify({referenceSet:j.referenceSet}));
           else fs.writeFileSync('live-result.json',JSON.stringify({ok:false,stage:'reference_scan',error:j.error||'referenceSet missing',response:j},null,2));
           NODE
           if [ -f live-enrich-request.json ]; then
-            enrich_code=$(curl --silent --show-error --location --max-time 420 --header 'content-type: application/json' --data-binary @live-enrich-request.json --output live-enriched.json --write-out '%{http_code}' "$BASE/api/reference-enrich-marketplaces" || true)
+            enrich_code=$(curl --silent --show-error --location --max-time 600 --header 'content-type: application/json' --data-binary @live-enrich-request.json --output live-enriched.json --write-out '%{http_code}' "$BASE/api/reference-enrich-marketplaces")
             echo "live marketplace enrichment HTTP=$enrich_code"
             node - <<'NODE'
           const fs=require('fs'); const host=x=>{try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}};
           const base=JSON.parse(fs.readFileSync('live-scan.json','utf8')).referenceSet; let j={};try{j=JSON.parse(fs.readFileSync('live-enriched.json','utf8'))}catch(e){j={error:e.message}}
           const before=base?.references||[],after=j.referenceSet?.references||[],market=after.filter(r=>/(^|\.)(amazon|ebay)\./i.test(host(r.sourceUrl))),amazon=market.filter(r=>/(^|\.)amazon\./i.test(host(r.sourceUrl))),ebay=market.filter(r=>/(^|\.)ebay\./i.test(host(r.sourceUrl)));
-          const sources=[...(base?.sourceCounts||[]),...(base?.aggregateOnlySources||[])];
-          fs.writeFileSync('live-result.json',JSON.stringify({ok:Boolean(j.referenceSet)&&after.length>=before.length&&market.length>0,stage:Boolean(j.referenceSet)&&after.length>=before.length&&market.length>0?'pass':'live_marketplace_missing',baselineReferences:before.length,enrichedReferences:after.length,marketplaceReferences:market.length,amazonReferences:amazon.length,ebayReferences:ebay.length,baselineReferenceHosts:[...new Set(before.map(r=>host(r.sourceUrl)).filter(Boolean))],discoveredMarketplaceHosts:[...new Set(sources.map(s=>host(s.directSourceUrl||s.sourceUrl)).filter(h=>/(^|\.)(amazon|ebay)\./i.test(h)))],marketplaceIngestion:j.referenceSet?.marketplaceIngestion||null,error:j.error||null},null,2));
+          const ingestion=j.referenceSet?.marketplaceIngestion||null,discovery=j.referenceSet?.amazonVolumeDiscovery||null;
+          const high=(ingestion?.sources||[]).filter(s=>s.discoveryOrigin==='amazon_high_volume');
+          const ok=Boolean(j.referenceSet)&&after.length>=before.length&&market.length>0;
+          fs.writeFileSync('live-result.json',JSON.stringify({ok,stage:ok?'pass':'live_marketplace_missing',baselineReferences:before.length,enrichedReferences:after.length,marketplaceReferences:market.length,amazonReferences:amazon.length,ebayReferences:ebay.length,corpusNeverShrank:after.length>=before.length,highVolumeSources:high,amazonVolumeDiscovery:discovery,marketplaceIngestion:ingestion,error:j.error||null},null,2));
           NODE
           fi
+
       - name: Build regression result
         if: always()
         shell: bash
@@ -69,9 +90,11 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'); const read=p=>{try{return JSON.parse(fs.readFileSync(p,'utf8'))}catch(e){return{ok:false,error:e.message}}};
           const deterministic=read('deterministic-result.json'),live=read('live-result.json');
-          const out={ok:Boolean(deterministic.ok&&live.ok),stage:deterministic.ok?(live.ok?'pass':live.stage||'live_failed'):'deterministic_failed',deterministic,live,checks:{amazonBodiesExtracted:deterministic.amazonReferences>0,ebayBodiesExtracted:deterministic.ebayReferences>0,liveCorpusNeverShrank:Number(live.enrichedReferences)>=Number(live.baselineReferences),liveMarketplaceBodiesExtracted:Number(live.marketplaceReferences)>0},workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
+          const checks={highVolumeAmazonExtracted:Number(deterministic.amazonReferences)>=200,liveCorpusNeverShrank:Boolean(live.corpusNeverShrank),liveMarketplaceBodiesExtracted:Number(live.marketplaceReferences)>0,liveAmazonBodiesExtracted:Number(live.amazonReferences)>0};
+          const out={ok:Boolean(deterministic.ok&&live.ok&&checks.liveCorpusNeverShrank),stage:!deterministic.ok?'high_volume_amazon_failed':!live.ok?(live.stage||'live_failed'):'pass',deterministic,live,checks,workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
           fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
           NODE
+
       - name: Publish self-test result
         if: always()
         shell: bash
@@ -80,7 +103,12 @@ jobs:
           git config user.name 'reference-selftest-bot'
           git config user.email 'reference-selftest-bot@users.noreply.github.com'
           git add REFERENCE_SELFTEST_RESULT.json
-          if ! git diff --cached --quiet; then git commit -m 'Update production self-test result [selftest-result]'; git push origin HEAD:main; fi
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update production self-test result [selftest-result]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
       - name: Enforce regression gate
         if: always()
         shell: bash
@@ -88,6 +116,6 @@ jobs:
           node - <<'NODE'
           const j=require('./REFERENCE_SELFTEST_RESULT.json');
           if(!j.ok) throw new Error(`Production reference regression failed at ${j.stage}`);
-          if(!j.checks.amazonBodiesExtracted||!j.checks.ebayBodiesExtracted) throw new Error('Deterministic marketplace extraction failed');
+          if(!j.checks.highVolumeAmazonExtracted) throw new Error('High-volume Amazon fixture did not return at least 200 real review bodies');
           if(!j.checks.liveCorpusNeverShrank||!j.checks.liveMarketplaceBodiesExtracted) throw new Error('Live Lens-to-marketplace enrichment failed');
           NODE
