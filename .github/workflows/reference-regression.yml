@@ -20,6 +20,14 @@ jobs:
       - name: Wait for production deployment
         run: sleep 55
 
+      - name: Check provider health
+        shell: bash
+        continue-on-error: true
+        run: |
+          BASE='https://synthetic-review-lab.vercel.app'
+          curl --silent --show-error --location --max-time 30 --output provider-health.json --write-out 'health HTTP=%{http_code}\n' "$BASE/api/reference-health" || true
+          cat provider-health.json || true
+
       - name: Prove Amazon review collector independently
         shell: bash
         continue-on-error: true
@@ -33,22 +41,22 @@ jobs:
           echo "collector fixture HTTP=$code"
           node - <<'NODE'
           const fs=require('fs');
-          const unavailable=s=>/customer is not active|invalid status|positive credit balance|required for all requests|account.*inactive/i.test(String(s||''));
+          const unavailable=s=>/bright_data_no_credits|insufficient[_\s-]*(credits?|balance)|customer is not active|invalid status|positive credit balance|required for all requests|account.*inactive|account.*suspended|add funds/i.test(String(s||''));
           let j={};try{j=JSON.parse(fs.readFileSync('deterministic-enriched.json','utf8'))}catch(e){j={error:e.message}}
           const refs=j.referenceSet?.references||[],ingestion=j.referenceSet?.marketplaceIngestion||null,target=(ingestion?.sources||[])[0]||null;
-          const providerUnavailable=unavailable(target?.error)||unavailable(j.error);
-          const out={ok:refs.length>=200,providerUnavailable,amazonReferences:refs.length,totalReferences:refs.length,targetSource:target,sampleAmazon:refs.slice(0,2).map(r=>({id:r.sourceReviewId||'',body:String(r.sourceBody||'').slice(0,260)})),marketplaceIngestion:ingestion,error:j.error||null};
+          const providerUnavailable=j.code==='bright_data_no_credits'||unavailable(target?.error)||unavailable(j.error);
+          const out={ok:refs.length>=200,providerUnavailable,providerCode:j.code||null,amazonReferences:refs.length,totalReferences:refs.length,targetSource:target,sampleAmazon:refs.slice(0,2).map(r=>({id:r.sourceReviewId||'',body:String(r.sourceBody||'').slice(0,260)})),marketplaceIngestion:ingestion,error:j.error||null};
           fs.writeFileSync('deterministic-result.json',JSON.stringify(out,null,2)); console.log(JSON.stringify(out,null,2));
           NODE
 
-      - name: Test real Premium Indoor PDP end to end
+      - name: Test real OmniReach Outdoor PDP end to end
         shell: bash
         continue-on-error: true
         run: |
           set +e
           BASE='https://synthetic-review-lab.vercel.app'
           cat > live-scan-request.json <<'JSON'
-          {"productUrl":"https://instabeamtv.com/products/premium-antenna-1","productTitle":"InstaBeam Premium Indoor HDTV Antenna","productDescription":"Premium indoor HDTV antenna. Use the authoritative PDP itself for product identity and same-product matching.","existingReviewCount":0,"targetReferenceCount":250,"originalReviewCount":0}
+          {"productUrl":"https://instabeamtv.com/products/outdoor-omni-antenna-2","productTitle":"InstaBeam OmniReach Extended Range TV Antenna","productDescription":"Outdoor omnidirectional amplified HDTV antenna. Use the authoritative PDP itself for product identity and same-product matching.","existingReviewCount":0,"targetReferenceCount":250,"originalReviewCount":0}
           JSON
           rm -f live-scan.json live-enrich-request.json live-result.json live-enriched.json
           scan_code=000
@@ -62,29 +70,34 @@ jobs:
             if [ $? -eq 0 ]; then break; fi
             echo "reference scan attempt $attempt failed HTTP=$scan_code"
             cat live-scan.json || true
+            node - <<'NODE'
+          const fs=require('fs');let j={};try{j=JSON.parse(fs.readFileSync('live-scan.json','utf8'))}catch{}
+          if(j.code==='bright_data_no_credits')process.exit(77)
+          NODE
+            [ $? -eq 77 ] && break
             sleep 18
           done
           node - <<'NODE'
           const fs=require('fs');let j={};try{j=JSON.parse(fs.readFileSync('live-scan.json','utf8'))}catch(e){j={error:e.message}}
           if(j.referenceSet) fs.writeFileSync('live-enrich-request.json',JSON.stringify({referenceSet:j.referenceSet}));
-          else fs.writeFileSync('live-result.json',JSON.stringify({ok:false,stage:'reference_scan',error:j.error||'referenceSet missing',response:j},null,2));
+          else fs.writeFileSync('live-result.json',JSON.stringify({ok:false,providerUnavailable:j.code==='bright_data_no_credits',providerCode:j.code||null,stage:j.code==='bright_data_no_credits'?'external_provider_unavailable':'reference_scan',error:j.error||'referenceSet missing',response:j},null,2));
           NODE
           if [ -f live-enrich-request.json ]; then
             enrich_code=$(curl --silent --show-error --location --max-time 600 --header 'content-type: application/json' --data-binary @live-enrich-request.json --output live-enriched.json --write-out '%{http_code}' "$BASE/api/reference-enrich-marketplaces")
             echo "live enrichment HTTP=$enrich_code"
             node - <<'NODE'
           const fs=require('fs');
-          const unavailable=s=>/customer is not active|invalid status|positive credit balance|required for all requests|account.*inactive/i.test(String(s||''));
+          const unavailable=s=>/bright_data_no_credits|insufficient[_\s-]*(credits?|balance)|customer is not active|invalid status|positive credit balance|required for all requests|account.*inactive|account.*suspended|add funds/i.test(String(s||''));
           const host=x=>{try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}};
           const scan=JSON.parse(fs.readFileSync('live-scan.json','utf8')),base=scan.referenceSet;let j={};try{j=JSON.parse(fs.readFileSync('live-enriched.json','utf8'))}catch(e){j={error:e.message}}
           const before=base?.references||[],after=j.referenceSet?.references||[],sourceRows=j.referenceSet?.sourceCounts||base?.sourceCounts||[],market=after.filter(r=>/(^|\.)(amazon|ebay)\./i.test(host(r.sourceUrl))),amazon=market.filter(r=>/(^|\.)amazon\./i.test(host(r.sourceUrl))),ebay=market.filter(r=>/(^|\.)ebay\./i.test(host(r.sourceUrl)));
           const ingestion=j.referenceSet?.marketplaceIngestion||null,fallback=base?.amazonFallbackDiscovery||j.referenceSet?.amazonFallbackDiscovery||null;
           const errors=[j.error,fallback?.diagnostics?.error,fallback?.diagnostics?.providerFallback?.diagnostics?.error,...(ingestion?.sources||[]).map(s=>s.error)].filter(Boolean);
-          const providerUnavailable=errors.some(unavailable);
+          const providerUnavailable=j.code==='bright_data_no_credits'||errors.some(unavailable);
           const verifiedSources=sourceRows.filter(s=>s.linkVerified!==false&&Number(s.matchConfidence||0)>=.8);
-          const corpusNeverShrank=after.length>=before.length,corpusTargetMet=after.length>=200;
-          const ok=verifiedSources.length>0&&corpusNeverShrank&&after.length>0;
-          fs.writeFileSync('live-result.json',JSON.stringify({ok,providerUnavailable,stage:ok?'pass':providerUnavailable?'external_provider_unavailable':verifiedSources.length===0?'no_verified_same_product_source':'live_corpus_missing',authoritativeProductTitle:base?.productTitle||null,baselineReferences:before.length,enrichedReferences:after.length,corpusTargetMet,marketplaceReferences:market.length,amazonReferences:amazon.length,ebayReferences:ebay.length,corpusNeverShrank,verifiedSources:verifiedSources.map(s=>({url:s.directSourceUrl||s.sourceUrl,asin:s.asin||null,title:s.title||null,platform:s.platform,matchConfidence:s.matchConfidence,verificationMethod:s.verificationMethod,reviewCount:s.publicReviewCount??s.reviewCount??null})),amazonFallbackDiscovery:fallback,marketplaceIngestion:ingestion,errors,error:j.error||null},null,2));
+          const corpusNeverShrank=after.length>=before.length,corpusTargetMet=after.length>=200,amazonTargetMet=amazon.length>=150;
+          const ok=verifiedSources.length>0&&corpusNeverShrank&&corpusTargetMet&&amazonTargetMet;
+          fs.writeFileSync('live-result.json',JSON.stringify({ok,providerUnavailable,providerCode:j.code||null,stage:ok?'pass':providerUnavailable?'external_provider_unavailable':verifiedSources.length===0?'no_verified_same_product_source':'live_corpus_missing',authoritativeProductTitle:base?.productTitle||null,baselineReferences:before.length,enrichedReferences:after.length,corpusTargetMet,amazonTargetMet,marketplaceReferences:market.length,amazonReferences:amazon.length,ebayReferences:ebay.length,corpusNeverShrank,verifiedSources:verifiedSources.map(s=>({url:s.directSourceUrl||s.sourceUrl,asin:s.asin||null,title:s.title||null,platform:s.platform,matchConfidence:s.matchConfidence,verificationMethod:s.verificationMethod,reviewCount:s.publicReviewCount??s.reviewCount??null})),amazonFallbackDiscovery:fallback,marketplaceIngestion:ingestion,errors,error:j.error||null},null,2));
           NODE
           fi
 
@@ -95,11 +108,12 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'); const read=p=>{try{return JSON.parse(fs.readFileSync(p,'utf8'))}catch(e){return{ok:false,error:e.message}}};
           const deterministic=read('deterministic-result.json'),live=read('live-result.json');
-          const externalProviderUnavailable=Boolean(deterministic.providerUnavailable||live.providerUnavailable);
-          const checks={collectorFixtureExtracted:Number(deterministic.amazonReferences)>=200,liveSameProductSourceDiscovered:Array.isArray(live.verifiedSources)&&live.verifiedSources.length>0,liveCorpusNeverShrank:Boolean(live.corpusNeverShrank),liveMarketplaceBodiesExtracted:Number(live.enrichedReferences)>0,liveCorpusTargetMet:Boolean(live.corpusTargetMet)};
-          const functional=Boolean(deterministic.ok&&live.ok&&checks.liveCorpusNeverShrank);
-          const stage=externalProviderUnavailable?'external_provider_unavailable':!deterministic.ok?'amazon_collector_failed':!live.ok?(live.stage||'live_failed'):checks.liveCorpusTargetMet?'pass':'pass_below_200_corpus';
-          const out={ok:functional&&!externalProviderUnavailable,stage,externalProviderUnavailable,deterministic,live,checks,workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
+          let health={};try{health=JSON.parse(fs.readFileSync('provider-health.json','utf8'))}catch{}
+          const externalProviderUnavailable=Boolean(health.brightDataNoCredits||deterministic.providerUnavailable||live.providerUnavailable);
+          const checks={brightDataFunded:!health.brightDataNoCredits,collectorFixtureExtracted:Number(deterministic.amazonReferences)>=200,liveSameProductSourceDiscovered:Array.isArray(live.verifiedSources)&&live.verifiedSources.length>0,liveCorpusNeverShrank:Boolean(live.corpusNeverShrank),liveMarketplaceBodiesExtracted:Number(live.enrichedReferences)>0,liveCorpusTargetMet:Boolean(live.corpusTargetMet),liveAmazonTargetMet:Boolean(live.amazonTargetMet)};
+          const functional=Boolean(deterministic.ok&&live.ok&&checks.liveCorpusNeverShrank&&checks.liveCorpusTargetMet&&checks.liveAmazonTargetMet);
+          const stage=externalProviderUnavailable?'external_provider_unavailable':!deterministic.ok?'amazon_collector_failed':!live.ok?(live.stage||'live_failed'):'pass';
+          const out={ok:functional&&!externalProviderUnavailable,stage,externalProviderUnavailable,providerHealth:health,deterministic,live,checks,workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
           fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify(out,null,2)+'\n'); console.log(JSON.stringify(out,null,2));
           NODE
 
@@ -126,5 +140,5 @@ jobs:
           if(j.externalProviderUnavailable){console.warn('Reference regression is blocked by an external provider account/credit state, not a code assertion.');process.exit(0)}
           if(!j.ok) throw new Error(`Production reference regression failed at ${j.stage}`);
           if(!j.checks.collectorFixtureExtracted) throw new Error('Amazon collector fixture did not return at least 200 real review bodies');
-          if(!j.checks.liveSameProductSourceDiscovered||!j.checks.liveCorpusNeverShrank||!j.checks.liveMarketplaceBodiesExtracted) throw new Error('Live same-product discovery/enrichment failed');
+          if(!j.checks.liveSameProductSourceDiscovered||!j.checks.liveCorpusNeverShrank||!j.checks.liveCorpusTargetMet||!j.checks.liveAmazonTargetMet) throw new Error('Live OmniReach same-product discovery/enrichment failed');
           NODE
