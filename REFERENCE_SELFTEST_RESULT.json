@@ -52,7 +52,13 @@
         }
       ],
       "amazonVolumeDiscovery": {
-        "elapsedMs": 1369,
+        "elapsedMs": 2353,
+        "authoritativePdpIdentity": {
+          "title": "InstaBeam Premium Indoor HDTV Antenna",
+          "descriptionLength": 183,
+          "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+          "error": null
+        },
         "referenceImageUsed": false,
         "referenceImageUrl": null,
         "verificationError": null,
@@ -64,6 +70,12 @@
             "resultCount": 0
           }
         ],
+        "providerFallback": {
+          "diagnostics": {
+            "error": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+          },
+          "candidates": []
+        },
         "shortlist": [],
         "verified": []
       }
@@ -73,65 +85,118 @@
   "live": {
     "ok": false,
     "stage": "reference_scan",
-    "error": "Google Lens discovery failed for every product image. Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.",
+    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=n/a, uniqueCandidates=n/a, verifierAccepted=n/a. transport=error:Bright Data account API 422: Customer has invalid status.",
     "response": {
-      "error": "Google Lens discovery failed for every product image. Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.",
+      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=n/a, uniqueCandidates=n/a, verifierAccepted=n/a. transport=error:Bright Data account API 422: Customer has invalid status.",
       "brightData": {
-        "stage": "native_lens_response",
+        "stage": "empty_verified_source_set",
         "zone": "synthetic_review_lens",
         "zoneSource": "auto_detected",
-        "activeSerpZones": [
-          "synthetic_review_lens"
-        ],
         "imageTransport": "bright_data_native_file_upload"
       },
-      "transportDiagnostics": [
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "exact_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
+      "diagnostics": {
+        "sourceImages": null,
+        "lensRequests": null,
+        "lensRequestsSucceeded": null,
+        "rawResults": null,
+        "uniqueCandidates": null,
+        "acceptedCandidates": null,
+        "rejectedCandidates": null,
+        "verifierCandidates": null,
+        "verifierAccepted": null,
+        "verifierRejected": null,
+        "amazonCandidates": null,
+        "amazonAccepted": null,
+        "amazonFallback": {
+          "status": "no_verified_candidate",
+          "baseLensError": "Google Lens discovery failed for every product image.",
+          "queries": [
+            "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup"
+          ],
+          "identity": {
+            "title": "InstaBeam Premium Indoor HDTV Antenna",
+            "descriptionLength": 183,
+            "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+            "error": null
+          },
+          "diagnostics": {
+            "elapsedMs": 714,
+            "authoritativePdpIdentity": {
+              "title": "InstaBeam Premium Indoor HDTV Antenna",
+              "descriptionLength": 183,
+              "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+              "error": null
+            },
+            "referenceImageUsed": false,
+            "referenceImageUrl": null,
+            "verificationError": null,
+            "searchRuns": [
+              {
+                "ok": false,
+                "rawRows": 0,
+                "error": "trigger_http_400:Customer is not active",
+                "resultCount": 0
+              }
+            ],
+            "providerFallback": {
+              "diagnostics": {
+                "error": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+              },
+              "candidates": []
+            },
+            "shortlist": [],
+            "verified": []
+          }
         },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "products",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "visual_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "exact_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "products",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-          "tab": "visual_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-          "tab": "exact_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-          "tab": "products",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        },
-        {
-          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-          "tab": "visual_matches",
-          "error": "Bright Data account API 422: Customer has invalid status"
-        }
-      ]
+        "tabs": null,
+        "transport": [
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "exact_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "products",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "visual_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "exact_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "products",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "visual_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "exact_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "products",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "visual_matches",
+            "error": "Bright Data account API 422: Customer has invalid status"
+          }
+        ]
+      }
     }
   },
   "checks": {
@@ -141,7 +206,7 @@
     "liveAmazonBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T14:50:15.067Z",
-    "commit": "64a16702b4692cdd2ad0ba47276f7b9adb2af8ac"
+    "testedAt": "2026-08-21T14:55:05.558Z",
+    "commit": "040cdedc339d8bbd7a37e9d28a620c2e0f8b6e83"
   }
 }
