@@ -1,14 +1,16 @@
 {
   "ok": true,
-  "count": 17,
+  "count": 6,
   "attempted": 2,
   "failed": 0,
   "pending": false,
-  "canonicalUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+  "canonicalUrl": "https://www.amazon.com/dp/B0CKYX98FX",
   "requested": 250,
-  "rawRows": 19,
-  "parsedBodies": 17,
-  "reviewIdCount": 17,
+  "aggregateRatingCount": 11,
+  "aggregateRating": 3.3,
+  "rawRows": 6,
+  "parsedBodies": 6,
+  "reviewIdCount": 6,
   "rowKeys": [
     "url",
     "product_name",
@@ -24,7 +26,6 @@
     "review_text",
     "author_id",
     "author_link",
-    "badge",
     "brand",
     "review_posted_date",
     "review_country",
@@ -43,13 +44,15 @@
     {
       "batch": 1,
       "ok": true,
-      "snapshotId": "sd_mt2kv83ayqizaock3",
-      "rawRows": 18,
-      "parsedBodies": 17,
-      "newBodies": 17,
-      "newReviewIds": 17,
-      "totalBodies": 17,
-      "totalReviewIds": 17,
+      "snapshotId": "sd_mt2l1wvm1zamgieofw",
+      "rawRows": 6,
+      "parsedBodies": 6,
+      "newBodies": 6,
+      "newReviewIds": 6,
+      "totalBodies": 6,
+      "totalReviewIds": 6,
+      "aggregateRatingCount": 11,
+      "aggregateRating": 3.3,
       "rowKeys": [
         "url",
         "product_name",
@@ -65,7 +68,6 @@
         "review_text",
         "author_id",
         "author_link",
-        "badge",
         "brand",
         "review_posted_date",
         "review_country",
@@ -84,98 +86,62 @@
     {
       "batch": 2,
       "ok": true,
-      "snapshotId": "sd_mt2kwe359opu5jkss",
-      "rawRows": 1,
+      "snapshotId": "sd_mt2l2896iofnlscye",
+      "rawRows": 0,
       "parsedBodies": 0,
       "newBodies": 0,
       "newReviewIds": 0,
-      "totalBodies": 17,
-      "totalReviewIds": 17,
-      "rowKeys": [
-        "url",
-        "product_name",
-        "product_rating",
-        "product_rating_object",
-        "product_rating_max",
-        "rating",
-        "author_name",
-        "asin",
-        "product_rating_count",
-        "review_header",
-        "review_id",
-        "review_text",
-        "badge",
-        "brand",
-        "review_posted_date",
-        "review_country",
-        "helpful_count",
-        "is_amazon_vine",
-        "is_verified",
-        "variant_asin",
-        "variant_name",
-        "videos",
-        "categories",
-        "department",
-        "timestamp",
-        "input"
-      ]
+      "totalBodies": 6,
+      "totalReviewIds": 6,
+      "aggregateRatingCount": null,
+      "aggregateRating": null,
+      "rowKeys": []
     }
   ],
-  "elapsedMs": 90530,
+  "elapsedMs": 30956,
   "sampleIds": [
-    "R5AVMYSQHC243",
-    "RGVANUTH3MAB4",
-    "RKXWSPXU83HRQ",
-    "R190J3VXK0ADZ",
-    "R3421TIB1H4RDK",
-    "R210TYWFRS8D23",
-    "R63OO4445O0X2",
-    "RPH9IIPW8860S",
-    "R3D0RV913U999N",
-    "R3KKP3VOIXGB7F",
-    "RJBFYFELNR3XC",
-    "R2J18E7SKFV069",
-    "RQACD5RSYHEFJ",
-    "R3RKL6HIEC8FZL",
-    "R19WYESD49ZQRX",
-    "R3HGS4OR41MVJ0",
-    "R1KNJF654FI669"
+    "R2F5S4764MX3U",
+    "R2KG86G39KRM3V",
+    "R18AR4PT9LYM2I",
+    "RYL581P76CDL9",
+    "R35ZH1HEBPWS8R",
+    "R2POFAO4XLDXYZ"
   ],
   "sampleReviews": [
     {
-      "reviewId": "R5AVMYSQHC243",
-      "title": "Great product",
+      "reviewId": "R2F5S4764MX3U",
+      "title": "Excellent Local TTV Reception Withouyt Using Antenna Amplifier",
       "rating": 5,
-      "body": "We love it, great service for local channels and easy to install"
+      "body": "This is a review of EOHIBOV's HD Digital Indoor or Outdoor TV Antenna with Long Distance Range, Antenna Amplifier, and supports Ultra HD 4K 1080P. The antenna may be placed indoors or outdoors. I placed mine in a room at a window pointing towards the area where most all of our local TV broadcast antennas are located. The wire coming off the physical antenna that connects to the TV is about 30 feet long, so it was convenient to have the TV a good distance from the actual antenna. The antenna wire is to be connected to the included antenna amplifier (with or without the amplifier being powerered thru the USB cable). Since I wasn't using a digital converter box, I connected the antenna amplifier to the TV's coaxial antenna port using the cable that came with the unit. If you're using a digital converter box, you would attach the cable from the antenna to the amplifier (as before) and then connect the amplifier to the digital converter box. The digital converter box is then connected to the TV. NOTE: A USB-A to amplifier cord is supplied with the unit, but there is no wall unit power adapter to plug the USB-A connector into. The manual recommends plugging the USB-A connector into the back of the TV (which may or may not exist on the back of the TV). I live in a 100 square mile metropolitan area that has the major TV networks and some minor TV channels. This TV antenna picked up all of the channels without using power input into the amplifier. I did not use the USB-A-based 5volt power adapter to boost its signal reception. The reception was VERY GOOD. I did not test the 1080p HD reception capability."
     },
     {
-      "reviewId": "RGVANUTH3MAB4",
-      "title": "Easy Set Up! Good Value!",
-      "rating": 5,
-      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it."
-    },
-    {
-      "reviewId": "RKXWSPXU83HRQ",
-      "title": "great antenna, worked the first time",
-      "rating": 4,
-      "body": "Hooked right up and put out great signal from indoors. Would be nice to have a couple of female feed thru's in the package."
-    },
-    {
-      "reviewId": "R190J3VXK0ADZ",
-      "title": "Prepared to be disappointed!",
+      "reviewId": "R2KG86G39KRM3V",
+      "title": "Very cheap mediocre antenna THAT FAILS AFTER EVERY RAIN",
       "rating": 1,
-      "body": "This antenna is a joke. 1) Size. The antenna itself, round dome, is no more than 10” across. In antennas, especially Omni-directional, size is everything. 2) Reception. I installed on a home in a Houston suburb on a wave mount w/ 10’ pole, 10.5 miles from 5 2200’ tall broadcast towers. First run I got 114 channels, then it clouded up and reception dropped to 33channels, and when the rain arrived it was down to 7. The indoor flat plastic HDTV Walmart antenna mounted on the back of the TV does a better job w/ reception. By the way, there is no marking on the antenna to ‘Front’ or as a lead point to tune the antenna w/ a starting point. 3) Mounting. Anyone seen a standard 1” mounting pole? Well, you’ll get one w/ this kit. Ridiculously small and not close to any normal antenna mounting pole size. This means something, as the only way this antenna mounts is by slipping over the crappy 1” pole they include. 4) Quality. I’ll be shocked if the whole thing lasts one year. Plastic and wing nuts hold it together. The super-cheap in line amplifier failed in 1 day. 5) Price. My point to this review is that this install was in the best of signal environments and it still struggles and fails. Durability is questionable. Price point is outrageous for the value. This antenna takes some money to get it to work. You get into the install and realize to modify it to work you’re past the point of returning. 6) The Fix. At least in this situation I was able to add a different high quality antenna signal booster to the project and get it working much better. Doesn’t change my opinion of buying this POS antenna, but if you already have - I suggest you get a quality Wineguard or ChannelMaster signal booster and you can boost and stabilize the signal propagation better. You also need more than a 18” 1” pole to get the antenna above ground clutter and descent line of site for the signal."
+      "body": "I bought this same antenna . This antenna is JUNK. I mounted it outdoors and it only pulls in about 3/4 of the channels in the area. Everytime it rains I lose half the channels. I bought one of those $9 5x7 antennas you tape to the wall indoors and now I get 214 channels instead of 124. THIS ANTENNA IS JUNK"
     },
     {
-      "reviewId": "R3421TIB1H4RDK",
-      "title": "Great Antenna...Better then ANTOP UFO....Worth the Money!!!",
+      "reviewId": "R18AR4PT9LYM2I",
+      "title": "Easy to connect!",
       "rating": 5,
-      "body": "We bought the ANTOP UFO 720°Dual-Omni-Directional Outdoor HDTV Antenna Exclusive Smartpass Amplifier &4G LTE Filter,Enhanced VHF/UHF Reception,Fit Outdoor/RV/Attic on May 7, 2019. We had to continually go up on the roof and re-adjust the antenna as we were no longer getting channels. We did the routine monthly auto scans on our TV to ensure we were getting the most stations. We often had problems getting 3 of the major stations with the ANTOP antenna. The antenna gave out so we replaced it with this Five Star [Newest 2020] HDTV Antenna - 360° Omnidirectional Amplified Outdoor TV Antenna. Absolutely awesome. We are picking up almost twice as many channels getting 64 most of the time. All of them are coming in crystal clear. We did put it on the roof of a two story home. I would recommend this antenna if you want to cut the cable cord and save money."
+      "body": "Full range antenna that's great for indoor or outdoor. HD digital. Easy to connect. My mother lives it because she can watch more channels. Recommendable."
+    },
+    {
+      "reviewId": "RYL581P76CDL9",
+      "title": "Great picture",
+      "rating": 5,
+      "body": "If antenna is placed in the right position you'll get all kinds of channels for FREE and the picture is great."
+    },
+    {
+      "reviewId": "R35ZH1HEBPWS8R",
+      "title": "No signal",
+      "rating": 1,
+      "body": "Did not like could not get it to work."
     }
   ],
   "error": "",
   "workflow": {
-    "testedAt": "2026-08-21T06:39:29.946Z",
-    "commit": "b01a93e03645a1f2544953fe7f88c642ac18c943"
+    "testedAt": "2026-08-21T06:43:42.540Z",
+    "commit": "e05603bf2d0ad35e45d746a7f3bbfbd113bd8e06"
   }
 }
