@@ -1,29 +1,14 @@
 {
   "ok": false,
   "stage": "deterministic_marketplace_reviews_missing",
-  "totalReferences": 17,
-  "amazonReferences": 17,
+  "totalReferences": 0,
+  "amazonReferences": 0,
   "ebayReferences": 0,
-  "sampleAmazon": [
-    {
-      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
-      "title": "",
-      "body": "We love it, great service for local channels and easy to install",
-      "rating": 5,
-      "provider": "bright_data_amazon_reviews"
-    },
-    {
-      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
-      "title": "",
-      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it.",
-      "rating": 5,
-      "provider": "bright_data_amazon_reviews"
-    }
-  ],
+  "sampleAmazon": [],
   "sampleEbay": [],
   "marketplaceIngestion": {
     "attemptedSources": 2,
-    "appendedReviews": 17,
+    "appendedReviews": 0,
     "sources": [
       {
         "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
@@ -32,32 +17,32 @@
         "attempted": 1,
         "blocked": 0,
         "failed": 0,
-        "pending": false,
-        "snapshotId": "sd_mt2jp16a20rimmxztk",
-        "extracted": 17,
-        "error": ""
+        "pending": true,
+        "snapshotId": "sd_mt2jumn21pfameqr6m",
+        "extracted": 0,
+        "error": "bright_data_snapshot_running"
       },
       {
         "sourceUrl": "https://www.ebay.com/itm/176327212659",
         "platform": "ebay.com",
-        "provider": "ebay_public_page",
+        "provider": "bright_data_ebay_product",
         "attempted": 1,
-        "blocked": 1,
+        "blocked": 0,
         "failed": 0,
-        "pending": false,
-        "snapshotId": null,
+        "pending": true,
+        "snapshotId": "sd_mt2juo5fjbdtlh8dk",
         "extracted": 0,
-        "error": "blocked_or_challenged"
+        "error": "bright_data_ebay_snapshot_running"
       }
     ]
   },
   "responseError": null,
   "checks": {
-    "amazonBodiesExtracted": true,
+    "amazonBodiesExtracted": false,
     "ebayBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T06:05:37.863Z",
-    "commit": "722c444a806b96c9c4e52b54c396ad4ec4e2f90f"
+    "testedAt": "2026-08-21T06:10:10.197Z",
+    "commit": "35f5bd83a7fc91bff12b94401e1f8c604353a005"
   }
 }
