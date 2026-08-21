@@ -13,6 +13,7 @@ async function brightDataHealth(key){
 
 export async function GET(req){
   const key=process.env.BRIGHT_DATA_API_KEY||'',brightData=await brightDataHealth(key),verifierConfigured=hasAIProvider(req),directOpenAIConfigured=Boolean(directOpenAIToken());
-  const configured=brightData.configured&&verifierConfigured,healthy=brightData.healthy===true&&verifierConfigured;
-  return Response.json({ok:healthy,provider:'Bright Data Google Lens + AI same-product verification',configured,healthy,lensConfigured:brightData.configured,lensHealthy:brightData.healthy,brightDataHttpStatus:brightData.httpStatus,brightDataError:brightData.error,activeSerpZones:brightData.zones,verifierConfigured,verifierAuth:authMode(req),directOpenAIConfigured,zone:brightData.zones[0]||process.env.BRIGHT_DATA_SERP_ZONE||null,env:null},{status:healthy?200:503,headers:{'cache-control':'no-store'}})
+  const credentialsConfigured=brightData.configured&&verifierConfigured,operational=brightData.healthy===true&&verifierConfigured;
+  const reason=!brightData.configured?'Bright Data is not configured.':brightData.healthy!==true?(brightData.error||'Bright Data account is not operational.') :!verifierConfigured?'No AI verification provider is configured.':null;
+  return Response.json({ok:operational,provider:'Bright Data Google Lens + AI same-product verification',configured:operational,credentialsConfigured,healthy:operational,reason,lensConfigured:brightData.configured,lensHealthy:brightData.healthy,brightDataHttpStatus:brightData.httpStatus,brightDataError:brightData.error,activeSerpZones:brightData.zones,verifierConfigured,verifierAuth:authMode(req),directOpenAIConfigured,zone:brightData.zones[0]||process.env.BRIGHT_DATA_SERP_ZONE||null,env:null},{status:operational?200:503,headers:{'cache-control':'no-store'}})
 }
