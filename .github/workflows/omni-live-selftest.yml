@@ -1,8 +1,6 @@
 name: OmniReach live self-test
 
 on:
-  push:
-    branches: ['main']
   workflow_dispatch:
 
 permissions:
@@ -10,7 +8,6 @@ permissions:
 
 jobs:
   omni-live-selftest:
-    if: ${{ !contains(github.event.head_commit.message || '', '[omni-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') && !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[source-probe-result]') && !contains(github.event.head_commit.message || '', '[discovery-probe-result]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
