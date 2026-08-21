@@ -19,11 +19,11 @@ jobs:
           fetch-depth: 0
       - name: Wait for Vercel
         run: sleep 45
-      - name: Call production Amazon search probe
+      - name: Call production generic Amazon discovery probe
         shell: bash
         run: |
           set +e
-          code=$(curl --silent --show-error --location --max-time 420 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-search-probe')
+          code=$(curl --silent --show-error --location --max-time 420 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-volume-probe')
           status=$?
           echo "curl=$status HTTP=$code"
           cat probe.json || true
