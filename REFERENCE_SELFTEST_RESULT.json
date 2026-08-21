@@ -1,78 +1,163 @@
 {
-  "ok": true,
-  "stage": "pass",
-  "totalReferences": 27,
-  "amazonReferences": 17,
-  "ebayReferences": 10,
-  "sampleAmazon": [
-    {
-      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
-      "title": "",
-      "body": "We love it, great service for local channels and easy to install",
-      "rating": 5,
-      "provider": "bright_data_amazon_reviews"
+  "ok": false,
+  "stage": "deterministic_failed",
+  "deterministic": {
+    "ok": false,
+    "totalReferences": 17,
+    "amazonReferences": 17,
+    "ebayReferences": 0,
+    "sampleAmazon": [
+      "We love it, great service for local channels and easy to install"
+    ],
+    "sampleEbay": [],
+    "marketplaceIngestion": {
+      "attemptedSources": 2,
+      "appendedReviews": 17,
+      "sources": [
+        {
+          "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+          "platform": "amazon.com",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2k2ooq2cw7az3fgz",
+          "extracted": 17,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/176327212659",
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "attempted": 2,
+          "blocked": 1,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2k2oo915jixabzvl",
+          "extracted": 0,
+          "error": "bright_data_ebay_no_item_feedback:keys:status|message;arrays:none"
+        }
+      ]
     },
-    {
-      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
-      "title": "",
-      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it.",
-      "rating": 5,
-      "provider": "bright_data_amazon_reviews"
-    }
-  ],
-  "sampleEbay": [
-    {
-      "sourceUrl": "https://www.ebay.com/itm/176327212659",
-      "title": "",
-      "body": "Love it! No more turning the antenna!!!",
-      "rating": null,
-      "provider": "bright_data_ebay_product"
-    },
-    {
-      "sourceUrl": "https://www.ebay.com/itm/176327212659",
-      "title": "",
-      "body": "Hi We have your antenna installed works but only within our 50-mile location. Please we let me know if you can supply another unit but a more power full antenna. Like is advertise 2024 ? We decided to keep the antenna sent need another one ASAP. Please reply?",
-      "rating": null,
-      "provider": "bright_data_ebay_product"
-    }
-  ],
-  "marketplaceIngestion": {
-    "attemptedSources": 2,
-    "appendedReviews": 27,
-    "sources": [
-      {
-        "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
-        "platform": "amazon.com",
-        "provider": "bright_data_amazon_reviews",
-        "attempted": 1,
-        "blocked": 0,
-        "failed": 0,
-        "pending": false,
-        "snapshotId": "sd_mt2jzlwh28njknlmo8",
-        "extracted": 17,
-        "error": ""
-      },
-      {
-        "sourceUrl": "https://www.ebay.com/itm/176327212659",
-        "platform": "ebay.com",
-        "provider": "bright_data_ebay_product",
-        "attempted": 1,
-        "blocked": 0,
-        "failed": 0,
-        "pending": false,
-        "snapshotId": "sd_mt2jzlqc1ur6inhu70",
-        "extracted": 10,
-        "error": ""
-      }
-    ]
+    "error": null
   },
-  "responseError": null,
+  "live": {
+    "ok": true,
+    "stage": "pass",
+    "baselineReferences": 0,
+    "enrichedReferences": 29,
+    "marketplaceReferences": 29,
+    "amazonReferences": 5,
+    "ebayReferences": 24,
+    "baselineReferenceHosts": [],
+    "discoveredMarketplaceHosts": [
+      "amazon.ca",
+      "us.amazon.com",
+      "amazon.com",
+      "amazon.sg",
+      "ebay.com"
+    ],
+    "marketplaceIngestion": {
+      "attemptedSources": 7,
+      "appendedReviews": 29,
+      "sources": [
+        {
+          "sourceUrl": "https://www.amazon.ca/dp/B0CKYX98FX",
+          "platform": "amazon.ca",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2k5uca2wee3r9zu",
+          "extracted": 5,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://us.amazon.com/dp/B0DZWZ3H6L",
+          "platform": "us.amazon.com",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": true,
+          "snapshotId": "sd_mt2k5ucv2j3u0trufa",
+          "extracted": 0,
+          "error": "bright_data_snapshot_running"
+        },
+        {
+          "sourceUrl": "https://www.amazon.com/clp/B0CKYX98FX",
+          "platform": "amazon.com",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 1,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews;missing_asin"
+        },
+        {
+          "sourceUrl": "https://www.amazon.ca/dp/B0DD6W87QF",
+          "platform": "amazon.ca",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 4,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews"
+        },
+        {
+          "sourceUrl": "https://www.amazon.sg/dp/B0BNTY8SX9",
+          "platform": "amazon.sg",
+          "provider": "bright_data_amazon_reviews",
+          "attempted": 3,
+          "blocked": 2,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": null,
+          "extracted": 0,
+          "error": "bright_data_amazon_zero_reviews"
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/178118779255",
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2k5ucf28nwf34egp",
+          "extracted": 14,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/405989037291",
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt2k5uq41ahc2nkioc",
+          "extracted": 10,
+          "error": ""
+        }
+      ]
+    },
+    "error": null
+  },
   "checks": {
     "amazonBodiesExtracted": true,
-    "ebayBodiesExtracted": true
+    "ebayBodiesExtracted": false,
+    "liveCorpusNeverShrank": true,
+    "liveMarketplaceBodiesExtracted": true
   },
   "workflow": {
-    "testedAt": "2026-08-21T06:13:45.115Z",
-    "commit": "ee232c214da9ef4b6e639def029e0d6f2f9ec639"
+    "testedAt": "2026-08-21T06:20:02.007Z",
+    "commit": "8983a5a8c28c71f107fc2f86ae572fb619497d72"
   }
 }
