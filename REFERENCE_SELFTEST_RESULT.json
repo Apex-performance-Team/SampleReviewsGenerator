@@ -1,163 +1,468 @@
 {
   "ok": false,
-  "stage": "deterministic_failed",
+  "stage": "reference_scan",
   "deterministic": {
-    "ok": false,
-    "totalReferences": 17,
-    "amazonReferences": 17,
-    "ebayReferences": 0,
+    "ok": true,
+    "amazonReferences": 219,
+    "totalReferences": 219,
+    "targetSource": {
+      "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
+      "platform": "amazon.com",
+      "provider": "bright_data_amazon_reviews_v2",
+      "budget": 220,
+      "discoveryOrigin": "amazon_high_volume",
+      "attempted": 1,
+      "blocked": 0,
+      "failed": 0,
+      "pending": false,
+      "snapshotId": "sd_mt2mluxy22fdr3fy0g",
+      "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
+      "requested": 220,
+      "aggregateRatingCount": 33151,
+      "rawRows": 220,
+      "parsedBodies": 219,
+      "reviewIdCount": 219,
+      "extracted": 219,
+      "error": ""
+    },
     "sampleAmazon": [
-      "We love it, great service for local channels and easy to install"
+      {
+        "id": "RYKSCLG2RTDYQ",
+        "body": "I was very skeptical about this antenna but saw it for a good price, and plus they do offer a 30 day money back guarantee if you are not satisfied. I decided to buy two, one for myself, and as a present to my parents for the new tv my brother and I got them fo"
+      },
+      {
+        "id": "R3TOH74XRVPF7R",
+        "body": "Excellent VHF/UHF HD antenna with optional signal amplifier. Long 20 feet of coaxial cable should be enough to reach window. You can use on a stand indoors but placing it between the window and screen works well for me. I live about 6 miles from Manhattan. My "
+      }
     ],
-    "sampleEbay": [],
     "marketplaceIngestion": {
-      "attemptedSources": 2,
-      "appendedReviews": 17,
+      "attemptedSources": 1,
+      "appendedReviews": 219,
       "sources": [
         {
-          "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+          "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
           "platform": "amazon.com",
-          "provider": "bright_data_amazon_reviews",
+          "provider": "bright_data_amazon_reviews_v2",
+          "budget": 220,
+          "discoveryOrigin": "amazon_high_volume",
           "attempted": 1,
           "blocked": 0,
           "failed": 0,
           "pending": false,
-          "snapshotId": "sd_mt2k2ooq2cw7az3fgz",
-          "extracted": 17,
+          "snapshotId": "sd_mt2mluxy22fdr3fy0g",
+          "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
+          "requested": 220,
+          "aggregateRatingCount": 33151,
+          "rawRows": 220,
+          "parsedBodies": 219,
+          "reviewIdCount": 219,
+          "extracted": 219,
           "error": ""
-        },
-        {
-          "sourceUrl": "https://www.ebay.com/itm/176327212659",
-          "platform": "ebay.com",
-          "provider": "bright_data_ebay_product",
-          "attempted": 2,
-          "blocked": 1,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": "sd_mt2k2oo915jixabzvl",
-          "extracted": 0,
-          "error": "bright_data_ebay_no_item_feedback:keys:status|message;arrays:none"
         }
-      ]
+      ],
+      "amazonVolumeDiscovery": {
+        "elapsedMs": 7388,
+        "searchRuns": [
+          {
+            "keyword": "instabeam omnireach extended range 1byone outdoor 360 omni directional reception long 100",
+            "ok": true,
+            "rawRows": 5,
+            "error": "",
+            "resultCount": 5
+          }
+        ],
+        "shortlist": [
+          {
+            "asin": "B0B7R81MFX",
+            "title": "Five Star Outdoor HDTV Antenna up to 200 Mile Long Range, Attic or Roof Mount, Digital OTA Antenna for 4K 1080P VHF UHF Supports 4 TVs Installation Kit & J Mount, ATSC 3.0 Ready",
+            "ratingCount": null,
+            "lexicalOverlap": 0.3181818181818182
+          }
+        ],
+        "verified": []
+      }
     },
     "error": null
   },
   "live": {
-    "ok": true,
-    "stage": "pass",
-    "baselineReferences": 0,
-    "enrichedReferences": 29,
-    "marketplaceReferences": 29,
-    "amazonReferences": 5,
-    "ebayReferences": 24,
-    "baselineReferenceHosts": [],
-    "discoveredMarketplaceHosts": [
-      "amazon.ca",
-      "us.amazon.com",
-      "amazon.com",
-      "amazon.sg",
-      "ebay.com"
-    ],
-    "marketplaceIngestion": {
-      "attemptedSources": 7,
-      "appendedReviews": 29,
-      "sources": [
-        {
-          "sourceUrl": "https://www.amazon.ca/dp/B0CKYX98FX",
-          "platform": "amazon.ca",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": "sd_mt2k5uca2wee3r9zu",
-          "extracted": 5,
-          "error": ""
+    "ok": false,
+    "stage": "reference_scan",
+    "error": "Google Lens scan returned no usable external sources. rawResults=644, uniqueCandidates=24, acceptedCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|offers|organic, images:56, tabs:KI‑Modus|all|exact_matches|visual_matches.",
+    "response": {
+      "error": "Google Lens scan returned no usable external sources. rawResults=644, uniqueCandidates=24, acceptedCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|offers|organic, images:56, tabs:KI‑Modus|all|exact_matches|visual_matches.",
+      "brightData": {
+        "stage": "empty_verified_source_set",
+        "zone": "synthetic_review_lens",
+        "zoneSource": "auto_detected",
+        "imageTransport": "bright_data_native_file_upload"
+      },
+      "diagnostics": {
+        "sourceImages": 3,
+        "lensRequests": 9,
+        "lensRequestsSucceeded": 6,
+        "rawResults": 644,
+        "uniqueCandidates": 24,
+        "acceptedCandidates": 0,
+        "rejectedCandidates": 24,
+        "verifierCandidates": 24,
+        "verifierAccepted": 0,
+        "verifierRejected": 24,
+        "amazonCandidates": 9,
+        "amazonAccepted": 0,
+        "tabs": {
+          "image1:exact_matches": {
+            "ok": false,
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          "image1:products": {
+            "ok": true,
+            "results": 100,
+            "amazon": 10
+          },
+          "image1:visual_matches": {
+            "ok": true,
+            "results": 100,
+            "amazon": 10
+          },
+          "image2:exact_matches": {
+            "ok": false,
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          "image2:products": {
+            "ok": true,
+            "results": 112,
+            "amazon": 10
+          },
+          "image2:visual_matches": {
+            "ok": true,
+            "results": 112,
+            "amazon": 10
+          },
+          "image3:exact_matches": {
+            "ok": false,
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          "image3:products": {
+            "ok": true,
+            "results": 110,
+            "amazon": 10
+          },
+          "image3:visual_matches": {
+            "ok": true,
+            "results": 110,
+            "amazon": 10
+          }
         },
-        {
-          "sourceUrl": "https://us.amazon.com/dp/B0DZWZ3H6L",
-          "platform": "us.amazon.com",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": true,
-          "snapshotId": "sd_mt2k5ucv2j3u0trufa",
-          "extracted": 0,
-          "error": "bright_data_snapshot_running"
-        },
-        {
-          "sourceUrl": "https://www.amazon.com/clp/B0CKYX98FX",
-          "platform": "amazon.com",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 1,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews;missing_asin"
-        },
-        {
-          "sourceUrl": "https://www.amazon.ca/dp/B0DD6W87QF",
-          "platform": "amazon.ca",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 4,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews"
-        },
-        {
-          "sourceUrl": "https://www.amazon.sg/dp/B0BNTY8SX9",
-          "platform": "amazon.sg",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 3,
-          "blocked": 2,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews"
-        },
-        {
-          "sourceUrl": "https://www.ebay.com/itm/178118779255",
-          "platform": "ebay.com",
-          "provider": "bright_data_ebay_product",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": "sd_mt2k5ucf28nwf34egp",
-          "extracted": 14,
-          "error": ""
-        },
-        {
-          "sourceUrl": "https://www.ebay.com/itm/405989037291",
-          "platform": "ebay.com",
-          "provider": "bright_data_ebay_product",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": "sd_mt2k5uq41ahc2nkioc",
-          "extracted": 10,
-          "error": ""
-        }
-      ]
-    },
-    "error": null
+        "transport": [
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "products",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 56,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "KI‑Modus",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "products"
+              ],
+              "generalType": "all",
+              "images": 56,
+              "exactMatches": null,
+              "products": 56,
+              "visualMatches": null,
+              "tabs": [
+                "KI‑Modus",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "visual_matches",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 56,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "KI‑Modus",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "visual_matches"
+              ],
+              "generalType": "all",
+              "images": 56,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": 56,
+              "tabs": [
+                "KI‑Modus",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "products",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 50,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "products"
+              ],
+              "generalType": "all",
+              "images": 50,
+              "exactMatches": null,
+              "products": 50,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "visual_matches",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 50,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "visual_matches"
+              ],
+              "generalType": "all",
+              "images": 50,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": 50,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "exact_matches",
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "exact_matches",
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "products",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 55,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "products"
+              ],
+              "generalType": "all",
+              "images": 55,
+              "exactMatches": null,
+              "products": 55,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "visual_matches",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 55,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "visual_matches"
+              ],
+              "generalType": "all",
+              "images": 55,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": 55,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "exact_matches",
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          }
+        ]
+      }
+    }
   },
   "checks": {
-    "amazonBodiesExtracted": true,
-    "ebayBodiesExtracted": false,
-    "liveCorpusNeverShrank": true,
-    "liveMarketplaceBodiesExtracted": true
+    "highVolumeAmazonExtracted": true,
+    "liveCorpusNeverShrank": false,
+    "liveMarketplaceBodiesExtracted": false,
+    "liveAmazonBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T06:20:02.007Z",
-    "commit": "8983a5a8c28c71f107fc2f86ae572fb619497d72"
+    "testedAt": "2026-08-21T07:28:33.517Z",
+    "commit": "ad5278dffd8cc09917674cb87ff8e6f85e5c1285"
   }
 }
