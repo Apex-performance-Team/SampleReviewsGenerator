@@ -1,10 +1,10 @@
 {
   "ok": false,
-  "stage": "high_volume_amazon_failed",
+  "stage": "reference_scan",
   "deterministic": {
-    "ok": false,
-    "amazonReferences": 13,
-    "totalReferences": 13,
+    "ok": true,
+    "amazonReferences": 219,
+    "totalReferences": 219,
     "targetSource": {
       "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "platform": "amazon.com",
@@ -15,14 +15,14 @@
       "blocked": 0,
       "failed": 0,
       "pending": false,
-      "snapshotId": "sd_mt2mqslrcjuzmgzdw",
+      "snapshotId": "sd_mt2mvcfc10takc0gno",
       "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "requested": 220,
       "aggregateRatingCount": 33151,
-      "rawRows": 13,
-      "parsedBodies": 13,
-      "reviewIdCount": 13,
-      "extracted": 13,
+      "rawRows": 220,
+      "parsedBodies": 219,
+      "reviewIdCount": 219,
+      "extracted": 219,
       "error": ""
     },
     "sampleAmazon": [
@@ -37,7 +37,7 @@
     ],
     "marketplaceIngestion": {
       "attemptedSources": 1,
-      "appendedReviews": 13,
+      "appendedReviews": 219,
       "sources": [
         {
           "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
@@ -49,19 +49,22 @@
           "blocked": 0,
           "failed": 0,
           "pending": false,
-          "snapshotId": "sd_mt2mqslrcjuzmgzdw",
+          "snapshotId": "sd_mt2mvcfc10takc0gno",
           "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
           "requested": 220,
           "aggregateRatingCount": 33151,
-          "rawRows": 13,
-          "parsedBodies": 13,
-          "reviewIdCount": 13,
-          "extracted": 13,
+          "rawRows": 220,
+          "parsedBodies": 219,
+          "reviewIdCount": 219,
+          "extracted": 219,
           "error": ""
         }
       ],
       "amazonVolumeDiscovery": {
-        "elapsedMs": 4872,
+        "elapsedMs": 9519,
+        "referenceImageUsed": false,
+        "referenceImageUrl": "http://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png?v=1779327556",
+        "verificationError": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
         "searchRuns": [
           {
             "keyword": "instabeam omnireach extended range 1byone outdoor 360 omni directional reception long 100",
@@ -87,57 +90,80 @@
   "live": {
     "ok": false,
     "stage": "reference_scan",
-    "error": "Google Lens scan returned no usable external sources. rawResults=440, uniqueCandidates=24, acceptedCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|offers|organic, images:52, tabs:AI Mode|all|exact_matches|visual_matches.",
+    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=436, uniqueCandidates=24, verifierAccepted=0. transport=uploadKeys:general, images:n/a, tabs:none.",
     "response": {
-      "error": "Google Lens scan returned no usable external sources. rawResults=440, uniqueCandidates=24, acceptedCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|offers|organic, images:52, tabs:AI Mode|all|exact_matches|visual_matches.",
+      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=436, uniqueCandidates=24, verifierAccepted=0. transport=uploadKeys:general, images:n/a, tabs:none.",
       "brightData": {
         "stage": "empty_verified_source_set",
         "zone": "synthetic_review_lens",
-        "zoneSource": "auto_detected",
+        "zoneSource": "cache",
         "imageTransport": "bright_data_native_file_upload"
       },
       "diagnostics": {
         "sourceImages": 3,
         "lensRequests": 9,
         "lensRequestsSucceeded": 7,
-        "rawResults": 440,
+        "rawResults": 436,
         "uniqueCandidates": 24,
         "acceptedCandidates": 0,
         "rejectedCandidates": 24,
         "verifierCandidates": 24,
         "verifierAccepted": 0,
         "verifierRejected": 24,
-        "amazonCandidates": 17,
+        "amazonCandidates": 5,
         "amazonAccepted": 0,
+        "amazonFallback": {
+          "status": "no_verified_candidate",
+          "queries": [
+            "instabeam omnireach extended range"
+          ],
+          "diagnostics": {
+            "elapsedMs": 7509,
+            "referenceImageUsed": false,
+            "referenceImageUrl": null,
+            "verificationError": null,
+            "searchRuns": [
+              {
+                "keyword": "instabeam omnireach extended range",
+                "ok": true,
+                "rawRows": 6,
+                "error": "",
+                "resultCount": 6
+              }
+            ],
+            "shortlist": [],
+            "verified": []
+          }
+        },
         "tabs": {
           "image1:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+            "ok": true,
+            "results": 0,
+            "amazon": 0
           },
           "image1:products": {
             "ok": true,
-            "results": 116,
-            "amazon": 36
+            "results": 0,
+            "amazon": 0
           },
           "image1:visual_matches": {
             "ok": true,
-            "results": 116,
-            "amazon": 36
-          },
-          "image2:exact_matches": {
-            "ok": true,
             "results": 0,
             "amazon": 0
+          },
+          "image2:exact_matches": {
+            "ok": false,
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
           },
           "image2:products": {
             "ok": true,
-            "results": 0,
-            "amazon": 0
+            "results": 116,
+            "amazon": 8
           },
           "image2:visual_matches": {
             "ok": true,
-            "results": 0,
-            "amazon": 0
+            "results": 116,
+            "amazon": 8
           },
           "image3:exact_matches": {
             "ok": false,
@@ -145,115 +171,16 @@
           },
           "image3:products": {
             "ok": true,
-            "results": 104,
-            "amazon": 10
+            "results": 102,
+            "amazon": 8
           },
           "image3:visual_matches": {
             "ok": true,
-            "results": 104,
-            "amazon": 10
+            "results": 102,
+            "amazon": 8
           }
         },
         "transport": [
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 52,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 52,
-              "exactMatches": null,
-              "products": 52,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 52,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 52,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 52,
-              "tabs": [
-                "AI Mode",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
-          },
           {
             "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
             "tab": "exact_matches",
@@ -353,7 +280,7 @@
               "products": null,
               "visualMatches": null,
               "tabs": [
-                "Modo IA",
+                "AI-tilstand",
                 "all",
                 "exact_matches",
                 "visual_matches"
@@ -375,7 +302,7 @@
               "products": 58,
               "visualMatches": null,
               "tabs": [
-                "Modo IA",
+                "AI-tilstand",
                 "all",
                 "exact_matches",
                 "visual_matches"
@@ -400,7 +327,7 @@
               "products": null,
               "visualMatches": null,
               "tabs": [
-                "Modo IA",
+                "AI-tilstand",
                 "all",
                 "exact_matches",
                 "visual_matches"
@@ -422,6 +349,100 @@
               "products": null,
               "visualMatches": 58,
               "tabs": [
+                "AI-tilstand",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "products",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 51,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "products"
+              ],
+              "generalType": "all",
+              "images": 51,
+              "exactMatches": null,
+              "products": 51,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "visual_matches",
+            "upload": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic"
+              ],
+              "generalType": "all",
+              "images": 51,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": [
+                "Modo IA",
+                "all",
+                "exact_matches",
+                "visual_matches"
+              ]
+            },
+            "result": {
+              "keys": [
+                "general",
+                "tabs",
+                "images",
+                "related_search",
+                "offers",
+                "organic",
+                "visual_matches"
+              ],
+              "generalType": "all",
+              "images": 51,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": 51,
+              "tabs": [
                 "Modo IA",
                 "all",
                 "exact_matches",
@@ -433,19 +454,24 @@
             "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
             "tab": "exact_matches",
             "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+            "tab": "exact_matches",
+            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
           }
         ]
       }
     }
   },
   "checks": {
-    "highVolumeAmazonExtracted": false,
+    "highVolumeAmazonExtracted": true,
     "liveCorpusNeverShrank": false,
     "liveMarketplaceBodiesExtracted": false,
     "liveAmazonBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T07:32:46.252Z",
-    "commit": "40f5e67236779731ac0a40a160e39f43150cf12e"
+    "testedAt": "2026-08-21T07:36:22.411Z",
+    "commit": "4ba34a6cf79be2e8bff81978015d9e42f4ac70a5"
   }
 }
