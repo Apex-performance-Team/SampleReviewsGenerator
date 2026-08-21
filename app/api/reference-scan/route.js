@@ -29,6 +29,11 @@ async function resolveSerpZone(key){
 function recomputePlatformCounts(refs){const m=new Map();for(const r of refs||[]){const k=`${r.platform}|${r.provider||''}`,x=m.get(k)||{platform:r.platform,provider:r.provider,reviewCount:0,pages:new Set()};x.reviewCount++;x.pages.add(r.sourceUrl);m.set(k,x)}return[...m.values()].map(x=>({platform:x.platform,provider:x.provider,reviewCount:x.reviewCount,pageCount:x.pages.size})).sort((a,b)=>b.reviewCount-a.reviewCount)}
 function stripOriginalStore(rs,originalProductUrl){const h=host(originalProductUrl);if(!h||!rs)return rs;rs.sourceCounts=(rs.sourceCounts||[]).filter(x=>host(x.directSourceUrl||x.sourceUrl)!==h);rs.aggregateOnlySources=(rs.aggregateOnlySources||[]).filter(x=>host(x.directSourceUrl||x.sourceUrl)!==h);rs.references=(rs.references||[]).filter(x=>host(x.sourceUrl)!==h);rs.platformCounts=recomputePlatformCounts(rs.references);rs.totalIndividualReviews=rs.references.length;rs.availableForGeneration=Math.min(250,rs.references.length);rs.matchedPages=rs.sourceCounts.length;rs.verifiedSourceLinks=rs.sourceCounts.filter(x=>x.linkVerified).length;return rs}
 
+function emptyScanDiagnostic(rs){
+  const l=rs?.lensDiscovery||{},v=rs?.verificationDiagnostics||{};
+  return{sourceImages:Array.isArray(l.sourceImages)?l.sourceImages.length:null,lensRequests:l.requests??l.lensRequests??null,lensRequestsSucceeded:l.succeeded??null,rawResults:l.rawResults??null,uniqueCandidates:l.uniqueCandidates??null,acceptedCandidates:l.acceptedCandidates??null,rejectedCandidates:l.rejectedCandidates??null,verifierCandidates:v.candidates??null,verifierAccepted:v.accepted??null,verifierRejected:v.rejected??null,amazonCandidates:l.amazonCandidates??null,amazonAccepted:l.amazonAccepted??null,tabs:l.tabs||null};
+}
+
 export async function POST(req){
   const key=process.env.BRIGHT_DATA_API_KEY||'';if(!key)return Response.json({error:'Bright Data Lens is not configured.'},{status:400});
   let zoneInfo;try{zoneInfo=await resolveSerpZone(key)}catch(e){return Response.json({error:e?.message||String(e),brightData:{stage:'zone_discovery'}},{status:400,headers:{'cache-control':'no-store'}})}
@@ -41,7 +46,14 @@ export async function POST(req){
   try{res=await withBrightLensNativeContext({referer:originalProductUrl},()=>mod.POST(forwarded))}
   catch(e){return Response.json({error:`Native Google Lens image upload failed: ${e?.message||String(e)}`,brightData:{stage:'native_file_upload',zone:zoneInfo.zone,zoneSource:zoneInfo.source,activeSerpZones:zoneInfo.activeSerpZones}},{status:400,headers:{'cache-control':'no-store'}})}
   let json;try{json=await res.clone().json()}catch{return res}
-  if(res.ok&&json?.referenceSet){json.referenceSet.productUrl=originalProductUrl;json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);json.referenceSet.provenance={...(json.referenceSet.provenance||{}),imageTransport:'bright_data_native_file_upload',originalProductUrl};json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:'native_file_upload'};return Response.json(json,{status:res.status,headers:{'cache-control':'no-store'}})}
+  if(res.ok&&json?.referenceSet){
+    json.referenceSet.productUrl=originalProductUrl;
+    json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);
+    json.referenceSet.provenance={...(json.referenceSet.provenance||{}),imageTransport:'bright_data_native_file_upload',originalProductUrl};
+    json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:'native_file_upload'};
+    if(!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet);return Response.json({error:`Google Lens scan returned no usable external sources. rawResults=${d.rawResults??'n/a'}, uniqueCandidates=${d.uniqueCandidates??'n/a'}, acceptedCandidates=${d.acceptedCandidates??'n/a'}, verifierAccepted=${d.verifierAccepted??'n/a'}.`,brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:'bright_data_native_file_upload'},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
+    return Response.json(json,{status:res.status,headers:{'cache-control':'no-store'}})
+  }
   if(String(json?.error||'').includes('Google Lens discovery failed for every product image'))return Response.json({error:`${json.error} Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.`,brightData:{stage:'native_lens_response',zone:zoneInfo.zone,zoneSource:zoneInfo.source,activeSerpZones:zoneInfo.activeSerpZones,imageTransport:'bright_data_native_file_upload'}},{status:400,headers:{'cache-control':'no-store'}});
   return Response.json(json,{status:res.status,headers:{'cache-control':'no-store'}})
 }
