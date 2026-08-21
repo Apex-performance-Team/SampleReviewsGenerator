@@ -17,7 +17,7 @@
       "blocked": 0,
       "failed": 0,
       "pending": false,
-      "snapshotId": "sd_mt38iuxf2qk5ekbr4y",
+      "snapshotId": "sd_mt38vbyb2fgmupuz9v",
       "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "requested": 220,
       "aggregateRatingCount": 33154,
@@ -51,7 +51,7 @@
           "blocked": 0,
           "failed": 0,
           "pending": false,
-          "snapshotId": "sd_mt38iuxf2qk5ekbr4y",
+          "snapshotId": "sd_mt38vbyb2fgmupuz9v",
           "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
           "requested": 220,
           "aggregateRatingCount": 33154,
@@ -78,7 +78,7 @@
       "brightData": {
         "stage": "empty_verified_source_set",
         "zone": "synthetic_review_lens",
-        "zoneSource": "auto_detected",
+        "zoneSource": "cache",
         "imageTransport": "bright_data_native_file_upload",
         "providerPreflight": {
           "ok": true,
@@ -96,21 +96,23 @@
         },
         "sourceImages": 3,
         "lensRequests": 9,
-        "lensRequestsSucceeded": 6,
-        "rawResults": 684,
-        "uniqueCandidates": 24,
+        "lensRequestsSucceeded": 7,
+        "rawResults": 0,
+        "uniqueCandidates": 0,
         "acceptedCandidates": 0,
-        "rejectedCandidates": 24,
-        "verifierCandidates": 24,
+        "rejectedCandidates": 0,
+        "verifierCandidates": 0,
         "verifierAccepted": 0,
-        "verifierRejected": 24,
-        "amazonCandidates": 21,
+        "verifierRejected": 0,
+        "amazonCandidates": 0,
         "amazonAccepted": 0,
         "amazonFallback": {
           "status": "no_verified_candidate",
           "baseLensError": null,
           "queries": [
-            "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup"
+            "indoor hdtv antenna",
+            "indoor hdtv antenna instabeam antennas reception helping you",
+            "indoor hdtv antenna reception"
           ],
           "identity": {
             "title": "InstaBeam Premium Indoor HDTV Antenna",
@@ -119,7 +121,8 @@
             "error": null
           },
           "diagnostics": {
-            "elapsedMs": 91853,
+            "elapsedMs": 41279,
+            "queryMode": "deterministic",
             "authoritativePdpIdentity": {
               "title": "InstaBeam Premium Indoor HDTV Antenna",
               "descriptionLength": 183,
@@ -127,44 +130,205 @@
               "error": null
             },
             "referenceImageUsed": false,
-            "referenceImageUrl": null,
-            "verificationError": null,
+            "referenceImageUrl": "http://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png?v=1779327556",
+            "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+            "localVisualFallbackUsed": false,
+            "localVisual": [],
             "searchRuns": [
               {
-                "ok": false,
-                "rawRows": 0,
-                "error": "snapshot_starting",
+                "keyword": "indoor hdtv antenna",
+                "ok": true,
+                "rawRows": 46,
+                "error": "",
+                "resultCount": 37
+              },
+              {
+                "keyword": "indoor hdtv antenna instabeam antennas reception helping you",
+                "ok": true,
+                "rawRows": 52,
+                "error": "",
+                "resultCount": 45
+              },
+              {
+                "keyword": "indoor hdtv antenna reception",
+                "ok": true,
+                "rawRows": 1,
+                "error": "",
                 "resultCount": 0
               }
             ],
-            "providerFallback": {
-              "diagnostics": {
-                "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
-              },
-              "candidates": []
-            },
-            "publicSearchRuns": [
+            "providerFallback": null,
+            "publicSearchRuns": [],
+            "shortlist": [
               {
-                "query": "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup",
-                "ok": false,
-                "error": null,
-                "resultCount": 0,
-                "diagnostics": {
-                  "bing": {
-                    "ok": true,
-                    "status": 200,
-                    "error": null
-                  },
-                  "duckduckgo": {
-                    "ok": false,
-                    "status": 403,
-                    "error": null
-                  },
-                  "rawResults": 0
-                }
+                "asin": "B0D9LQLSFF",
+                "title": "Digital TV Antenna for Smart TV Indoor, HDTV Antenna with Magnetic Base | Strong Magnetic Base 360°&Long Range Reception,Easy Setup Antenna for TV Without Cable",
+                "ratingCount": 12,
+                "lexicalOverlap": 0.4,
+                "rankOnPage": 13,
+                "pageNumber": 1,
+                "discoveryScore": 2.9892429190383547,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0FD9RLFSP",
+                "title": "HD Antenna for TV Indoor,Digital Antenna with Strong Magnetic Base,Long Range Reception TV Antennas for Local Channels,Easy Installation with 9.69FT Cable 130Mlies,Supports 4K 1080p",
+                "ratingCount": 15,
+                "lexicalOverlap": 0.26666666666666666,
+                "rankOnPage": 4,
+                "pageNumber": 1,
+                "discoveryScore": 2.4905149978319905,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B07YJ4TKFM",
+                "title": "HIDB TV Antenna for Smart TV Indoor, Digital TV Antenna for Local Channels | OTA Digital HD Signal Antenna with Magnetic Base and 10ft Cable for Easy Setup",
+                "ratingCount": 212,
+                "lexicalOverlap": 0.18181818181818182,
+                "rankOnPage": 1,
+                "pageNumber": 1,
+                "discoveryScore": 2.4592292686116606,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0D5YH3R5C",
+                "title": "DAANT TV Antenna Indoor Long Range | Supports 4K 1080p Smart TV Signal Reception with 16ft HDTV Coax Cable",
+                "ratingCount": 39,
+                "lexicalOverlap": 0.25,
+                "rankOnPage": 5,
+                "pageNumber": 1,
+                "discoveryScore": 2.441924165582662,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0CVW14368",
+                "title": "TV Antennas, HD Digital Antenna for Smart TV Indoor, 360°Signal Reception-Digital tv Antenna Indoor for Local Channels-Support 4K 1080p for All Type of HDTV Digital TV's",
+                "ratingCount": 21,
+                "lexicalOverlap": 0.25,
+                "rankOnPage": 5,
+                "pageNumber": 1,
+                "discoveryScore": 2.4094695017694425,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0D5MCGGXL",
+                "title": "Digital TV Antenna for Smart TV Indoor,HD Antenna for TV Indoor | TV Antennas for Local Channels,Strong Magnetic Base,Long Range Reception,Easy Installation Antennas for TVs",
+                "ratingCount": 36,
+                "lexicalOverlap": 0.25,
+                "rankOnPage": 8,
+                "pageNumber": 1,
+                "discoveryScore": 2.398802993286152,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0D5MC9MSX",
+                "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
+                "ratingCount": 36,
+                "lexicalOverlap": 0.35714285714285715,
+                "rankOnPage": 15,
+                "pageNumber": 2,
+                "discoveryScore": 2.3469180726512313,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0G4CS1RZR",
+                "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
+                "ratingCount": 278,
+                "lexicalOverlap": 0.21052631578947367,
+                "rankOnPage": 9,
+                "pageNumber": 1,
+                "discoveryScore": 2.3230689464618313,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0F542J65B",
+                "title": "TV Antenna for Local Channels, TV Antenna for Smart TV Indoor -18ft Cable | Support 4K 1080p with Signal Booster for Local Channels, Long Range Reception(Dark Grey)",
+                "ratingCount": 85,
+                "lexicalOverlap": 0.2,
+                "rankOnPage": 7,
+                "pageNumber": 1,
+                "discoveryScore": 2.2293123064054456,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0FQ5C6MTP",
+                "title": "Mornixol TV Antenna Indoor, Digital Outdoor TV Antenna with Signal Booster, 100 Miles Long Range Reception for 4K 8K 1080P HD Outdoor Antenna, 360° Reception, 40ft Cable, Weatherproof, Easy Setup",
+                "ratingCount": 14,
+                "lexicalOverlap": 0.2,
+                "rankOnPage": 0,
+                "pageNumber": 1,
+                "discoveryScore": 2.0803447407152937,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0GSFLF2KN",
+                "title": "Indoor Antenna for Smart TV,HDTV Antenna for All Tvs Support 4k 1080p with Long Range 102 Miles,Easy Installation Antennas for 9.77FT Cable",
+                "ratingCount": 1,
+                "lexicalOverlap": 0.21428571428571427,
+                "rankOnPage": 13,
+                "pageNumber": 1,
+                "discoveryScore": 2.051914463743712,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
+              },
+              {
+                "asin": "B0HC3WD486",
+                "title": "TV Antenna Indoor, 2026 Digital TV Antenna for Local Channels, HDTV Antenna for TV Without Cable for Smart/Old TV Long Range Reception Support 4K 1080p A41",
+                "ratingCount": 23,
+                "lexicalOverlap": 0.2857142857142857,
+                "rankOnPage": 7,
+                "pageNumber": 2,
+                "discoveryScore": 2.0457406909282363,
+                "webSearchConfidence": null,
+                "publicSignals": null,
+                "publicEngineCount": null,
+                "publicQueryCount": null,
+                "localVisual": null
               }
             ],
-            "shortlist": [],
             "verified": []
           }
         },
@@ -175,27 +339,28 @@
           },
           "image1:products": {
             "ok": true,
-            "results": 112,
-            "amazon": 10
+            "results": 0,
+            "amazon": 0
           },
           "image1:visual_matches": {
             "ok": true,
-            "results": 112,
-            "amazon": 10
+            "results": 0,
+            "amazon": 0
           },
           "image2:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
+            "ok": true,
+            "results": 0,
+            "amazon": 0
           },
           "image2:products": {
             "ok": true,
-            "results": 114,
-            "amazon": 42
+            "results": 0,
+            "amazon": 0
           },
           "image2:visual_matches": {
             "ok": true,
-            "results": 114,
-            "amazon": 42
+            "results": 0,
+            "amazon": 0
           },
           "image3:exact_matches": {
             "ok": false,
@@ -203,13 +368,13 @@
           },
           "image3:products": {
             "ok": true,
-            "results": 116,
-            "amazon": 12
+            "results": 0,
+            "amazon": 0
           },
           "image3:visual_matches": {
             "ok": true,
-            "results": 116,
-            "amazon": 12
+            "results": 0,
+            "amazon": 0
           }
         },
         "transport": [
@@ -310,10 +475,86 @@
           {
             "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
             "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
+            "upload": {
+              "keys": [
+                "general"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": []
+            },
+            "result": {
+              "keys": [
+                "general",
+                "exact_matches"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": 0,
+              "products": null,
+              "visualMatches": null,
+              "tabs": []
+            }
           },
           {
             "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "products",
+            "upload": {
+              "keys": [
+                "general"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": []
+            },
+            "result": {
+              "keys": [
+                "general",
+                "products"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": null,
+              "products": 0,
+              "visualMatches": null,
+              "tabs": []
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "tab": "visual_matches",
+            "upload": {
+              "keys": [
+                "general"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": null,
+              "tabs": []
+            },
+            "result": {
+              "keys": [
+                "general",
+                "visual_matches"
+              ],
+              "generalType": "all",
+              "images": null,
+              "exactMatches": null,
+              "products": null,
+              "visualMatches": 0,
+              "tabs": []
+            }
+          },
+          {
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
             "tab": "products",
             "upload": {
               "keys": [
@@ -360,7 +601,7 @@
             }
           },
           {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
             "tab": "visual_matches",
             "upload": {
               "keys": [
@@ -413,100 +654,6 @@
           },
           {
             "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 58,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Chế độ AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 58,
-              "exactMatches": null,
-              "products": 58,
-              "visualMatches": null,
-              "tabs": [
-                "Chế độ AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 58,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Chế độ AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "offers",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 58,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 58,
-              "tabs": [
-                "Chế độ AI",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
             "tab": "exact_matches",
             "error": "bright_data_native_exact_matches_400:either q, as_q or kgmid parameter must be present"
           }
@@ -522,7 +669,7 @@
     "liveCorpusTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T17:45:43.830Z",
-    "commit": "58dcaaa8d14a24798753f7a80803f4b77134de1d"
+    "testedAt": "2026-08-21T17:53:58.165Z",
+    "commit": "691db2a1607df52ca39b5bee00f3844e5b1bbdb5"
   }
 }
