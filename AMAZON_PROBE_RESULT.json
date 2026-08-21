@@ -1,235 +1,709 @@
 {
-  "ok": false,
-  "ai": {
-    "configured": true,
-    "auth": "oidc-header",
-    "directOpenAIConfigured": false
-  },
-  "candidates": [],
-  "queries": [
-    "indoor hdtv antenna",
-    "indoor hdtv antenna instabeam antennas reception helping you",
-    "indoor hdtv antenna reception"
-  ],
-  "identity": {
-    "title": "InstaBeam Premium Indoor HDTV Antenna",
-    "descriptionLength": 183,
-    "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
-    "error": null
-  },
-  "diagnostics": {
-    "elapsedMs": 65218,
-    "queryMode": "deterministic",
-    "authoritativePdpIdentity": {
+  "volume": {
+    "ok": false,
+    "ai": {
+      "configured": true,
+      "auth": "oidc-header",
+      "directOpenAIConfigured": false
+    },
+    "candidates": [],
+    "queries": [
+      "indoor hdtv antenna",
+      "indoor hdtv antenna instabeam antennas reception helping you",
+      "indoor hdtv antenna reception"
+    ],
+    "identity": {
       "title": "InstaBeam Premium Indoor HDTV Antenna",
       "descriptionLength": 183,
       "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
       "error": null
     },
-    "referenceImageUsed": false,
-    "referenceImageUrl": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
-    "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
-    "localVisualFallbackUsed": false,
-    "localVisual": [],
+    "diagnostics": {
+      "elapsedMs": 22737,
+      "queryMode": "deterministic",
+      "authoritativePdpIdentity": {
+        "title": "InstaBeam Premium Indoor HDTV Antenna",
+        "descriptionLength": 183,
+        "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+        "error": null
+      },
+      "referenceImageUsed": false,
+      "referenceImageUrl": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+      "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+      "localVisualFallbackUsed": false,
+      "localVisual": [],
+      "searchRuns": [
+        {
+          "keyword": "indoor hdtv antenna",
+          "ok": true,
+          "rawRows": 46,
+          "error": "",
+          "resultCount": 36
+        },
+        {
+          "keyword": "indoor hdtv antenna instabeam antennas reception helping you",
+          "ok": true,
+          "rawRows": 48,
+          "error": "",
+          "resultCount": 39
+        },
+        {
+          "keyword": "indoor hdtv antenna reception",
+          "ok": true,
+          "rawRows": 55,
+          "error": "",
+          "resultCount": 44
+        }
+      ],
+      "providerFallback": null,
+      "publicSearchRuns": [],
+      "shortlist": [
+        {
+          "asin": "B0D9LQLSFF",
+          "title": "Digital TV Antenna for Smart TV Indoor, HDTV Antenna with Magnetic Base | Strong Magnetic Base 360°&Long Range Reception,Easy Setup Antenna for TV Without Cable",
+          "ratingCount": 12,
+          "lexicalOverlap": 0.4,
+          "rankOnPage": 14,
+          "pageNumber": 1,
+          "discoveryScore": 2.9859095857050213,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0D5MC9MSX",
+          "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
+          "ratingCount": 36,
+          "lexicalOverlap": 0.35714285714285715,
+          "rankOnPage": 13,
+          "pageNumber": 1,
+          "discoveryScore": 2.853168072651232,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0GSXXLMJ1",
+          "title": "Antenna for Smart TV,2026 TV Antenna for Local Channels,Supports 4k, 1080p for TVs Without Cable and Long Range Reception，Easy Setup Antennas for Tvs (Yellow)",
+          "ratingCount": 37,
+          "lexicalOverlap": 0.2857142857142857,
+          "rankOnPage": 4,
+          "pageNumber": 1,
+          "discoveryScore": 2.6231872352913865,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0D5YH3R5C",
+          "title": "DAANT TV Antenna Indoor Long Range | Supports 4K 1080p Smart TV Signal Reception with 16ft HDTV Coax Cable",
+          "ratingCount": 39,
+          "lexicalOverlap": 0.25,
+          "rankOnPage": 2,
+          "pageNumber": 1,
+          "discoveryScore": 2.5585908322493287,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B07YJ4TKFM",
+          "title": "HIDB TV Antenna for Smart TV Indoor, Digital TV Antenna for Local Channels | OTA Digital HD Signal Antenna with Magnetic Base and 10ft Cable for Easy Setup",
+          "ratingCount": 212,
+          "lexicalOverlap": 0.18181818181818182,
+          "rankOnPage": 1,
+          "pageNumber": 1,
+          "discoveryScore": 2.4592292686116606,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0CVW14368",
+          "title": "TV Antennas, HD Digital Antenna for Smart TV Indoor, 360°Signal Reception-Digital tv Antenna Indoor for Local Channels-Support 4K 1080p for All Type of HDTV Digital TV's",
+          "ratingCount": 21,
+          "lexicalOverlap": 0.25,
+          "rankOnPage": 5,
+          "pageNumber": 1,
+          "discoveryScore": 2.4094695017694425,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0D5MCGGXL",
+          "title": "Digital TV Antenna for Smart TV Indoor,HD Antenna for TV Indoor | TV Antennas for Local Channels,Strong Magnetic Base,Long Range Reception,Easy Installation Antennas for TVs",
+          "ratingCount": 36,
+          "lexicalOverlap": 0.25,
+          "rankOnPage": 8,
+          "pageNumber": 1,
+          "discoveryScore": 2.398802993286152,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0G4CS1RZR",
+          "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
+          "ratingCount": 278,
+          "lexicalOverlap": 0.21052631578947367,
+          "rankOnPage": 11,
+          "pageNumber": 1,
+          "discoveryScore": 2.3114022797951645,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0F542J65B",
+          "title": "TV Antenna for Local Channels, TV Antenna for Smart TV Indoor -18ft Cable | Support 4K 1080p with Signal Booster for Local Channels, Long Range Reception(Dark Grey)",
+          "ratingCount": 85,
+          "lexicalOverlap": 0.2,
+          "rankOnPage": 4,
+          "pageNumber": 1,
+          "discoveryScore": 2.281812306405446,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B087KDM3Z6",
+          "title": "GE TV Antenna for Smart TV Indoor, HD Antenna, Free Local Channels | Supports 4K 1080p Signal Reception with Signal Amplifier, 48732",
+          "ratingCount": 243,
+          "lexicalOverlap": 0.18181818181818182,
+          "rankOnPage": 16,
+          "pageNumber": 1,
+          "discoveryScore": 2.1577820170623947,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0FQ5C6MTP",
+          "title": "Mornixol TV Antenna Indoor, Digital Outdoor TV Antenna with Signal Booster, 100 Miles Long Range Reception for 4K 8K 1080P HD Outdoor Antenna, 360° Reception, 40ft Cable, Weatherproof, Easy Setup",
+          "ratingCount": 14,
+          "lexicalOverlap": 0.2,
+          "rankOnPage": 0,
+          "pageNumber": 1,
+          "discoveryScore": 2.0803447407152937,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        },
+        {
+          "asin": "B0H5PRNV45",
+          "title": "TV Antenna for Smart TV, Indoor Antenna for Local Channels, Long Range Reception, Supports 4K 1080p HD, Amplified Signal Booster, 9.84FT Coax Cable, Easy Installation",
+          "ratingCount": 27,
+          "lexicalOverlap": 0.1875,
+          "rankOnPage": 16,
+          "pageNumber": 1,
+          "discoveryScore": 2.0658212245060126,
+          "webSearchConfidence": null,
+          "publicSignals": null,
+          "publicEngineCount": null,
+          "publicQueryCount": null,
+          "localVisual": null
+        }
+      ],
+      "verified": []
+    }
+  },
+  "imageSimilarity": {
+    "ok": true,
+    "identity": {
+      "title": "InstaBeam Premium Indoor HDTV Antenna",
+      "description": "InstaBeam TV offers HDTV antennas designed for crystal-clear viewing, strong reception, and easy setup — helping you enjoy affordable home entertainment without expensive cable bills.",
+      "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+      "finalUrl": "https://instabeamtv.com/products/premium-antenna-1"
+    },
+    "queries": [
+      "indoor hdtv antenna",
+      "digital tv antenna smart tv indoor magnetic base",
+      "indoor tv antenna long range reception magnetic base"
+    ],
     "searchRuns": [
       {
         "keyword": "indoor hdtv antenna",
         "ok": true,
-        "rawRows": 57,
-        "error": "",
-        "resultCount": 41
+        "rawRows": 24,
+        "resultCount": 20,
+        "error": ""
       },
       {
-        "keyword": "indoor hdtv antenna instabeam antennas reception helping you",
+        "keyword": "digital tv antenna smart tv indoor magnetic base",
         "ok": true,
-        "rawRows": 53,
-        "error": "",
-        "resultCount": 41
+        "rawRows": 22,
+        "resultCount": 20,
+        "error": ""
       },
       {
-        "keyword": "indoor hdtv antenna reception",
+        "keyword": "indoor tv antenna long range reception magnetic base",
         "ok": true,
-        "rawRows": 55,
-        "error": "",
-        "resultCount": 46
+        "rawRows": 22,
+        "resultCount": 20,
+        "error": ""
       }
     ],
-    "providerFallback": null,
-    "publicSearchRuns": [],
-    "shortlist": [
-      {
-        "asin": "B0D5MC9MSX",
-        "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
-        "ratingCount": 36,
-        "lexicalOverlap": 0.35714285714285715,
-        "rankOnPage": 12,
-        "pageNumber": 1,
-        "discoveryScore": 2.8570142264973857,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
-      },
-      {
-        "asin": "B0D5YH3R5C",
-        "title": "DAANT TV Antenna Indoor Long Range | Supports 4K 1080p Smart TV Signal Reception with 16ft HDTV Coax Cable",
-        "ratingCount": 39,
-        "lexicalOverlap": 0.25,
-        "rankOnPage": 2,
-        "pageNumber": 1,
-        "discoveryScore": 2.5585908322493287,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
-      },
+    "candidates": [
       {
         "asin": "B07YJ4TKFM",
+        "url": "https://www.amazon.com/dp/B07YJ4TKFM",
         "title": "HIDB TV Antenna for Smart TV Indoor, Digital TV Antenna for Local Channels | OTA Digital HD Signal Antenna with Magnetic Base and 10ft Cable for Easy Setup",
+        "image": "https://m.media-amazon.com/images/I/61B2oJ9iT8L._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
         "ratingCount": 212,
-        "lexicalOverlap": 0.18181818181818182,
         "rankOnPage": 1,
-        "pageNumber": 1,
-        "discoveryScore": 2.4592292686116606,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "similarity": {
+          "index": 0,
+          "ok": true,
+          "score": 0.6319,
+          "averageHash": 0.6855,
+          "differenceHash": 0.5986,
+          "silhouetteIou": 0.5772,
+          "pixelCorrelation": 0.6853
+        }
       },
       {
-        "asin": "B0CVW14368",
-        "title": "TV Antennas, HD Digital Antenna for Smart TV Indoor, 360°Signal Reception-Digital tv Antenna Indoor for Local Channels-Support 4K 1080p for All Type of HDTV Digital TV's",
-        "ratingCount": 21,
-        "lexicalOverlap": 0.25,
-        "rankOnPage": 5,
-        "pageNumber": 1,
-        "discoveryScore": 2.4094695017694425,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "asin": "B0DB78DFBB",
+        "url": "https://www.amazon.com/dp/B0DB78DFBB",
+        "title": "HIDB Indoor TV Antenna for Smart TV, Digital tv Antenna for Local Channels | OTA HD TV Antenna Indoor with Long Range Reception & 10ft Cables, Strong Magnetic Base, Easy Installation, Support 4K 1080P",
+        "image": "https://m.media-amazon.com/images/I/619JI5gPhpL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 212,
+        "rankOnPage": 6,
+        "similarity": {
+          "index": 14,
+          "ok": true,
+          "score": 0.6019,
+          "averageHash": 0.6357,
+          "differenceHash": 0.6025,
+          "silhouetteIou": 0.5414,
+          "pixelCorrelation": 0.6413
+        }
+      },
+      {
+        "asin": "B0GR12MK6V",
+        "url": "https://www.amazon.com/dp/B0GR12MK6V",
+        "title": "TV Antenna Indoor for Local Channels,Digital Antenna for Smart TV Indoor | Easy Installation Support 4K 1080p Channels Strong Magnetic Base-16.5 ft Long Cables (Black Upgrade)",
+        "image": "https://m.media-amazon.com/images/I/81q9WyX3dlL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 93,
+        "rankOnPage": 2,
+        "similarity": {
+          "index": 3,
+          "ok": true,
+          "score": 0.5779,
+          "averageHash": 0.5859,
+          "differenceHash": 0.5986,
+          "silhouetteIou": 0.5378,
+          "pixelCorrelation": 0.5939
+        }
+      },
+      {
+        "asin": "B0D5MC9MSX",
+        "url": "https://www.amazon.com/dp/B0D5MC9MSX",
+        "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
+        "image": "https://m.media-amazon.com/images/I/713FzuDet6L._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 36,
+        "rankOnPage": 1,
+        "similarity": {
+          "index": 1,
+          "ok": true,
+          "score": 0.5707,
+          "averageHash": 0.6016,
+          "differenceHash": 0.5625,
+          "silhouetteIou": 0.5193,
+          "pixelCorrelation": 0.6152
+        }
       },
       {
         "asin": "B0D5MCGGXL",
+        "url": "https://www.amazon.com/dp/B0D5MCGGXL",
         "title": "Digital TV Antenna for Smart TV Indoor,HD Antenna for TV Indoor | TV Antennas for Local Channels,Strong Magnetic Base,Long Range Reception,Easy Installation Antennas for TVs",
+        "image": "https://m.media-amazon.com/images/I/51KTwuK4ApL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
         "ratingCount": 36,
-        "lexicalOverlap": 0.25,
-        "rankOnPage": 8,
-        "pageNumber": 1,
-        "discoveryScore": 2.398802993286152,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "rankOnPage": 5,
+        "similarity": {
+          "index": 11,
+          "ok": true,
+          "score": 0.5586,
+          "averageHash": 0.5703,
+          "differenceHash": 0.5693,
+          "silhouetteIou": 0.5152,
+          "pixelCorrelation": 0.5905
+        }
       },
       {
-        "asin": "B0G4CS1RZR",
-        "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
-        "ratingCount": 278,
-        "lexicalOverlap": 0.21052631578947367,
-        "rankOnPage": 14,
-        "pageNumber": 1,
-        "discoveryScore": 2.299735613128498,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "asin": "B0D5YH3R5C",
+        "url": "https://www.amazon.com/dp/B0D5YH3R5C",
+        "title": "DAANT TV Antenna Indoor Long Range | Supports 4K 1080p Smart TV Signal Reception with 16ft HDTV Coax Cable",
+        "image": "https://m.media-amazon.com/images/I/61hB6kStamL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 39,
+        "rankOnPage": 5,
+        "similarity": {
+          "index": 10,
+          "ok": true,
+          "score": 0.5545,
+          "averageHash": 0.5293,
+          "differenceHash": 0.5723,
+          "silhouetteIou": 0.551,
+          "pixelCorrelation": 0.5724
+        }
+      },
+      {
+        "asin": "B0GXVC3LKL",
+        "url": "https://www.amazon.com/dp/B0GXVC3LKL",
+        "title": "TV Antenna for Local Channels, Digital Antenna for Smart TV Indoor 4K HD | Magnetic Base, OTA HDTV Antenna Indoor with 360° Reception and 8.2 ft Cable for TVs with a Built-in ATSC Tuner",
+        "image": "https://m.media-amazon.com/images/I/71m05DcGrhL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 102,
+        "rankOnPage": 4,
+        "similarity": {
+          "index": 8,
+          "ok": true,
+          "score": 0.5455,
+          "averageHash": 0.5635,
+          "differenceHash": 0.5615,
+          "silhouetteIou": 0.4865,
+          "pixelCorrelation": 0.5834
+        }
+      },
+      {
+        "asin": "B01FUB4ZG8",
+        "url": "https://www.amazon.com/dp/B01FUB4ZG8",
+        "title": "TV Antenna Indoor, Digital Amplified Indoor HDTV Antenna, 1080p VHF UHF Television Local Channels Detachable Signal Amplifier and 16.5ft Long Coax Cable",
+        "image": "https://m.media-amazon.com/images/I/61k+sBPppPL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 189,
+        "rankOnPage": 10,
+        "similarity": {
+          "index": 22,
+          "ok": true,
+          "score": 0.5445,
+          "averageHash": 0.541,
+          "differenceHash": 0.583,
+          "silhouetteIou": 0.4984,
+          "pixelCorrelation": 0.5602
+        }
+      },
+      {
+        "asin": "B074TWSQFM",
+        "url": "https://www.amazon.com/dp/B074TWSQFM",
+        "title": "Channel Master FLATenna - Indoor Digital HDTV Antenna, 12' Coaxial Cable, Superior Reception Range & Signal Reliability, Supports 4K Smart TVs, OTA Broadcast & NextGen TV, Easy Install",
+        "image": "https://m.media-amazon.com/images/I/71BllsFHBOL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 2,
+        "rankOnPage": 7,
+        "similarity": {
+          "index": 15,
+          "ok": true,
+          "score": 0.5389,
+          "averageHash": 0.5391,
+          "differenceHash": 0.5918,
+          "silhouetteIou": 0.4759,
+          "pixelCorrelation": 0.5516
+        }
+      },
+      {
+        "asin": "B0GVW7VRKS",
+        "url": "https://www.amazon.com/dp/B0GVW7VRKS",
+        "title": "TV Antenna for Local Channels Indoor, 2026 Digital Antenna for Smart TV with Magnetic Base, 360° Long Range Reception Supports 4K/1080p HD, 16.66ft Cable for Smart & Old TVs",
+        "image": "https://m.media-amazon.com/images/I/81INBT8c5sL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 21,
+        "rankOnPage": 8,
+        "similarity": {
+          "index": 18,
+          "ok": true,
+          "score": 0.5317,
+          "averageHash": 0.5576,
+          "differenceHash": 0.5459,
+          "silhouetteIou": 0.4823,
+          "pixelCorrelation": 0.5442
+        }
+      },
+      {
+        "asin": "B0FD9RLFSP",
+        "url": "https://www.amazon.com/dp/B0FD9RLFSP",
+        "title": "HD Antenna for TV Indoor,Digital Antenna with Strong Magnetic Base,Long Range Reception TV Antennas for Local Channels,Easy Installation with 9.69FT Cable 130Mlies,Supports 4K 1080p",
+        "image": "https://m.media-amazon.com/images/I/51wHOIBcbrL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 15,
+        "rankOnPage": 2,
+        "similarity": {
+          "index": 4,
+          "ok": true,
+          "score": 0.5232,
+          "averageHash": 0.5889,
+          "differenceHash": 0.6309,
+          "silhouetteIou": 0.297,
+          "pixelCorrelation": 0.5969
+        }
+      },
+      {
+        "asin": "B0GWQMMFSF",
+        "url": "https://www.amazon.com/dp/B0GWQMMFSF",
+        "title": "TV Antenna for Smart TV Indoor,TV Antenna for Local Channels | Support 4K 1080p with Signal Booster Antenna TV Digital HD Indoor & Outdoor-Cylindrical Antenna",
+        "image": "https://m.media-amazon.com/images/I/71fT5M-4PFL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 258,
+        "rankOnPage": 2,
+        "similarity": {
+          "index": 2,
+          "ok": true,
+          "score": 0.5227,
+          "averageHash": 0.5371,
+          "differenceHash": 0.5449,
+          "silhouetteIou": 0.4834,
+          "pixelCorrelation": 0.5247
+        }
+      },
+      {
+        "asin": "B0H8D77N5T",
+        "url": "https://www.amazon.com/dp/B0H8D77N5T",
+        "title": "TV Antenna Indoor for Local Channels,Digital Antenna for Smart TV Indoor | Long-Range Reception Digital antenna for smart tv easy installation support 4K 1080p strong magnetic base 16 ft Long Cables",
+        "image": "https://m.media-amazon.com/images/I/71nrWBkFd2L._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 93,
+        "rankOnPage": 5,
+        "similarity": {
+          "index": 12,
+          "ok": true,
+          "score": 0.5218,
+          "averageHash": 0.5537,
+          "differenceHash": 0.5498,
+          "silhouetteIou": 0.4616,
+          "pixelCorrelation": 0.519
+        }
+      },
+      {
+        "asin": "B0DNQ7NSR1",
+        "url": "https://www.amazon.com/dp/B0DNQ7NSR1",
+        "title": "Digital Antenna for Smart TV Indoor,TV Antenna for Local Channels | Strong Magnetic Base TV Antenna Indoor for Easy Installation, Long Range Reception for 4k 1080p, Support All Smart/Old TVs",
+        "image": "https://m.media-amazon.com/images/I/71dXXcwLeZL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 503,
+        "rankOnPage": 7,
+        "similarity": {
+          "index": 16,
+          "ok": true,
+          "score": 0.5153,
+          "averageHash": 0.5195,
+          "differenceHash": 0.5098,
+          "silhouetteIou": 0.4938,
+          "pixelCorrelation": 0.5515
+        }
+      },
+      {
+        "asin": "B0HFCSG8R4",
+        "url": "https://www.amazon.com/dp/B0HFCSG8R4",
+        "title": "2026 TV Antenna Indoor for Local Channels Digital TV Antenna for Smart TV | with Magnetic Base,3600+ Miles High Gain Long-Range Receiption with Amplifier Signal Booster,Support 4K 1080P/ Older TVs",
+        "image": "https://m.media-amazon.com/images/I/716eOFNN8EL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 38,
+        "rankOnPage": 10,
+        "similarity": {
+          "index": 23,
+          "ok": true,
+          "score": 0.5134,
+          "averageHash": 0.5801,
+          "differenceHash": 0.5146,
+          "silhouetteIou": 0.4206,
+          "pixelCorrelation": 0.549
+        }
+      },
+      {
+        "asin": "B0GWDG1ZPR",
+        "url": "https://www.amazon.com/dp/B0GWDG1ZPR",
+        "title": "TV Antenna Indoor for All Smart TVs, HD Digital Antenna with 124Miles 360° Long Range Reception, Strong Magnetic Base and Easy Installation Antennas with 9.95FT Cable",
+        "image": "https://m.media-amazon.com/images/I/51uQs+k6VsL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 1,
+        "rankOnPage": 3,
+        "similarity": {
+          "index": 6,
+          "ok": true,
+          "score": 0.5106,
+          "averageHash": 0.5781,
+          "differenceHash": 0.6074,
+          "silhouetteIou": 0.33,
+          "pixelCorrelation": 0.5267
+        }
+      },
+      {
+        "asin": "B0D8MB6PBP",
+        "url": "https://www.amazon.com/dp/B0D8MB6PBP",
+        "title": "UltraPro Hover Digital TV Antenna Indoor for Smart TV | Long Range HD Local Channels, Easy Mount on Top Design, Supports 4K 1080P HDTV VHF UHF, 360° Reception, 83713",
+        "image": "https://m.media-amazon.com/images/I/71RXWwhsX8L._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 11,
+        "rankOnPage": 4,
+        "similarity": {
+          "index": 7,
+          "ok": true,
+          "score": 0.4994,
+          "averageHash": 0.5811,
+          "differenceHash": 0.5811,
+          "silhouetteIou": 0.2923,
+          "pixelCorrelation": 0.5594
+        }
+      },
+      {
+        "asin": "B0GHW74WX8",
+        "url": "https://www.amazon.com/dp/B0GHW74WX8",
+        "title": "Digital TV Antenna for Smart TV Indoor, HDTV Antenna for Local Channels, Long Range Reception with Signal Booster, 4K 1080P, Magnetic Base",
+        "image": "https://m.media-amazon.com/images/I/71piNtYzcwL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 5,
+        "rankOnPage": 4,
+        "similarity": {
+          "index": 9,
+          "ok": true,
+          "score": 0.4947,
+          "averageHash": 0.4834,
+          "differenceHash": 0.5273,
+          "silhouetteIou": 0.4968,
+          "pixelCorrelation": 0.456
+        }
       },
       {
         "asin": "B0F542J65B",
+        "url": "https://www.amazon.com/dp/B0F542J65B",
         "title": "TV Antenna for Local Channels, TV Antenna for Smart TV Indoor -18ft Cable | Support 4K 1080p with Signal Booster for Local Channels, Long Range Reception(Dark Grey)",
+        "image": "https://m.media-amazon.com/images/I/61c+FqzFyOL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
         "ratingCount": 85,
-        "lexicalOverlap": 0.2,
         "rankOnPage": 6,
-        "pageNumber": 1,
-        "discoveryScore": 2.241812306405446,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "similarity": {
+          "index": 13,
+          "ok": true,
+          "score": 0.4905,
+          "averageHash": 0.499,
+          "differenceHash": 0.5508,
+          "silhouetteIou": 0.4164,
+          "pixelCorrelation": 0.4948
+        }
       },
       {
-        "asin": "B0H39G91RH",
-        "title": "Digital Indoor TV Antenna for Smart TV for Local Channels 4K HD | OTA TV Antenna Indoor with Magnetic Base, 360° Reception, 8.2ft Cable - Fit Any TVs with Built-in Tuner",
-        "ratingCount": 37,
-        "lexicalOverlap": 0.1875,
-        "rankOnPage": 4,
-        "pageNumber": 1,
-        "discoveryScore": 2.1812229495771014,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "asin": "B0GHY79QF4",
+        "url": "https://www.amazon.com/dp/B0GHY79QF4",
+        "title": "Indoor TV Antenna with 2 Signal Boosters & 32FT Cable – Digital Antenna for Smart TV, Magnetic Base, Supports 4K 1080p – Dual Amplifiers for Long Range Reception of Local Channels (Red)",
+        "image": "https://m.media-amazon.com/images/I/61mJd0QB3ZL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 69,
+        "rankOnPage": 8,
+        "similarity": {
+          "index": 19,
+          "ok": true,
+          "score": 0.4865,
+          "averageHash": 0.5156,
+          "differenceHash": 0.5996,
+          "silhouetteIou": 0.3343,
+          "pixelCorrelation": 0.4939
+        }
       },
       {
-        "asin": "B087KDM3Z6",
-        "title": "GE TV Antenna for Smart TV Indoor, HD Antenna, Free Local Channels | Supports 4K 1080p Signal Reception with Signal Amplifier, 48732",
-        "ratingCount": 243,
-        "lexicalOverlap": 0.18181818181818182,
-        "rankOnPage": 15,
-        "pageNumber": 1,
-        "discoveryScore": 2.1603555464741593,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
-      },
-      {
-        "asin": "B0FQ5C6MTP",
-        "title": "Mornixol TV Antenna Indoor, Digital Outdoor TV Antenna with Signal Booster, 100 Miles Long Range Reception for 4K 8K 1080P HD Outdoor Antenna, 360° Reception, 40ft Cable, Weatherproof, Easy Setup",
-        "ratingCount": 14,
-        "lexicalOverlap": 0.2,
-        "rankOnPage": 0,
-        "pageNumber": 1,
-        "discoveryScore": 2.0803447407152937,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
-      },
-      {
-        "asin": "B0H5PRNV45",
-        "title": "TV Antenna for Smart TV, Indoor Antenna for Local Channels, Long Range Reception, Supports 4K 1080p HD, Amplified Signal Booster, 9.84FT Coax Cable, Easy Installation",
-        "ratingCount": 27,
-        "lexicalOverlap": 0.1875,
-        "rankOnPage": 16,
-        "pageNumber": 1,
-        "discoveryScore": 2.0658212245060126,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
-      },
-      {
-        "asin": "B0HC3WD486",
-        "title": "TV Antenna Indoor, 2026 Digital TV Antenna for Local Channels, HDTV Antenna for TV Without Cable for Smart/Old TV Long Range Reception Support 4K 1080p A41",
-        "ratingCount": 23,
-        "lexicalOverlap": 0.2857142857142857,
+        "asin": "B07BLNWZHS",
+        "url": "https://www.amazon.com/dp/B07BLNWZHS",
+        "title": "Philips Rabbit Ears Black Indoor TV Antenna, Dipole and Circular Loop | Tabletop Antenna, Digital, Smart TV Compatible, HDTV Antenna, 4K 1080P VHF UHF, 5Ft Coaxial Cable, SDV8201B/27",
+        "image": "https://m.media-amazon.com/images/I/51QRQEdAKBL._AC_UY218_.jpg",
+        "query": "indoor hdtv antenna",
+        "ratingCount": 43,
         "rankOnPage": 9,
-        "pageNumber": 2,
-        "discoveryScore": 2.0282406909282362,
-        "webSearchConfidence": null,
-        "publicSignals": null,
-        "publicEngineCount": null,
-        "publicQueryCount": null,
-        "localVisual": null
+        "similarity": {
+          "index": 20,
+          "ok": true,
+          "score": 0.4814,
+          "averageHash": 0.5449,
+          "differenceHash": 0.6172,
+          "silhouetteIou": 0.2575,
+          "pixelCorrelation": 0.5085
+        }
+      },
+      {
+        "asin": "B074SHZHFF",
+        "url": "https://www.amazon.com/dp/B074SHZHFF",
+        "title": "Chaowei 2026 TV Antenna for Smart TV Indoor (16.5ft) Cable | Long Range HD Digital Antenna for Local Channels with Strong Magnetic Base, 360° Reception, Supports 4K 1080P HDTV",
+        "image": "https://m.media-amazon.com/images/I/51d8lMhJkQL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 53,
+        "rankOnPage": 7,
+        "similarity": {
+          "index": 17,
+          "ok": true,
+          "score": 0.4784,
+          "averageHash": 0.5313,
+          "differenceHash": 0.6191,
+          "silhouetteIou": 0.2539,
+          "pixelCorrelation": 0.5161
+        }
+      },
+      {
+        "asin": "B0GSY4ZZ7R",
+        "url": "https://www.amazon.com/dp/B0GSY4ZZ7R",
+        "title": "Indoor HDTV Antenna for All TVs, Strong Magnetic Base Digital Antenna | Digital Antenna for Smart TV Indoor, TV Antenna forLocal Channels Supports 8K 4K 1080P, Long Range Reception (Black White)",
+        "image": "https://m.media-amazon.com/images/I/51uiYED66jL._AC_UY218_.jpg",
+        "query": "indoor tv antenna long range reception magnetic base",
+        "ratingCount": 34,
+        "rankOnPage": 9,
+        "similarity": {
+          "index": 21,
+          "ok": true,
+          "score": 0.4709,
+          "averageHash": 0.4746,
+          "differenceHash": 0.625,
+          "silhouetteIou": 0.3086,
+          "pixelCorrelation": 0.469
+        }
+      },
+      {
+        "asin": "B0F4ML9L4P",
+        "url": "https://www.amazon.com/dp/B0F4ML9L4P",
+        "title": "TV Antenna for Smart TV Indoor,Digital HD Antenna with Strong Magnetic Base | Indoor Antenna for Easy Installation, TV Antenna for Local Channels Long Range Reception for 4K 1080P (Blue)",
+        "image": "https://m.media-amazon.com/images/I/71STHdlViYL._AC_UY218_.jpg",
+        "query": "digital tv antenna smart tv indoor magnetic base",
+        "ratingCount": 106,
+        "rankOnPage": 3,
+        "similarity": {
+          "index": 5,
+          "ok": true,
+          "score": 0.4603,
+          "averageHash": 0.4521,
+          "differenceHash": 0.5137,
+          "silhouetteIou": 0.412,
+          "pixelCorrelation": 0.4624
+        }
       }
-    ],
-    "verified": []
+    ]
   },
   "workflow": {
-    "testedAt": "2026-08-21T17:54:22.247Z",
-    "commit": "7c86cb33bae38044d7569a965ef9f805c6f2adde"
-  }
+    "testedAt": "2026-08-21T17:57:05.961Z",
+    "commit": "6dc2d74c3fdc499c826ea8ac1c94875e795ed8fe"
+  },
+  "ok": true
 }
