@@ -2,6 +2,7 @@ export const runtime='nodejs';
 export const maxDuration=300;
 
 import{withBrightLensNativeContext}from'../../../lib/bright-lens-native';
+import{getBrightDataBalance,classifyBrightDataFailure,cleanBright}from'../../../lib/bright-data-status';
 
 const BD='https://api.brightdata.com';
 let cachedZone=null;
@@ -10,19 +11,21 @@ function clean(x){return String(x||'').replace(/\s+/g,' ').trim()}
 function host(x){try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}}
 
 async function accountPreflight(key){
-  if(!key)return{ok:false,configured:false,httpStatus:null,error:'Bright Data Lens is not configured.'};
+  if(!key)return{ok:false,configured:false,httpStatus:null,error:'Bright Data Lens is not configured.',noCredits:false,balance:null};
+  const balance=await getBrightDataBalance(key,{force:true});
+  if(balance.noCredits)return{ok:false,configured:true,httpStatus:402,error:'bright_data_no_credits',message:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',noCredits:true,balance:balance.balance,pendingBalance:balance.pendingBalance};
   try{
     const r=await fetch(`${BD}/status`,{headers:{authorization:`Bearer ${key}`},cache:'no-store',signal:AbortSignal.timeout(12000)}),raw=await r.text();
-    if(!r.ok)return{ok:false,configured:true,httpStatus:r.status,error:`Bright Data account API ${r.status}: ${clean(raw).slice(0,180)}`};
-    if(/invalid status|not active|inactive|suspended/i.test(raw))return{ok:false,configured:true,httpStatus:r.status,error:'Bright Data account is not active.'};
-    return{ok:true,configured:true,httpStatus:r.status,error:null};
-  }catch(e){return{ok:null,configured:true,httpStatus:null,error:`Bright Data account preflight failed: ${clean(e?.message||e).slice(0,180)}`}}
+    if(!r.ok){const f=classifyBrightDataFailure({status:r.status,body:raw,headers:r.headers,service:'account'});return{ok:false,configured:true,httpStatus:r.status,error:f?.code||`Bright Data account API ${r.status}: ${clean(raw).slice(0,180)}`,message:f?.message||null,noCredits:f?.code==='bright_data_no_credits',balance:balance.balance,pendingBalance:balance.pendingBalance}}
+    if(/invalid status|not active|inactive|suspended/i.test(raw))return{ok:false,configured:true,httpStatus:r.status,error:'Bright Data account is not active.',noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance};
+    return{ok:true,configured:true,httpStatus:r.status,error:null,noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance};
+  }catch(e){return{ok:null,configured:true,httpStatus:null,error:`Bright Data account preflight failed: ${clean(e?.message||e).slice(0,180)}`,noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance}}
 }
 
 async function getActiveZones(key){
   const r=await fetch(`${BD}/zone/get_active_zones`,{headers:{authorization:`Bearer ${key}`},cache:'no-store',signal:AbortSignal.timeout(15000)});
   const raw=await r.text();
-  if(!r.ok)throw Error(`Bright Data zone lookup HTTP ${r.status}: ${clean(raw).slice(0,220)}`);
+  if(!r.ok){const f=classifyBrightDataFailure({status:r.status,body:raw,headers:r.headers,service:'account'});if(f)throw Error(`${f.code}:${f.message}`);throw Error(`Bright Data zone lookup HTTP ${r.status}: ${clean(raw).slice(0,220)}`)}
   let zones;try{zones=JSON.parse(raw)}catch{throw Error('Bright Data zone lookup returned invalid JSON.')}
   if(!Array.isArray(zones))throw Error('Bright Data zone lookup returned an unexpected response.');
   return zones;
@@ -48,24 +51,26 @@ export async function POST(req){
   const key=process.env.BRIGHT_DATA_API_KEY||'',providerPreflight=await accountPreflight(key);
   let body;try{body=await req.json()}catch{return Response.json({error:'Invalid JSON body.'},{status:400})}
   const originalProductUrl=String(body?.productUrl||'').trim();if(!originalProductUrl)return Response.json({error:'Product URL is required.'},{status:400});
+  if(providerPreflight.noCredits)return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',brightData:{stage:'account_preflight',providerPreflight}},{status:402,headers:{'cache-control':'no-store'}});
   let zoneInfo={zone:clean(process.env.BRIGHT_DATA_SERP_ZONE)||null,source:'not_resolved',activeSerpZones:[]},lensUnavailableReason=null;
   if(providerPreflight.ok===false)lensUnavailableReason=providerPreflight.error;
   else if(key){try{zoneInfo=await resolveSerpZone(key);process.env.BRIGHT_DATA_SERP_ZONE=zoneInfo.zone}catch(e){lensUnavailableReason=e?.message||String(e)}}
   else lensUnavailableReason='Bright Data Lens is not configured.';
+  if(/bright_data_no_credits/i.test(String(lensUnavailableReason||'')))return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',brightData:{stage:'zone_resolution',providerPreflight}},{status:402,headers:{'cache-control':'no-store'}});
   const forwardedBody={...body,...(lensUnavailableReason?{_lensUnavailableReason:lensUnavailableReason}:{})},forwarded=new Request(req.url,{method:'POST',headers:req.headers,body:JSON.stringify(forwardedBody)});
   const mod=await import('../reference-scan-v12/route.js');
   const transportDiagnostics=[];
   let res;
   try{
     res=lensUnavailableReason?await mod.POST(forwarded):await withBrightLensNativeContext({referer:originalProductUrl,diagnostics:transportDiagnostics},()=>mod.POST(forwarded));
-  }catch(e){return Response.json({error:`Reference discovery failed: ${e?.message||String(e)}`,brightData:{stage:'discovery_exception',zone:zoneInfo.zone,zoneSource:zoneInfo.source,providerPreflight},transportDiagnostics},{status:400,headers:{'cache-control':'no-store'}})}
+  }catch(e){const msg=cleanBright(e?.message||e);const f=classifyBrightDataFailure({body:msg,service:'dataset'});if(f?.code==='bright_data_no_credits'||/bright_data_no_credits/i.test(msg))return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',brightData:{stage:'discovery_exception',zone:zoneInfo.zone,zoneSource:zoneInfo.source,providerPreflight},transportDiagnostics},{status:402,headers:{'cache-control':'no-store'}});return Response.json({error:`Reference discovery failed: ${msg}`,brightData:{stage:'discovery_exception',zone:zoneInfo.zone,zoneSource:zoneInfo.source,providerPreflight},transportDiagnostics},{status:400,headers:{'cache-control':'no-store'}})}
   let json;try{json=await res.clone().json()}catch{return res}
   if(res.ok&&json?.referenceSet){
     json.referenceSet.productUrl=originalProductUrl;
     json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);
     json.referenceSet.provenance={...(json.referenceSet.provenance||{}),imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_native_file_upload',originalProductUrl,providerPreflight};
     json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:lensUnavailableReason?'skipped_provider_unavailable':'native_file_upload'};
-    if(!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet,transportDiagnostics,providerPreflight),t=d.transport?.[0]||{},providerReason=lensUnavailableReason||t.error||d.amazonFallback?.diagnostics?.error||null;return Response.json({error:`Reference scan returned no verified external sources after Lens and Amazon fallback.${providerReason?` Provider diagnostic: ${providerReason}`:''}`,brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_native_file_upload',providerPreflight},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
+    if(!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet,transportDiagnostics,providerPreflight),t=d.transport?.[0]||{},providerReason=lensUnavailableReason||t.error||d.amazonFallback?.diagnostics?.error||null;if(/bright_data_no_credits/i.test(String(providerReason||'')))return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,providerPreflight},diagnostics:d},{status:402,headers:{'cache-control':'no-store'}});return Response.json({error:`Reference scan returned no verified external sources after Lens and Amazon fallback.${providerReason?` Provider diagnostic: ${providerReason}`:''}`,brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_native_file_upload',providerPreflight},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
     return Response.json(json,{status:res.status,headers:{'cache-control':'no-store'}})
   }
   return Response.json({...json,brightData:{...(json?.brightData||{}),providerPreflight,zone:zoneInfo.zone,zoneSource:zoneInfo.source}},{status:res.status,headers:{'cache-control':'no-store'}})
