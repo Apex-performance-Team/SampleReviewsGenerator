@@ -1,12 +1,22 @@
 {
   "ok": false,
-  "containsTarget": false,
+  "ai": {
+    "configured": true,
+    "auth": "oidc-header",
+    "directOpenAIConfigured": false
+  },
   "candidates": [],
   "queries": [
     "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup"
   ],
+  "identity": {
+    "title": "InstaBeam Premium Indoor HDTV Antenna",
+    "descriptionLength": 183,
+    "image": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+    "error": null
+  },
   "diagnostics": {
-    "elapsedMs": 1339,
+    "elapsedMs": 19453,
     "authoritativePdpIdentity": {
       "title": "InstaBeam Premium Indoor HDTV Antenna",
       "descriptionLength": 183,
@@ -14,27 +24,144 @@
       "error": null
     },
     "referenceImageUsed": false,
-    "referenceImageUrl": null,
-    "verificationError": null,
+    "referenceImageUrl": "https://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png?v=1779327556",
+    "verificationError": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
     "searchRuns": [
       {
-        "ok": false,
-        "rawRows": 0,
-        "error": "trigger_http_400:Customer is not active",
-        "resultCount": 0
+        "keyword": "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup",
+        "ok": true,
+        "rawRows": 57,
+        "error": "",
+        "resultCount": 53
       }
     ],
-    "providerFallback": {
-      "diagnostics": {
-        "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
+    "providerFallback": null,
+    "shortlist": [
+      {
+        "asin": "B0FXW7YDVS",
+        "title": "Digital TV Antenna for Smart TV Indoor, HD TV Antenna for Local Channels | HDTV Antenna with Magnetic Base & 360° Reception for Smart TVs, 4K 1080P Antennas for TV Without Cable, 10FT Cable Easy Setup",
+        "ratingCount": 119,
+        "lexicalOverlap": 0.4444444444444444,
+        "rankOnPage": 4,
+        "pageNumber": 1,
+        "discoveryScore": 3.399897655755953,
+        "webSearchConfidence": null
       },
-      "candidates": []
-    },
-    "shortlist": [],
+      {
+        "asin": "B0D5MC9MSX",
+        "title": "Digital TV Antenna for Smart TV Indoor, Long Range Reception TV Antenna | Strong Magnetic Base,360°& HD Antennas for Local Channels, Easy Installation for TV Without Cable",
+        "ratingCount": 36,
+        "lexicalOverlap": 0.4117647058823529,
+        "rankOnPage": 8,
+        "pageNumber": 1,
+        "discoveryScore": 3.12674416975674,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0D9LQ3MW4",
+        "title": "Digital TV Antenna Indoor, HD Antenna for Smart TV with 3M Stick Base | Strong Magnetic Base 360°&Long Range Reception,Easy Setup Antenna for TV Without Cable",
+        "ratingCount": 12,
+        "lexicalOverlap": 0.4666666666666667,
+        "rankOnPage": 8,
+        "pageNumber": 2,
+        "discoveryScore": 2.8170206968161327,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0D5YH3R5C",
+        "title": "DAANT TV Antenna Indoor Long Range | Supports 4K 1080p Smart TV Signal Reception with 16ft HDTV Coax Cable",
+        "ratingCount": 39,
+        "lexicalOverlap": 0.3076923076923077,
+        "rankOnPage": 7,
+        "pageNumber": 1,
+        "discoveryScore": 2.67237288353138,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0GGY4FPVS",
+        "title": "HD Digital TV Antenna for Smart TV Indoor with Strong Magnetic,Indoor Antenna Easy Installation, Antenna for Smart TV Long Range Reception, TV Antenna for Local Channels 4K 1080P",
+        "ratingCount": 6,
+        "lexicalOverlap": 0.3076923076923077,
+        "rankOnPage": 12,
+        "pageNumber": 1,
+        "discoveryScore": 2.544098793463321,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0CVW14368",
+        "title": "TV Antennas, HD Digital Antenna for Smart TV Indoor, 360°Signal Reception-Digital tv Antenna Indoor for Local Channels-Support 4K 1080p for All Type of HDTV Digital TV's",
+        "ratingCount": 21,
+        "lexicalOverlap": 0.2857142857142857,
+        "rankOnPage": 11,
+        "pageNumber": 1,
+        "discoveryScore": 2.511850454150395,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0H1WKKHN7",
+        "title": "2026 TV Antenna for Smart TV Indoor 5000+ Miles Range-36FT Coaxial Cable | TV Antenna for Local Channels,Digital TV Antenna with Signal Booster Support 4K 8K 1080P All TVs-HDTV Antennas Easy Install",
+        "ratingCount": 36,
+        "lexicalOverlap": 0.22727272727272727,
+        "rankOnPage": 2,
+        "pageNumber": 1,
+        "discoveryScore": 2.4520858215689803,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0DB78DFBB",
+        "title": "HIDB Indoor TV Antenna for Smart TV, Digital tv Antenna for Local Channels | OTA HD TV Antenna Indoor with Long Range Reception & 10ft Cables, Strong Magnetic Base, Easy Installation, Support 4K 1080P",
+        "ratingCount": 212,
+        "lexicalOverlap": 0.21052631578947367,
+        "rankOnPage": 6,
+        "pageNumber": 1,
+        "discoveryScore": 2.3384158714824737,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0G4CS1RZR",
+        "title": "2026 Digital TV Antenna for Smart TV Indoor, 360° Long Range Reception for Local Channels, HDTV Antenna for TV Without Cable Supports 4K 1080P for Smart & Old TVs, Magnetic Base (Black Blue)",
+        "ratingCount": 278,
+        "lexicalOverlap": 0.23809523809523808,
+        "rankOnPage": 1,
+        "pageNumber": 2,
+        "discoveryScore": 2.227129096837771,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B07DCPBZWT",
+        "title": "HD Free TV Indoor Antenna - Free HD Signal, Digital, As Seen On TV",
+        "ratingCount": 134,
+        "lexicalOverlap": 0.2,
+        "rankOnPage": 16,
+        "pageNumber": 1,
+        "discoveryScore": 2.2074681916501113,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0GR12MK6V",
+        "title": "TV Antenna Indoor for Local Channels,Digital Antenna for Smart TV Indoor | Easy Installation Support 4K 1080p Channels Strong Magnetic Base-16.5 ft Long Cables (Black Upgrade)",
+        "ratingCount": 93,
+        "lexicalOverlap": 0.1875,
+        "rankOnPage": 5,
+        "pageNumber": 1,
+        "discoveryScore": 2.207057648366629,
+        "webSearchConfidence": null
+      },
+      {
+        "asin": "B0H6X4GNPC",
+        "title": "2026 TV Antenna Indoor,TV Antenna for Smart TV with 360° Signal Booster Reception,Digital Antennas 3500+ Miles Long Range Support 8K 4K 1080p TVs,Portable HD Antenna for Local Channels-25ft Coax Cable",
+        "ratingCount": 16,
+        "lexicalOverlap": 0.18181818181818182,
+        "rankOnPage": 3,
+        "pageNumber": 1,
+        "discoveryScore": 2.146987933354102,
+        "webSearchConfidence": null
+      }
+    ],
     "verified": []
   },
   "workflow": {
-    "testedAt": "2026-08-21T15:10:29.547Z",
-    "commit": "b5767aa207d7b6a0e16aa69e95e4edf88afb707f"
+    "testedAt": "2026-08-21T17:40:23.692Z",
+    "commit": "58dcaaa8d14a24798753f7a80803f4b77134de1d"
   }
 }
