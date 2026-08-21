@@ -147,7 +147,7 @@
             "error": null
           },
           "diagnostics": {
-            "elapsedMs": 1666,
+            "elapsedMs": 1230,
             "queryMode": "deterministic",
             "authoritativePdpIdentity": {
               "title": "InstaBeam OmniReach Extended Range TV Antenna",
@@ -241,7 +241,7 @@
     "liveAmazonTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T18:13:06.680Z",
-    "commit": "62e61931c0d33aeca7adc7724dc15afaa9aa9e5e"
+    "testedAt": "2026-08-21T18:25:37.701Z",
+    "commit": "be0de11b998e3daa134a7fbe26650052666e6006"
   }
 }
