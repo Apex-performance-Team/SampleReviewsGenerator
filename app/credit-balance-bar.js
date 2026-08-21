@@ -1,7 +1,7 @@
 'use client';
 import{useEffect,useState}from'react';
 function money(v){return Number.isFinite(Number(v))?`$${Number(v).toFixed(2)}`:'—'}
-function status(x){if(!x?.configured)return'Not configured';if(x?.ok===false)return x?.error||'Unavailable';if(x?.ok===null)return'Check failed';return money(x?.balance)}
+function status(x){if(!x?.configured)return'Not configured';if(x?.permissionRequired)return'Permission required';if(x?.ok===false)return x?.error||'Unavailable';if(x?.ok===null)return'Check failed';return money(x?.balance)}
 export default function CreditBalanceBar(){
   const[data,setData]=useState(null),[loading,setLoading]=useState(true);
   async function refresh(){setLoading(true);try{const r=await fetch('/api/credit-balances',{cache:'no-store'}),j=await r.json();setData(j)}catch(e){setData({error:e.message})}finally{setLoading(false)}}
@@ -17,7 +17,7 @@ export default function CreditBalanceBar(){
       <div style={{flex:'1 1 260px',border:'1px solid rgba(255,255,255,.12)',borderRadius:12,padding:'12px 14px',background:'rgba(255,255,255,.03)'}}>
         <div style={{fontSize:12,opacity:.65,marginBottom:4}}>Bright Data credits</div>
         <div style={{fontSize:20,fontWeight:700}}>{loading&&!data?'Checking…':status(b)}</div>
-        {Number.isFinite(Number(b?.pendingBalance))&&<div style={{fontSize:11,opacity:.55,marginTop:4}}>Pending: {money(b.pendingBalance)}</div>}
+        {b?.permissionRequired?<div style={{fontSize:11,opacity:.7,marginTop:4}}>Balance read access is missing. <a href={b.permissionsUrl||'https://brightdata.com/cp/setting/users'} target="_blank" rel="noreferrer" style={{color:'inherit',textDecoration:'underline'}}>Update token permissions</a></div>:Number.isFinite(Number(b?.pendingBalance))&&<div style={{fontSize:11,opacity:.55,marginTop:4}}>Pending: {money(b.pendingBalance)}</div>}
       </div>
       <button onClick={refresh} disabled={loading} style={{alignSelf:'center',padding:'10px 14px',borderRadius:10,border:'1px solid rgba(255,255,255,.14)',background:'transparent',color:'inherit',cursor:loading?'default':'pointer'}}>{loading?'Refreshing…':'Refresh credits'}</button>
     </div>
