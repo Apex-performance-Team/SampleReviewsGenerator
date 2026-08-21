@@ -5,41 +5,78 @@ on:
     branches: ['main']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   live-reference-regression:
+    if: ${{ !contains(github.event.head_commit.message || '', '[selftest-result]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Wait for production deployment
-        run: sleep 45
+        run: sleep 55
       - name: Run production reference self-test
+        id: selftest
         shell: bash
+        continue-on-error: true
         run: |
-          set -euo pipefail
+          set +e
           URL='https://synthetic-review-lab.vercel.app/api/reference-selftest'
-          ok=0
+          best_code=000
+          rm -f selftest.json
           for attempt in 1 2 3; do
             echo "Attempt $attempt"
-            code=$(curl --silent --show-error --location --max-time 290 \
-              --output selftest.json --write-out '%{http_code}' "$URL" || true)
-            cat selftest.json || true
+            code=$(curl --silent --show-error --location --max-time 300 \
+              --output selftest.json --write-out '%{http_code}' "$URL")
+            curl_status=$?
+            best_code="$code"
+            echo "curl=$curl_status HTTP=$code"
+            [ -f selftest.json ] && cat selftest.json || true
             echo
-            echo "HTTP $code"
-            if [ "$code" = "200" ]; then
-              node - <<'NODE'
+            if [ "$curl_status" = "0" ] && [ "$code" = "200" ]; then
+              break
+            fi
+            sleep 20
+          done
+          if [ ! -f selftest.json ]; then
+            printf '{"ok":false,"stage":"workflow_fetch","error":"curl produced no response body","http":"%s"}\n' "$best_code" > selftest.json
+          fi
+          node - <<'NODE'
           const fs=require('fs');
-          const j=JSON.parse(fs.readFileSync('selftest.json','utf8'));
+          const path='selftest.json';
+          let raw=fs.readFileSync(path,'utf8');
+          let j;
+          try{j=JSON.parse(raw)}catch(e){j={ok:false,stage:'invalid_json',error:e.message,raw:raw.slice(0,6000)}}
+          j.workflow={testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA};
+          fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify(j,null,2)+'\n');
           console.log(JSON.stringify(j,null,2));
-          if(!j.ok) process.exit(1);
+          NODE
+      - name: Publish self-test result
+        if: always()
+        shell: bash
+        run: |
+          set -e
+          git config user.name 'reference-selftest-bot'
+          git config user.email 'reference-selftest-bot@users.noreply.github.com'
+          git add REFERENCE_SELFTEST_RESULT.json
+          if git diff --cached --quiet; then
+            echo 'No self-test result change to publish.'
+          else
+            git commit -m 'Update production self-test result [selftest-result]'
+            git push origin HEAD:main
+          fi
+      - name: Enforce regression gate
+        if: always()
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('REFERENCE_SELFTEST_RESULT.json','utf8'));
+          if(!j.ok) throw new Error(`Production self-test failed at ${j.stage||'unknown'}: ${j.error||'marketplace review bodies missing'}`);
           if(!j.checks?.corpusNeverShrank) throw new Error('Corpus shrank during enrichment');
           if(!j.checks?.marketplaceBodiesExtracted) throw new Error('No Amazon/eBay individual review bodies extracted');
           NODE
-              ok=1
-              break
-            fi
-            sleep 30
-          done
-          if [ "$ok" != "1" ]; then
-            echo 'Production reference regression failed after 3 attempts.' >&2
-            exit 1
-          fi
