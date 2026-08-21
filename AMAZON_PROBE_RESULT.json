@@ -6,7 +6,7 @@
     "instabeam premium indoor hdtv"
   ],
   "diagnostics": {
-    "elapsedMs": 292,
+    "elapsedMs": 3848,
     "referenceImageUsed": false,
     "referenceImageUrl": null,
     "verificationError": null,
@@ -22,7 +22,7 @@
     "verified": []
   },
   "workflow": {
-    "testedAt": "2026-08-21T07:39:59.507Z",
-    "commit": "4432749510a2d7af47d95be91d8bae1ef4abc4de"
+    "testedAt": "2026-08-21T14:49:09.847Z",
+    "commit": "64a16702b4692cdd2ad0ba47276f7b9adb2af8ac"
   }
 }
