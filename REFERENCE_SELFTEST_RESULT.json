@@ -1,10 +1,10 @@
 {
   "ok": false,
-  "stage": "reference_scan",
+  "stage": "high_volume_amazon_failed",
   "deterministic": {
-    "ok": true,
-    "amazonReferences": 219,
-    "totalReferences": 219,
+    "ok": false,
+    "amazonReferences": 0,
+    "totalReferences": 0,
     "targetSource": {
       "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "platform": "amazon.com",
@@ -13,31 +13,22 @@
       "discoveryOrigin": "amazon_high_volume",
       "attempted": 1,
       "blocked": 0,
-      "failed": 0,
+      "failed": 1,
       "pending": false,
-      "snapshotId": "sd_mt2n0gpx25ser7znc3",
+      "snapshotId": null,
       "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
       "requested": 220,
-      "aggregateRatingCount": 33151,
-      "rawRows": 220,
-      "parsedBodies": 219,
-      "reviewIdCount": 219,
-      "extracted": 219,
-      "error": ""
+      "aggregateRatingCount": null,
+      "rawRows": 0,
+      "parsedBodies": 0,
+      "reviewIdCount": 0,
+      "extracted": 0,
+      "error": "bright_data_trigger_http_400:Customer is not active"
     },
-    "sampleAmazon": [
-      {
-        "id": "RYKSCLG2RTDYQ",
-        "body": "I was very skeptical about this antenna but saw it for a good price, and plus they do offer a 30 day money back guarantee if you are not satisfied. I decided to buy two, one for myself, and as a present to my parents for the new tv my brother and I got them fo"
-      },
-      {
-        "id": "R3TOH74XRVPF7R",
-        "body": "Excellent VHF/UHF HD antenna with optional signal amplifier. Long 20 feet of coaxial cable should be enough to reach window. You can use on a stand indoors but placing it between the window and screen works well for me. I live about 6 miles from Manhattan. My "
-      }
-    ],
+    "sampleAmazon": [],
     "marketplaceIngestion": {
       "attemptedSources": 1,
-      "appendedReviews": 219,
+      "appendedReviews": 0,
       "sources": [
         {
           "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
@@ -47,44 +38,33 @@
           "discoveryOrigin": "amazon_high_volume",
           "attempted": 1,
           "blocked": 0,
-          "failed": 0,
+          "failed": 1,
           "pending": false,
-          "snapshotId": "sd_mt2n0gpx25ser7znc3",
+          "snapshotId": null,
           "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
           "requested": 220,
-          "aggregateRatingCount": 33151,
-          "rawRows": 220,
-          "parsedBodies": 219,
-          "reviewIdCount": 219,
-          "extracted": 219,
-          "error": ""
+          "aggregateRatingCount": null,
+          "rawRows": 0,
+          "parsedBodies": 0,
+          "reviewIdCount": 0,
+          "extracted": 0,
+          "error": "bright_data_trigger_http_400:Customer is not active"
         }
       ],
       "amazonVolumeDiscovery": {
-        "elapsedMs": 6360,
+        "elapsedMs": 1369,
         "referenceImageUsed": false,
-        "referenceImageUrl": "http://instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png?v=1779327556",
-        "verificationError": "A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+        "referenceImageUrl": null,
+        "verificationError": null,
         "searchRuns": [
           {
-            "keyword": "instabeam omnireach extended range 1byone outdoor 360 omni directional reception long 100",
-            "ok": true,
-            "rawRows": 7,
-            "error": "",
-            "resultCount": 7
+            "ok": false,
+            "rawRows": 0,
+            "error": "trigger_http_400:Customer is not active",
+            "resultCount": 0
           }
         ],
-        "shortlist": [
-          {
-            "asin": "B0B7R81MFX",
-            "title": "Five Star Outdoor HDTV Antenna up to 200 Mile Long Range, Attic or Roof Mount, Digital OTA Antenna for 4K 1080P VHF UHF Supports 4 TVs Installation Kit & J Mount, ATSC 3.0 Ready",
-            "ratingCount": 869,
-            "lexicalOverlap": 0.3181818181818182,
-            "rankOnPage": 0,
-            "pageNumber": 1,
-            "discoveryScore": 2.7959804814970424
-          }
-        ],
+        "shortlist": [],
         "verified": []
       }
     },
@@ -93,367 +73,75 @@
   "live": {
     "ok": false,
     "stage": "reference_scan",
-    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=0, uniqueCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|organic, images:59, tabs:Modo IA|all|exact_matches|visual_matches.",
+    "error": "Google Lens discovery failed for every product image. Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.",
     "response": {
-      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=0, uniqueCandidates=0, verifierAccepted=0. transport=uploadKeys:general|tabs|images|related_search|organic, images:59, tabs:Modo IA|all|exact_matches|visual_matches.",
+      "error": "Google Lens discovery failed for every product image. Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.",
       "brightData": {
-        "stage": "empty_verified_source_set",
+        "stage": "native_lens_response",
         "zone": "synthetic_review_lens",
         "zoneSource": "auto_detected",
+        "activeSerpZones": [
+          "synthetic_review_lens"
+        ],
         "imageTransport": "bright_data_native_file_upload"
       },
-      "diagnostics": {
-        "sourceImages": 3,
-        "lensRequests": 9,
-        "lensRequestsSucceeded": 8,
-        "rawResults": 0,
-        "uniqueCandidates": 0,
-        "acceptedCandidates": 0,
-        "rejectedCandidates": 0,
-        "verifierCandidates": 0,
-        "verifierAccepted": 0,
-        "verifierRejected": 0,
-        "amazonCandidates": 0,
-        "amazonAccepted": 0,
-        "amazonFallback": {
-          "status": "no_verified_candidate",
-          "queries": [
-            "instabeam omnireach extended range"
-          ],
-          "diagnostics": {
-            "elapsedMs": 3272,
-            "referenceImageUsed": false,
-            "referenceImageUrl": null,
-            "verificationError": null,
-            "searchRuns": [
-              {
-                "keyword": "instabeam omnireach extended range",
-                "ok": true,
-                "rawRows": 6,
-                "error": "",
-                "resultCount": 5
-              }
-            ],
-            "shortlist": [],
-            "verified": []
-          }
+      "transportDiagnostics": [
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "exact_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
         },
-        "tabs": {
-          "image1:exact_matches": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image1:products": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image1:visual_matches": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image2:exact_matches": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image2:products": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image2:visual_matches": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image3:exact_matches": {
-            "ok": false,
-            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
-          },
-          "image3:products": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          },
-          "image3:visual_matches": {
-            "ok": true,
-            "results": 0,
-            "amazon": 0
-          }
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "products",
+          "error": "Bright Data account API 422: Customer has invalid status"
         },
-        "transport": [
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 59,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "organic",
-                "products"
-              ],
-              "generalType": "all",
-              "images": 59,
-              "exactMatches": null,
-              "products": 59,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "organic"
-              ],
-              "generalType": "all",
-              "images": 59,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            },
-            "result": {
-              "keys": [
-                "general",
-                "tabs",
-                "images",
-                "related_search",
-                "organic",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": 59,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 59,
-              "tabs": [
-                "Modo IA",
-                "all",
-                "exact_matches",
-                "visual_matches"
-              ]
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
-            "tab": "exact_matches",
-            "error": "bright_data_native_exact_matches_400:parameter vsrid is specified twice"
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "exact_matches",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "exact_matches"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": 0,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "products"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": 0,
-              "visualMatches": null,
-              "tabs": []
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 0,
-              "tabs": []
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "exact_matches",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "exact_matches"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": 0,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "products",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "products"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": 0,
-              "visualMatches": null,
-              "tabs": []
-            }
-          },
-          {
-            "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
-            "tab": "visual_matches",
-            "upload": {
-              "keys": [
-                "general"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": null,
-              "tabs": []
-            },
-            "result": {
-              "keys": [
-                "general",
-                "visual_matches"
-              ],
-              "generalType": "all",
-              "images": null,
-              "exactMatches": null,
-              "products": null,
-              "visualMatches": 0,
-              "tabs": []
-            }
-          }
-        ]
-      }
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "visual_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "exact_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "products",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a.png",
+          "tab": "visual_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+          "tab": "exact_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+          "tab": "products",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        },
+        {
+          "image": "instabeamtv.com/cdn/shop/files/Image16_559a2df4-a4f8-4975-9c5d-c057d4c85d5a_2048x.png",
+          "tab": "visual_matches",
+          "error": "Bright Data account API 422: Customer has invalid status"
+        }
+      ]
     }
   },
   "checks": {
-    "highVolumeAmazonExtracted": true,
+    "highVolumeAmazonExtracted": false,
     "liveCorpusNeverShrank": false,
     "liveMarketplaceBodiesExtracted": false,
     "liveAmazonBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T07:40:06.729Z",
-    "commit": "5e2d66fabb208bbc36ba8c1fdb04ea6d105f4d98"
+    "testedAt": "2026-08-21T14:50:15.067Z",
+    "commit": "64a16702b4692cdd2ad0ba47276f7b9adb2af8ac"
   }
 }
