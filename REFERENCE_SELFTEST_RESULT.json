@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "stage": "pdp_scan",
+  "status": 400,
+  "error": "No AI Gateway credential is available in this deployment.",
+  "elapsedMs": 137,
+  "workflow": {
+    "testedAt": "2026-08-21T05:55:56.446Z",
+    "commit": "b06cf16344e56217f4acbf0619e9f37e213fcd25"
+  }
+}
