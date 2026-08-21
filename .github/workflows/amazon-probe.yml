@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          code=$(curl --silent --show-error --location --max-time 240 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-review-probe')
+          code=$(curl --silent --show-error --location --max-time 240 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-multi-probe')
           status=$?
           echo "curl=$status HTTP=$code"
           cat probe.json || true
