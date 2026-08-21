@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "stage": "pdp_scan",
+  "status": 400,
+  "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue.",
+  "elapsedMs": 711,
+  "workflow": {
+    "httpStatus": null,
+    "testedAt": "2026-08-21T17:56:32.650Z",
+    "commit": "4192b0d9d6770f178aeba9f53e0730b2583a8b51"
+  }
+}
