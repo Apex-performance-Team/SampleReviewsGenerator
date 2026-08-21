@@ -13,11 +13,13 @@ export default function MarketplaceEnrichmentBridge(){
       if(!payload?.referenceSet)return base;
       const market=[...(payload.referenceSet.sourceCounts||[]),...(payload.referenceSet.aggregateOnlySources||[])].some(x=>/(^|\.)(amazon|ebay)\./i.test((()=>{try{return new URL(x?.directSourceUrl||x?.sourceUrl||'').hostname}catch{return''}})()));
       if(!market)return base;
-      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);
       try{
         const r=await baseFetch('/api/reference-enrich-marketplaces',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({referenceSet:payload.referenceSet}),signal:controller.signal,cache:'no-store'});
         if(!r.ok)return base;
         const j=await r.json();if(!j?.referenceSet)return base;
+        const original=Array.isArray(payload.referenceSet.references)?payload.referenceSet.references:[],enriched=Array.isArray(j.referenceSet.references)?j.referenceSet.references:[];
+        if(enriched.length<original.length)return base;
         return new Response(JSON.stringify({...payload,referenceSet:j.referenceSet}),{status:base.status,headers:{'content-type':'application/json','cache-control':'no-store'}})
       }catch{return base}
       finally{clearTimeout(timer)}
