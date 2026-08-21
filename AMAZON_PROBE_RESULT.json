@@ -6,7 +6,7 @@
     "instabeam premium indoor hdtv offers antennas designed crystal clear viewing strong reception easy setup"
   ],
   "diagnostics": {
-    "elapsedMs": 1831,
+    "elapsedMs": 6988,
     "authoritativePdpIdentity": {
       "title": "InstaBeam Premium Indoor HDTV Antenna",
       "descriptionLength": 183,
@@ -34,7 +34,7 @@
     "verified": []
   },
   "workflow": {
-    "testedAt": "2026-08-21T15:04:30.956Z",
-    "commit": "63d9168e8f39bb91d7409f8eadc2433a9b60a7dd"
+    "testedAt": "2026-08-21T15:07:50.810Z",
+    "commit": "93c673af0a11b4090fed6e85426703d5d18709e8"
   }
 }
