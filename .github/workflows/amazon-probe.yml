@@ -12,18 +12,18 @@ jobs:
   probe:
     if: ${{ !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Wait for Vercel
-        run: sleep 40
-      - name: Call production Amazon probe
+        run: sleep 45
+      - name: Call production Amazon search probe
         shell: bash
         run: |
           set +e
-          code=$(curl --silent --show-error --location --max-time 240 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-multi-probe')
+          code=$(curl --silent --show-error --location --max-time 420 --output probe.json --write-out '%{http_code}' 'https://synthetic-review-lab.vercel.app/api/amazon-search-probe')
           status=$?
           echo "curl=$status HTTP=$code"
           cat probe.json || true
