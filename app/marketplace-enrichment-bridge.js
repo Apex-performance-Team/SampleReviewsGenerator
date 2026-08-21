@@ -13,7 +13,7 @@ export default function MarketplaceEnrichmentBridge(){
       if(!payload?.referenceSet)return base;
       const market=[...(payload.referenceSet.sourceCounts||[]),...(payload.referenceSet.aggregateOnlySources||[])].some(x=>/(^|\.)(amazon|ebay)\./i.test((()=>{try{return new URL(x?.directSourceUrl||x?.sourceUrl||'').hostname}catch{return''}})()));
       if(!market)return base;
-      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),140000);
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),280000);
       try{
         const r=await baseFetch('/api/reference-enrich-marketplaces',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({referenceSet:payload.referenceSet}),signal:controller.signal,cache:'no-store'});
         if(!r.ok)return base;
