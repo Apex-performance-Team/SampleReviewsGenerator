@@ -1,0 +1,40 @@
+name: Amazon source probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['main']
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    if: ${{ !contains(github.event.head_commit.message || '', '[source-probe-result]') && !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - run: sleep 40
+      - name: Scan live InstaBeam sources
+        shell: bash
+        run: |
+          cat > req.json <<'JSON'
+          {"productUrl":"https://instabeamtv.com/products/premium-antenna-1","productTitle":"InstaBeam OmniReach Extended Range TV Antenna","productDescription":"Indoor and outdoor HDTV antenna for receiving over-the-air television channels with simple installation and extended reception range.","existingReviewCount":0,"targetReferenceCount":250,"originalReviewCount":0}
+          JSON
+          curl --silent --show-error --location --max-time 360 --header 'content-type: application/json' --data-binary @req.json --output scan.json 'https://synthetic-review-lab.vercel.app/api/reference-scan' || true
+          node - <<'NODE'
+          const fs=require('fs');let j={};try{j=JSON.parse(fs.readFileSync('scan.json','utf8'))}catch(e){j={error:e.message}}
+          const rs=j.referenceSet||{},all=[...(rs.sourceCounts||[]),...(rs.aggregateOnlySources||[])];
+          const host=x=>{try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}};
+          const amazon=all.filter(s=>/(^|\.)amazon\./i.test(host(s.directSourceUrl||s.sourceUrl))).map(s=>({url:s.directSourceUrl||s.sourceUrl,asin:s.asin||null,platform:s.platform||host(s.directSourceUrl||s.sourceUrl),publicReviewCount:s.publicReviewCount??null,reviewCountEstimate:s.reviewCountEstimate??null,reviewCount:s.reviewCount??null,individualExtractedCount:s.individualExtractedCount??null,aggregateOnly:Boolean(s.aggregateOnly),lensTabs:s.lensTabs||null,lensRank:s.lensRank??null,matchConfidence:s.matchConfidence??null}));
+          const out={ok:Boolean(j.referenceSet),error:j.error||null,amazonSources:amazon,allSourceCount:all.length,workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
+          fs.writeFileSync('AMAZON_SOURCE_RESULT.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out,null,2));
+          NODE
+      - name: Publish
+        run: |
+          git config user.name 'amazon-source-probe-bot'
+          git config user.email 'amazon-source-probe-bot@users.noreply.github.com'
+          git add AMAZON_SOURCE_RESULT.json
+          if ! git diff --cached --quiet; then git commit -m 'Update Amazon source probe result [source-probe-result]'; git push origin HEAD:main; fi
