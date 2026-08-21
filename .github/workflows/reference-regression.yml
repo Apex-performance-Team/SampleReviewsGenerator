@@ -12,49 +12,80 @@ jobs:
   live-reference-regression:
     if: ${{ !contains(github.event.head_commit.message || '', '[selftest-result]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Wait for production deployment
         run: sleep 55
-      - name: Run production reference self-test
-        id: selftest
+      - name: Run live reference scan and marketplace enrichment
         shell: bash
         continue-on-error: true
         run: |
           set +e
-          URL='https://synthetic-review-lab.vercel.app/api/reference-selftest'
-          best_code=000
-          rm -f selftest.json
-          for attempt in 1 2 3; do
-            echo "Attempt $attempt"
-            code=$(curl --silent --show-error --location --max-time 300 \
-              --output selftest.json --write-out '%{http_code}' "$URL")
-            curl_status=$?
-            best_code="$code"
-            echo "curl=$curl_status HTTP=$code"
-            [ -f selftest.json ] && cat selftest.json || true
-            echo
-            if [ "$curl_status" = "0" ] && [ "$code" = "200" ]; then
-              break
-            fi
-            sleep 20
-          done
-          if [ ! -f selftest.json ]; then
-            printf '{"ok":false,"stage":"workflow_fetch","error":"curl produced no response body","http":"%s"}\n' "$best_code" > selftest.json
-          fi
-          node - <<'NODE'
+          BASE='https://synthetic-review-lab.vercel.app'
+          cat > request.json <<'JSON'
+          {
+            "productUrl":"https://instabeamtv.com/products/premium-antenna-1",
+            "productTitle":"InstaBeam Premium Indoor HDTV Antenna",
+            "productDescription":"Indoor HDTV antenna for receiving over-the-air television channels. Designed for indoor placement and simple setup.",
+            "existingReviewCount":0,
+            "targetReferenceCount":250,
+            "originalReviewCount":0
+          }
+          JSON
+
+          echo 'Calling production reference scan...'
+          scan_code=$(curl --silent --show-error --location --max-time 300 \
+            --header 'content-type: application/json' \
+            --data-binary @request.json \
+            --output reference-scan.json --write-out '%{http_code}' \
+            "$BASE/api/reference-scan")
+          scan_curl=$?
+          echo "reference-scan curl=$scan_curl HTTP=$scan_code"
+          [ -f reference-scan.json ] && cat reference-scan.json || true
+          echo
+
+          if [ "$scan_curl" != "0" ] || [ "$scan_code" -lt 200 ] || [ "$scan_code" -ge 300 ]; then
+            node - <<'NODE'
           const fs=require('fs');
-          const path='selftest.json';
-          let raw=fs.readFileSync(path,'utf8');
-          let j;
-          try{j=JSON.parse(raw)}catch(e){j={ok:false,stage:'invalid_json',error:e.message,raw:raw.slice(0,6000)}}
-          j.workflow={testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA};
-          fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify(j,null,2)+'\n');
-          console.log(JSON.stringify(j,null,2));
+          let raw='';try{raw=fs.readFileSync('reference-scan.json','utf8')}catch{}
+          let body;try{body=JSON.parse(raw)}catch{body={raw:raw.slice(0,6000)}}
+          fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify({ok:false,stage:'reference_scan',http:process.env.SCAN_CODE||null,response:body,workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}},null,2)+'\n');
           NODE
+          else
+            node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('reference-scan.json','utf8'));
+          if(!j.referenceSet) throw new Error('referenceSet missing from production reference scan');
+          fs.writeFileSync('enrich-request.json',JSON.stringify({referenceSet:j.referenceSet}));
+          NODE
+
+            echo 'Calling production marketplace enrichment...'
+            enrich_code=$(curl --silent --show-error --location --max-time 360 \
+              --header 'content-type: application/json' \
+              --data-binary @enrich-request.json \
+              --output enriched.json --write-out '%{http_code}' \
+              "$BASE/api/reference-enrich-marketplaces")
+            enrich_curl=$?
+            echo "marketplace-enrich curl=$enrich_curl HTTP=$enrich_code"
+            [ -f enriched.json ] && cat enriched.json || true
+            echo
+
+            node - <<'NODE'
+          const fs=require('fs');
+          const host=x=>{try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}};
+          const scan=JSON.parse(fs.readFileSync('reference-scan.json','utf8'));
+          let enrichedRaw='';try{enrichedRaw=fs.readFileSync('enriched.json','utf8')}catch{}
+          let enrichedJson;try{enrichedJson=JSON.parse(enrichedRaw)}catch{enrichedJson={error:'invalid enrichment JSON',raw:enrichedRaw.slice(0,6000)}}
+          const summarize=rs=>{const refs=Array.isArray(rs?.references)?rs.references:[],sources=[...(rs?.sourceCounts||[]),...(rs?.aggregateOnlySources||[])],marketRefs=refs.filter(r=>/(^|\.)(amazon|ebay)\./i.test(host(r.sourceUrl)));return{totalReferences:refs.length,marketplaceReferences:marketRefs.length,amazonReferences:marketRefs.filter(r=>/(^|\.)amazon\./i.test(host(r.sourceUrl))).length,ebayReferences:marketRefs.filter(r=>/(^|\.)ebay\./i.test(host(r.sourceUrl))).length,referenceHosts:[...new Set(refs.map(r=>host(r.sourceUrl)).filter(Boolean))],amazonSources:sources.filter(s=>/(^|\.)amazon\./i.test(host(s.directSourceUrl||s.sourceUrl))).map(s=>({url:s.directSourceUrl||s.sourceUrl,asin:s.asin||null,publicReviewCount:s.publicReviewCount??s.reviewCountEstimate??null,aggregateOnly:Boolean(s.aggregateOnly)})),ebaySources:sources.filter(s=>/(^|\.)ebay\./i.test(host(s.directSourceUrl||s.sourceUrl))).map(s=>({url:s.directSourceUrl||s.sourceUrl,publicReviewCount:s.publicReviewCount??s.reviewCountEstimate??null,aggregateOnly:Boolean(s.aggregateOnly)})),marketplaceIngestion:rs?.marketplaceIngestion||null}};
+          const before=summarize(scan.referenceSet),after=summarize(enrichedJson.referenceSet),ok=Boolean(enrichedJson.referenceSet)&&after.totalReferences>=before.totalReferences&&after.marketplaceReferences>0;
+          const out={ok,stage:ok?'pass':'marketplace_reviews_missing',baseline:before,enriched:after,enrichmentResponseError:enrichedJson.error||null,checks:{corpusNeverShrank:after.totalReferences>=before.totalReferences,marketplaceBodiesExtracted:after.marketplaceReferences>0,amazonBodiesExtracted:after.amazonReferences>0,ebayBodiesExtracted:after.ebayReferences>0},workflow:{testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA}};
+          fs.writeFileSync('REFERENCE_SELFTEST_RESULT.json',JSON.stringify(out,null,2)+'\n');
+          console.log(JSON.stringify(out,null,2));
+          NODE
+          fi
       - name: Publish self-test result
         if: always()
         shell: bash
@@ -76,7 +107,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const j=JSON.parse(fs.readFileSync('REFERENCE_SELFTEST_RESULT.json','utf8'));
-          if(!j.ok) throw new Error(`Production self-test failed at ${j.stage||'unknown'}: ${j.error||'marketplace review bodies missing'}`);
+          if(!j.ok) throw new Error(`Production reference regression failed at ${j.stage||'unknown'}`);
           if(!j.checks?.corpusNeverShrank) throw new Error('Corpus shrank during enrichment');
           if(!j.checks?.marketplaceBodiesExtracted) throw new Error('No Amazon/eBay individual review bodies extracted');
           NODE
