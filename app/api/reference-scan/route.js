@@ -1,5 +1,5 @@
 export const runtime='nodejs';
-export const maxDuration=180;
+export const maxDuration=300;
 
 import{withBrightLensNativeContext}from'../../../lib/bright-lens-native';
 
@@ -31,7 +31,7 @@ function stripOriginalStore(rs,originalProductUrl){const h=host(originalProductU
 
 function emptyScanDiagnostic(rs,transport){
   const l=rs?.lensDiscovery||{},v=rs?.verificationDiagnostics||{};
-  return{sourceImages:Array.isArray(l.sourceImages)?l.sourceImages.length:null,lensRequests:l.requests??l.lensRequests??null,lensRequestsSucceeded:l.succeeded??null,rawResults:l.rawResults??null,uniqueCandidates:l.uniqueCandidates??null,acceptedCandidates:l.acceptedCandidates??null,rejectedCandidates:l.rejectedCandidates??null,verifierCandidates:v.candidates??null,verifierAccepted:v.accepted??null,verifierRejected:v.rejected??null,amazonCandidates:l.amazonCandidates??null,amazonAccepted:l.amazonAccepted??null,tabs:l.tabs||null,transport:(transport||[]).slice(0,12)};
+  return{sourceImages:Array.isArray(l.sourceImages)?l.sourceImages.length:null,lensRequests:l.requests??l.lensRequests??null,lensRequestsSucceeded:l.succeeded??null,rawResults:l.rawResults??null,uniqueCandidates:l.uniqueCandidates??null,acceptedCandidates:l.acceptedCandidates??null,rejectedCandidates:l.rejectedCandidates??null,verifierCandidates:v.candidates??null,verifierAccepted:v.accepted??null,verifierRejected:v.rejected??null,amazonCandidates:l.amazonCandidates??null,amazonAccepted:l.amazonAccepted??null,amazonFallback:rs?.amazonFallbackDiscovery||null,tabs:l.tabs||null,transport:(transport||[]).slice(0,12)};
 }
 
 export async function POST(req){
@@ -41,7 +41,7 @@ export async function POST(req){
   let body;try{body=await req.json()}catch{return Response.json({error:'Invalid JSON body.'},{status:400})}
   const originalProductUrl=String(body?.productUrl||'').trim();if(!originalProductUrl)return Response.json({error:'Product URL is required.'},{status:400});
   const forwarded=new Request(req.url,{method:'POST',headers:req.headers,body:JSON.stringify(body)});
-  const mod=await import('../reference-scan-v11/route.js');
+  const mod=await import('../reference-scan-v12/route.js');
   const transportDiagnostics=[];
   let res;
   try{res=await withBrightLensNativeContext({referer:originalProductUrl,diagnostics:transportDiagnostics},()=>mod.POST(forwarded))}
@@ -52,7 +52,7 @@ export async function POST(req){
     json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);
     json.referenceSet.provenance={...(json.referenceSet.provenance||{}),imageTransport:'bright_data_native_file_upload',originalProductUrl};
     json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:'native_file_upload'};
-    if(!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet,transportDiagnostics);const t=d.transport?.[0]||{};return Response.json({error:`Google Lens scan returned no usable external sources. rawResults=${d.rawResults??'n/a'}, uniqueCandidates=${d.uniqueCandidates??'n/a'}, acceptedCandidates=${d.acceptedCandidates??'n/a'}, verifierAccepted=${d.verifierAccepted??'n/a'}. transport=${t.error?`error:${t.error}`:`uploadKeys:${(t.upload?.keys||[]).join('|')||'none'}, images:${t.upload?.images??'n/a'}, tabs:${(t.upload?.tabs||[]).join('|')||'none'}`}.`,brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:'bright_data_native_file_upload'},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
+    if(!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet,transportDiagnostics);const t=d.transport?.[0]||{};return Response.json({error:`Reference scan returned no verified external sources after Lens and Amazon fallback. rawResults=${d.rawResults??'n/a'}, uniqueCandidates=${d.uniqueCandidates??'n/a'}, verifierAccepted=${d.verifierAccepted??'n/a'}. transport=${t.error?`error:${t.error}`:`uploadKeys:${(t.upload?.keys||[]).join('|')||'none'}, images:${t.upload?.images??'n/a'}, tabs:${(t.upload?.tabs||[]).join('|')||'none'}`}.`,brightData:{stage:'empty_verified_source_set',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:'bright_data_native_file_upload'},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
     return Response.json(json,{status:res.status,headers:{'cache-control':'no-store'}})
   }
   if(String(json?.error||'').includes('Google Lens discovery failed for every product image'))return Response.json({error:`${json.error} Native file upload transport was active, so the failure is now inside Bright Data/Google Lens response handling rather than image URL reachability.`,brightData:{stage:'native_lens_response',zone:zoneInfo.zone,zoneSource:zoneInfo.source,activeSerpZones:zoneInfo.activeSerpZones,imageTransport:'bright_data_native_file_upload'},transportDiagnostics},{status:400,headers:{'cache-control':'no-store'}});
