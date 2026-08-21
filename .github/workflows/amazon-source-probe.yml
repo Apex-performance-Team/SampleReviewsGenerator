@@ -2,15 +2,12 @@ name: Amazon source probe
 
 on:
   workflow_dispatch:
-  push:
-    branches: ['main']
 
 permissions:
   contents: write
 
 jobs:
   probe:
-    if: ${{ !contains(github.event.head_commit.message || '', '[source-probe-result]') && !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -37,4 +34,8 @@ jobs:
           git config user.name 'amazon-source-probe-bot'
           git config user.email 'amazon-source-probe-bot@users.noreply.github.com'
           git add AMAZON_SOURCE_RESULT.json
-          if ! git diff --cached --quiet; then git commit -m 'Update Amazon source probe result [source-probe-result]'; git push origin HEAD:main; fi
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update Amazon source probe result [source-probe-result]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
