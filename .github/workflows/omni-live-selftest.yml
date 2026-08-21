@@ -1,0 +1,61 @@
+name: OmniReach live self-test
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  omni-live-selftest:
+    if: ${{ !contains(github.event.head_commit.message || '', '[omni-result]') && !contains(github.event.head_commit.message || '', '[selftest-result]') && !contains(github.event.head_commit.message || '', '[probe-result]') && !contains(github.event.head_commit.message || '', '[source-probe-result]') && !contains(github.event.head_commit.message || '', '[discovery-probe-result]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wait for production deployment
+        run: sleep 55
+      - name: Call production OmniReach self-test
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          BASE='https://synthetic-review-lab.vercel.app'
+          code=$(curl --silent --show-error --location --max-time 720 --output OMNI_SELFTEST_RESULT.json --write-out '%{http_code}' "$BASE/api/reference-selftest")
+          echo "HTTP=$code"
+          cat OMNI_SELFTEST_RESULT.json || true
+          node - <<'NODE'
+          const fs=require('fs');
+          let j={};try{j=JSON.parse(fs.readFileSync('OMNI_SELFTEST_RESULT.json','utf8'))}catch(e){j={ok:false,stage:'invalid_json',error:e.message}}
+          j.workflow={...(j.workflow||{}),httpStatus:process.env.HTTP_STATUS||null,testedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA};
+          fs.writeFileSync('OMNI_SELFTEST_RESULT.json',JSON.stringify(j,null,2)+'\n');
+          NODE
+      - name: Publish OmniReach result
+        if: always()
+        shell: bash
+        run: |
+          set -e
+          git config user.name 'omni-selftest-bot'
+          git config user.email 'omni-selftest-bot@users.noreply.github.com'
+          git add OMNI_SELFTEST_RESULT.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update OmniReach production result [omni-result]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Enforce OmniReach gate
+        if: always()
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const j=require('./OMNI_SELFTEST_RESULT.json');
+          const noCredits=/bright_data_no_credits|insufficient credits|no available credits|add funds/i.test(JSON.stringify(j));
+          if(noCredits){console.warn('Blocked by Bright Data credits; not a code failure.');process.exit(0)}
+          if(!j.ok) throw new Error(`OmniReach self-test failed at ${j.stage||'unknown'}`);
+          const total=Number(j.enriched?.totalReferences||0),amazon=Number(j.enriched?.amazonReferences||0);
+          if(total<200||amazon<150) throw new Error(`Corpus below gate: total=${total}, amazon=${amazon}`);
+          NODE
