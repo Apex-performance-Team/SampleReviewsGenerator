@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "count": 17,
+  "attempted": 1,
+  "failed": 0,
+  "pending": false,
+  "snapshotId": "sd_mt2kqtuh1jrpnr18zx",
+  "canonicalUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+  "requested": 250,
+  "rawRows": 18,
+  "parsedBodies": 17,
+  "reviewIdCount": 17,
+  "rowKeys": [
+    "url",
+    "product_name",
+    "product_rating",
+    "product_rating_object",
+    "product_rating_max",
+    "rating",
+    "author_name",
+    "asin",
+    "product_rating_count",
+    "review_header",
+    "review_id",
+    "review_text",
+    "author_id",
+    "author_link",
+    "badge",
+    "brand",
+    "review_posted_date",
+    "review_country",
+    "helpful_count",
+    "is_amazon_vine",
+    "is_verified",
+    "variant_asin",
+    "variant_name",
+    "videos",
+    "categories",
+    "department",
+    "timestamp",
+    "input"
+  ],
+  "sampleIds": [
+    "R5AVMYSQHC243",
+    "RGVANUTH3MAB4",
+    "RKXWSPXU83HRQ",
+    "R190J3VXK0ADZ",
+    "R3421TIB1H4RDK",
+    "R210TYWFRS8D23",
+    "R63OO4445O0X2",
+    "RPH9IIPW8860S",
+    "R3D0RV913U999N",
+    "R3KKP3VOIXGB7F",
+    "RJBFYFELNR3XC",
+    "R2J18E7SKFV069",
+    "RQACD5RSYHEFJ",
+    "R3RKL6HIEC8FZL",
+    "R19WYESD49ZQRX",
+    "R3HGS4OR41MVJ0",
+    "R1KNJF654FI669"
+  ],
+  "sampleReviews": [
+    {
+      "reviewId": "R5AVMYSQHC243",
+      "title": "",
+      "rating": 5,
+      "body": "We love it, great service for local channels and easy to install"
+    },
+    {
+      "reviewId": "RGVANUTH3MAB4",
+      "title": "",
+      "rating": 5,
+      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it."
+    },
+    {
+      "reviewId": "RKXWSPXU83HRQ",
+      "title": "",
+      "rating": 4,
+      "body": "Hooked right up and put out great signal from indoors. Would be nice to have a couple of female feed thru's in the package."
+    }
+  ],
+  "error": "",
+  "workflow": {
+    "testedAt": "2026-08-21T06:35:26.800Z",
+    "commit": "be67d8130f537c6ffff8dbb2f3c231f01d80dbfe"
+  }
+}
