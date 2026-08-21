@@ -1,218 +1,63 @@
 {
-  "ok": true,
-  "stage": "pass",
-  "baseline": {
-    "totalReferences": 0,
-    "marketplaceReferences": 0,
-    "amazonReferences": 0,
-    "ebayReferences": 0,
-    "referenceHosts": [],
-    "amazonSources": [
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
-        "asin": "B0CKYX98FX",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com/dp/B0F66HDCYW",
-        "asin": "B0F66HDCYW",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
-        "asin": "B0F5W3XRJS",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
-        "asin": "B0D8HZ89MY",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
-        "asin": "B0CFVM3K4G",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
-        "asin": "B0CKYX98FX",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com/dp/B0F66HDCYW",
-        "asin": "B0F66HDCYW",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
-        "asin": "B0F5W3XRJS",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
-        "asin": "B0D8HZ89MY",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
-        "asin": "B0CFVM3K4G",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      }
-    ],
-    "ebaySources": [],
-    "marketplaceIngestion": null
-  },
-  "enriched": {
-    "totalReferences": 5,
-    "marketplaceReferences": 5,
-    "amazonReferences": 5,
-    "ebayReferences": 0,
-    "referenceHosts": [
-      "amazon.com.mx"
-    ],
-    "amazonSources": [
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CKYX98FX",
-        "asin": "B0CKYX98FX",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com/dp/B0F66HDCYW",
-        "asin": "B0F66HDCYW",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
-        "asin": "B0F5W3XRJS",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
-        "asin": "B0D8HZ89MY",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
-        "asin": "B0CFVM3K4G",
-        "publicReviewCount": null,
-        "aggregateOnly": true
-      },
-      {
-        "url": "https://www.amazon.com/dp/B0F66HDCYW",
-        "asin": "B0F66HDCYW",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
-        "asin": "B0F5W3XRJS",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
-        "asin": "B0D8HZ89MY",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      },
-      {
-        "url": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
-        "asin": "B0CFVM3K4G",
-        "publicReviewCount": null,
-        "aggregateOnly": false
-      }
-    ],
-    "ebaySources": [],
-    "marketplaceIngestion": {
-      "attemptedSources": 5,
-      "appendedReviews": 5,
-      "sources": [
-        {
-          "sourceUrl": "https://www.amazon.com.mx/dp/B0CKYX98FX",
-          "platform": "amazon.com.mx",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": "sd_mt2jl44xe109jls06",
-          "extracted": 5,
-          "error": ""
-        },
-        {
-          "sourceUrl": "https://www.amazon.com/dp/B0F66HDCYW",
-          "platform": "amazon.com",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 1,
-          "blocked": 0,
-          "failed": 0,
-          "pending": true,
-          "snapshotId": "sd_mt2jl1tr2hltxapdtx",
-          "extracted": 0,
-          "error": "bright_data_snapshot_running"
-        },
-        {
-          "sourceUrl": "https://www.amazon.com.mx/dp/B0F5W3XRJS",
-          "platform": "amazon.com.mx",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 4,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews"
-        },
-        {
-          "sourceUrl": "https://www.amazon.com.tr/dp/B0D8HZ89MY",
-          "platform": "amazon.com.tr",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 4,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews"
-        },
-        {
-          "sourceUrl": "https://www.amazon.com.mx/dp/B0CFVM3K4G",
-          "platform": "amazon.com.mx",
-          "provider": "bright_data_amazon_reviews",
-          "attempted": 4,
-          "blocked": 0,
-          "failed": 0,
-          "pending": false,
-          "snapshotId": null,
-          "extracted": 0,
-          "error": "bright_data_amazon_zero_reviews"
-        }
-      ]
+  "ok": false,
+  "stage": "deterministic_marketplace_reviews_missing",
+  "totalReferences": 17,
+  "amazonReferences": 17,
+  "ebayReferences": 0,
+  "sampleAmazon": [
+    {
+      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+      "title": "",
+      "body": "We love it, great service for local channels and easy to install",
+      "rating": 5,
+      "provider": "bright_data_amazon_reviews"
+    },
+    {
+      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+      "title": "",
+      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it.",
+      "rating": 5,
+      "provider": "bright_data_amazon_reviews"
     }
+  ],
+  "sampleEbay": [],
+  "marketplaceIngestion": {
+    "attemptedSources": 2,
+    "appendedReviews": 17,
+    "sources": [
+      {
+        "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+        "platform": "amazon.com",
+        "provider": "bright_data_amazon_reviews",
+        "attempted": 1,
+        "blocked": 0,
+        "failed": 0,
+        "pending": false,
+        "snapshotId": "sd_mt2jp16a20rimmxztk",
+        "extracted": 17,
+        "error": ""
+      },
+      {
+        "sourceUrl": "https://www.ebay.com/itm/176327212659",
+        "platform": "ebay.com",
+        "provider": "ebay_public_page",
+        "attempted": 1,
+        "blocked": 1,
+        "failed": 0,
+        "pending": false,
+        "snapshotId": null,
+        "extracted": 0,
+        "error": "blocked_or_challenged"
+      }
+    ]
   },
-  "enrichmentResponseError": null,
+  "responseError": null,
   "checks": {
-    "corpusNeverShrank": true,
-    "marketplaceBodiesExtracted": true,
     "amazonBodiesExtracted": true,
     "ebayBodiesExtracted": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T06:02:42.738Z",
-    "commit": "7060c9aec2082332f83022747c0b1a099a4a64f1"
+    "testedAt": "2026-08-21T06:05:37.863Z",
+    "commit": "722c444a806b96c9c4e52b54c396ad4ec4e2f90f"
   }
 }
