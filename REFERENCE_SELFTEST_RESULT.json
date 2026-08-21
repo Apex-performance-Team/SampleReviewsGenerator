@@ -1,14 +1,44 @@
 {
-  "ok": false,
-  "stage": "deterministic_marketplace_reviews_missing",
-  "totalReferences": 0,
-  "amazonReferences": 0,
-  "ebayReferences": 0,
-  "sampleAmazon": [],
-  "sampleEbay": [],
+  "ok": true,
+  "stage": "pass",
+  "totalReferences": 27,
+  "amazonReferences": 17,
+  "ebayReferences": 10,
+  "sampleAmazon": [
+    {
+      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+      "title": "",
+      "body": "We love it, great service for local channels and easy to install",
+      "rating": 5,
+      "provider": "bright_data_amazon_reviews"
+    },
+    {
+      "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+      "title": "",
+      "body": "I was looking for local channels. Got all the ones I wanted but one. Couldn't get NBC so I have to look for a better antenna but it might work where you live. Easy set-up, nothing complicated. A 2 yr old could do it.",
+      "rating": 5,
+      "provider": "bright_data_amazon_reviews"
+    }
+  ],
+  "sampleEbay": [
+    {
+      "sourceUrl": "https://www.ebay.com/itm/176327212659",
+      "title": "",
+      "body": "Love it! No more turning the antenna!!!",
+      "rating": null,
+      "provider": "bright_data_ebay_product"
+    },
+    {
+      "sourceUrl": "https://www.ebay.com/itm/176327212659",
+      "title": "",
+      "body": "Hi We have your antenna installed works but only within our 50-mile location. Please we let me know if you can supply another unit but a more power full antenna. Like is advertise 2024 ? We decided to keep the antenna sent need another one ASAP. Please reply?",
+      "rating": null,
+      "provider": "bright_data_ebay_product"
+    }
+  ],
   "marketplaceIngestion": {
     "attemptedSources": 2,
-    "appendedReviews": 0,
+    "appendedReviews": 27,
     "sources": [
       {
         "sourceUrl": "https://www.amazon.com/dp/B0845Y7DGS",
@@ -17,10 +47,10 @@
         "attempted": 1,
         "blocked": 0,
         "failed": 0,
-        "pending": true,
-        "snapshotId": "sd_mt2jumn21pfameqr6m",
-        "extracted": 0,
-        "error": "bright_data_snapshot_running"
+        "pending": false,
+        "snapshotId": "sd_mt2jzlwh28njknlmo8",
+        "extracted": 17,
+        "error": ""
       },
       {
         "sourceUrl": "https://www.ebay.com/itm/176327212659",
@@ -29,20 +59,20 @@
         "attempted": 1,
         "blocked": 0,
         "failed": 0,
-        "pending": true,
-        "snapshotId": "sd_mt2juo5fjbdtlh8dk",
-        "extracted": 0,
-        "error": "bright_data_ebay_snapshot_running"
+        "pending": false,
+        "snapshotId": "sd_mt2jzlqc1ur6inhu70",
+        "extracted": 10,
+        "error": ""
       }
     ]
   },
   "responseError": null,
   "checks": {
-    "amazonBodiesExtracted": false,
-    "ebayBodiesExtracted": false
+    "amazonBodiesExtracted": true,
+    "ebayBodiesExtracted": true
   },
   "workflow": {
-    "testedAt": "2026-08-21T06:10:10.197Z",
-    "commit": "35f5bd83a7fc91bff12b94401e1f8c604353a005"
+    "testedAt": "2026-08-21T06:13:45.115Z",
+    "commit": "ee232c214da9ef4b6e639def029e0d6f2f9ec639"
   }
 }
