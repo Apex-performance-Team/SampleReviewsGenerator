@@ -1,16 +1,18 @@
 export const runtime='nodejs';
 import{gatewayToken,authMode}from'../../../lib/gateway';
+
+const BD='https://api.brightdata.com';
+const clean=x=>String(x||'').replace(/\s+/g,' ').trim();
+async function brightDataHealth(key){
+  if(!key)return{configured:false,healthy:false,httpStatus:null,error:'not_configured',zones:[]};
+  let status=null,statusText='',zones=[];
+  try{const r=await fetch(`${BD}/status`,{headers:{authorization:`Bearer ${key}`},cache:'no-store',signal:AbortSignal.timeout(10000)});status=r.status;statusText=await r.text();if(!r.ok)return{configured:true,healthy:false,httpStatus:r.status,error:clean(statusText).slice(0,180),zones:[]}}catch(e){return{configured:true,healthy:null,httpStatus:null,error:clean(e?.message||e).slice(0,180),zones:[]}}
+  try{const r=await fetch(`${BD}/zone/get_active_zones`,{headers:{authorization:`Bearer ${key}`},cache:'no-store',signal:AbortSignal.timeout(10000)}),raw=await r.text();if(r.ok){const j=JSON.parse(raw);if(Array.isArray(j))zones=j.filter(x=>String(x?.type||'').toLowerCase()==='serp'&&x?.name).map(x=>x.name)}}catch{}
+  return{configured:true,healthy:!/invalid status|not active|inactive|suspended/i.test(statusText),httpStatus:status,error:null,zones};
+}
+
 export async function GET(req){
-  const lensConfigured=Boolean(process.env.BRIGHT_DATA_API_KEY);
-  const verifierConfigured=Boolean(gatewayToken(req));
-  return Response.json({
-    ok:true,
-    provider:'Bright Data Google Lens + GPT-5.6 Sol verification',
-    configured:lensConfigured&&verifierConfigured,
-    lensConfigured,
-    verifierConfigured,
-    auth:authMode(req),
-    zone:process.env.BRIGHT_DATA_SERP_ZONE||'serp_api1',
-    env:null
-  },{headers:{'cache-control':'no-store'}})
+  const key=process.env.BRIGHT_DATA_API_KEY||'',brightData=await brightDataHealth(key),verifierConfigured=Boolean(gatewayToken(req));
+  const configured=brightData.configured&&verifierConfigured,healthy=brightData.healthy===true&&verifierConfigured;
+  return Response.json({ok:healthy,provider:'Bright Data Google Lens + GPT-5.6 Sol verification',configured,healthy,lensConfigured:brightData.configured,lensHealthy:brightData.healthy,brightDataHttpStatus:brightData.httpStatus,brightDataError:brightData.error,activeSerpZones:brightData.zones,verifierConfigured,verifierAuth:authMode(req),zone:brightData.zones[0]||process.env.BRIGHT_DATA_SERP_ZONE||null,env:null},{status:healthy?200:503,headers:{'cache-control':'no-store'}})
 }
