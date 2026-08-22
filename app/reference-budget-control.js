@@ -2,7 +2,7 @@
 import{useEffect,useState}from'react';
 
 const MODES={
-  test:{label:'Test',detail:'1 image · up to 3 Lens requests · 2 reference AI calls · 1 Amazon query · 20 Amazon/eBay reviews'},
+  test:{label:'Test',detail:'1 image · up to 3 Lens requests · 2 reference AI calls · 1 Amazon query · 50 Amazon/eBay reviews'},
   balanced:{label:'Balanced',detail:'2 images · up to 6 Lens requests · 8 reference AI calls · 3 Amazon queries · 50 Amazon/eBay reviews'},
   thorough:{label:'Thorough',detail:'4 images · up to 12 Lens requests · 10 reference AI calls · 4 Amazon queries · 50 Amazon/eBay reviews'}
 };

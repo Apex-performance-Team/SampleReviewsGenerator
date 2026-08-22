@@ -3,7 +3,7 @@ import{readFile}from'node:fs/promises';
 import{candidateHost,referenceBudget,selectDiverseCandidates,uniqueReferences}from'../lib/reference-pipeline.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
-assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,20]);
+assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,50]);
 assert.equal(test.maxCandidates,6);
 assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[2,false,false,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
