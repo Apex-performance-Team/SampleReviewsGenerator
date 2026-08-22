@@ -2,6 +2,7 @@ import assert from'node:assert/strict';
 import{parseEbayItemFeedback,selectBrightUnlockerZone}from'../lib/marketplace-review-ingest.js';
 
 const html=`
+<div>This item (2)</div><div>All items (99)</div>
 <div id=item-tabpanel-0 aria-labelledby=item-tabs-0 role=tabpanel>
   <div data-track='{"fdbk_tab":"ITEM"}' action='{"URL":"?page_id_item=1&page_type=FILTER_ITEM"}'></div>
   <ul>
@@ -25,9 +26,12 @@ const html=`
   </li>
 </div>`;
 
-const result=parseEbayItemFeedback(html);
+const result=parseEbayItemFeedback(html,'113678777302',1);
 assert.equal(result.cardCount,2);
+assert.equal(result.totalCardCount,3);
+assert.equal(result.itemFeedbackCount,2);
 assert.equal(result.automatedExcluded,1);
+assert.equal(result.sellerWideExcluded,1);
 assert.equal(result.reviews.length,1);
 assert.equal(result.reviews[0].body,'This exact antenna works well in our remote area.');
 assert.equal(result.reviews[0].authorName,'b***r (42)');
@@ -38,4 +42,4 @@ assert.deepEqual(selectBrightUnlockerZone([{name:'search-zone',type:'serp'},{nam
 assert.deepEqual(selectBrightUnlockerZone([{name:'first-unlock',type:'unblocker'},{name:'preferred-unlock',type:'web_unlocker'}],'preferred-unlock'),{zone:'preferred-unlock',source:'environment'});
 assert.equal(selectBrightUnlockerZone([{name:'search-zone',type:'serp'}]),null);
 
-console.log(JSON.stringify({ok:true,itemCards:result.cardCount,automatedExcluded:result.automatedExcluded,accepted:result.reviews.length,sellerWideAccepted:0}));
+console.log(JSON.stringify({ok:true,itemCards:result.cardCount,totalCards:result.totalCardCount,automatedExcluded:result.automatedExcluded,sellerWideExcluded:result.sellerWideExcluded,accepted:result.reviews.length,sellerWideAccepted:0}));
