@@ -1,23 +1,23 @@
 {
   "ok": false,
-  "stage": "external_provider_unavailable",
-  "externalProviderUnavailable": true,
+  "stage": "amazon_collector_failed",
+  "externalProviderUnavailable": false,
   "providerHealth": {
     "ok": true,
-    "provider": "Degraded reference discovery with deterministic/public fallbacks",
+    "provider": "Bright Data Google Lens + AI same-product verification",
     "configured": true,
     "credentialsConfigured": true,
-    "healthy": false,
-    "degraded": true,
+    "healthy": true,
+    "degraded": false,
     "canAttemptReferenceSourcing": true,
     "fallbackDiscoveryAvailable": true,
-    "reason": "Bright Data account is not operational. Fallback discovery is available.",
+    "reason": null,
     "lensConfigured": true,
-    "lensHealthy": false,
+    "lensHealthy": true,
     "brightDataHttpStatus": 200,
     "brightDataError": null,
     "brightDataNoCredits": false,
-    "brightDataBalance": null,
+    "brightDataBalance": 15.24,
     "brightDataPendingBalance": null,
     "activeSerpZones": [
       "synthetic_review_lens"
@@ -30,61 +30,89 @@
   },
   "deterministic": {
     "ok": false,
-    "providerUnavailable": true,
+    "providerUnavailable": false,
     "providerCode": null,
-    "amazonReferences": 0,
-    "totalReferences": 0,
+    "amazonReferences": 50,
+    "totalReferences": 50,
     "targetSource": {
       "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
+      "asin": "B089LMG6L4",
       "platform": "amazon.com",
       "provider": "bright_data_amazon_reviews_v2",
-      "budget": 220,
+      "type": "amazon",
+      "budget": 50,
       "discoveryOrigin": "amazon_high_volume",
       "attempted": 1,
       "blocked": 0,
-      "failed": 1,
+      "failed": 0,
       "pending": false,
-      "snapshotId": null,
+      "snapshotId": "sd_mt4ol8ujl408x65qa",
       "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
-      "requested": 220,
-      "aggregateRatingCount": null,
-      "rawRows": 0,
-      "parsedBodies": 0,
-      "reviewIdCount": 0,
-      "extracted": 0,
-      "error": "bright_data_trigger_http_400:Customer is not active"
+      "requested": 50,
+      "aggregateRatingCount": 33154,
+      "rawRows": 50,
+      "parsedBodies": 50,
+      "reviewIdCount": 50,
+      "pulled": 50,
+      "error": ""
     },
-    "sampleAmazon": [],
+    "sampleAmazon": [
+      {
+        "id": "RYKSCLG2RTDYQ",
+        "body": "I was very skeptical about this antenna but saw it for a good price, and plus they do offer a 30 day money back guarantee if you are not satisfied. I decided to buy two, one for myself, and as a present to my parents for the new tv my brother and I got them fo"
+      },
+      {
+        "id": "R3TOH74XRVPF7R",
+        "body": "Excellent VHF/UHF HD antenna with optional signal amplifier. Long 20 feet of coaxial cable should be enough to reach window. You can use on a stand indoors but placing it between the window and screen works well for me. I live about 6 miles from Manhattan. My "
+      }
+    ],
     "marketplaceIngestion": {
       "attemptedSources": 1,
-      "appendedReviews": 0,
+      "verifiedAmazonSources": 1,
+      "appendedReviews": 50,
+      "pulledReviews": 50,
       "sources": [
         {
           "sourceUrl": "https://www.amazon.com/dp/B089LMG6L4",
+          "asin": "B089LMG6L4",
           "platform": "amazon.com",
           "provider": "bright_data_amazon_reviews_v2",
-          "budget": 220,
+          "type": "amazon",
+          "budget": 50,
           "discoveryOrigin": "amazon_high_volume",
           "attempted": 1,
           "blocked": 0,
-          "failed": 1,
+          "failed": 0,
           "pending": false,
-          "snapshotId": null,
+          "snapshotId": "sd_mt4ol8ujl408x65qa",
           "canonicalUrl": "https://www.amazon.com/dp/B089LMG6L4",
-          "requested": 220,
-          "aggregateRatingCount": null,
-          "rawRows": 0,
-          "parsedBodies": 0,
-          "reviewIdCount": 0,
-          "extracted": 0,
-          "error": "bright_data_trigger_http_400:Customer is not active"
+          "requested": 50,
+          "aggregateRatingCount": 33154,
+          "rawRows": 50,
+          "parsedBodies": 50,
+          "reviewIdCount": 50,
+          "pulled": 50,
+          "error": ""
         }
       ],
       "amazonVolumeDiscovery": {
         "skipped": true,
         "reason": "verified_high_volume_source_already_present"
       },
-      "brightDataBalance": null
+      "budget": {
+        "hardCap": 50,
+        "remainingCapacity": 50,
+        "planned": 50,
+        "amazonSources": [
+          {
+            "asin": "B089LMG6L4",
+            "url": "https://www.amazon.com/dp/B089LMG6L4",
+            "budget": 50
+          }
+        ],
+        "ebaySources": []
+      },
+      "brightDataBalance": 15.24
     },
     "error": null
   },
@@ -92,156 +120,703 @@
     "ok": false,
     "providerUnavailable": false,
     "providerCode": null,
-    "stage": "reference_scan",
-    "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. Provider diagnostic: Bright Data account is not active.",
-    "response": {
-      "error": "Reference scan returned no verified external sources after Lens and Amazon fallback. Provider diagnostic: Bright Data account is not active.",
-      "brightData": {
-        "stage": "empty_verified_source_set",
-        "zone": null,
-        "zoneSource": "not_resolved",
-        "imageTransport": "lens_skipped",
-        "providerPreflight": {
-          "ok": false,
-          "configured": true,
-          "httpStatus": 200,
-          "error": "Bright Data account is not active.",
-          "noCredits": false,
-          "balance": null,
-          "pendingBalance": null
-        }
+    "stage": "live_corpus_missing",
+    "authoritativeProductTitle": "InstaBeam OmniReach Extended Range TV Antenna",
+    "baselineReferences": 7,
+    "enrichedReferences": 56,
+    "corpusTargetMet": false,
+    "amazonTargetMet": false,
+    "marketplaceReferences": 49,
+    "amazonReferences": 40,
+    "ebayReferences": 9,
+    "corpusNeverShrank": true,
+    "verifiedSources": [
+      {
+        "url": "https://www.amazon.es/dp/B0845Y7DGS",
+        "asin": "B0845Y7DGS",
+        "title": "Five Star HDTV Antenna - 360° Amplified Omni-Directional TV ...",
+        "platform": "amazon.es",
+        "matchConfidence": 0.96,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 1149
       },
-      "diagnostics": {
-        "providerPreflight": {
-          "ok": false,
-          "configured": true,
-          "httpStatus": 200,
-          "error": "Bright Data account is not active.",
-          "noCredits": false,
-          "balance": null,
-          "pendingBalance": null
+      {
+        "url": "https://www.amazon.ae/dp/B0845NYBBJ",
+        "asin": "B0845NYBBJ",
+        "title": "Five Star [Newest 2020] HDTV Antenna - 360° Omni ...",
+        "platform": "amazon.ae",
+        "matchConfidence": 0.94,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 330
+      },
+      {
+        "url": "https://www.amazon.com/dp/B0845V5GCK",
+        "asin": "B0845V5GCK",
+        "title": "Amazon.com: Five Star HDTV Antenna 360° Omni-Directional ...",
+        "platform": "amazon.com",
+        "matchConfidence": 0.98,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 407
+      },
+      {
+        "url": "https://saksby.com/products/amplified-outdoor-long-range-omni-directional-digital-hdtv-antenna-sak91588",
+        "asin": null,
+        "title": "Amplified Outdoor Long Range Omni Directional Digital HDTV Antenna, 150 Miles (SAK91588)",
+        "platform": "saksby.com",
+        "matchConfidence": 0.97,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 125
+      },
+      {
+        "url": "https://www.ebay.com/itm/176327212659",
+        "asin": null,
+        "title": "Tablo Compatible HDTV Antenna Omni-directional 4K Amplified ...",
+        "platform": "ebay.com",
+        "matchConfidence": 0.98,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 3
+      },
+      {
+        "url": "https://www.walmart.com/blocked?url=L2lwL0ZpdmUtU3Rhci1PbW5pZGlyZWN0aW9uYWwtSW5kb29yLU91dGRvb3ItQW1wbGlmaWVkLVRWLUFudGVubmEtU3VwcG9ydC00LVRWcy1Nb3VudGluZy1Qb2xlLzgxOTE0MTQyNg==&uuid=7dbe4afb-9e53-11f1-b5e8-080940a62ff3&vid=&g=b",
+        "asin": null,
+        "title": "Robot or human?",
+        "platform": "walmart.com",
+        "matchConfidence": 0.97,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://www.ebay.com/itm/174296548604",
+        "asin": null,
+        "title": "Outdoor Amplified HDTV Antenna 360° Digital HD 1080P 4K ...",
+        "platform": "ebay.com",
+        "matchConfidence": 0.97,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 3
+      },
+      {
+        "url": "https://www.walmart.com/blocked?url=L2lwL0ZpdmVTdGFyLU9tbmktRGlnaXRhbC1UVi1BbnRlbm5hLUZTQS01ODE4LTM2MC1BbXBsaWZpZWQtUmVjZXB0aW9uLTIwMC1NaWxlLVJhbmdlLTRLLTEwODBQLUhEVFYtZm9yLUluZG9vci1PdXRkb29yLVJWLU1hcmluZS8xNTgyOTU2MDUxMw==&uuid=7dc82aaf-9e53-11f1-aaa7-c2288bf58a9f&vid=&g=b",
+        "asin": null,
+        "title": "Robot or human?",
+        "platform": "walmart.com",
+        "matchConfidence": 0.95,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://cordlessmagic.com/products/new-cordless-magic%E2%84%A2-omni-directional-2023-outdoor-hd-tv-antenna-free-hd-channels",
+        "asin": null,
+        "title": "Super Omni-Antenna - 860-mile range",
+        "platform": "cordlessmagic.com",
+        "matchConfidence": 0.93,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://stonetiledepot.com/products/amplified-outdoor-long-range-omni-directional-digital-hdtv-antenna-150-miles-sak91588",
+        "asin": null,
+        "title": "Amplified Outdoor Long Range Omni Directional Digital HDTV ...",
+        "platform": "stonetiledepot.com",
+        "matchConfidence": 0.91,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://www.ubuy.com.ps/ar/product/1NNR84GG-indoor-outdoor-antenna-360-omnidirectional-omnipro-amplified-tv-antenna-with-installation-kit-and-mo",
+        "asin": null,
+        "title": "طقم هوائي تلفزيون داخلي من Palestine | Ubuy",
+        "platform": "ubuy.com.ps",
+        "matchConfidence": 0.9,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://business.walmart.com/blocked?url=L2lwL0ZpdmUtU3Rhci0zNjAtUmVjZXB0aW9uLUF0dGljLUluZG9vci1UVi1BbnRlbm5hLUFtcGxpZmllci1PdXRkb29yLUFudGVubmEtSERUVi1BbnRlbm5hLXdpdGgtSW5zdGFsbGF0aW9uLUtpdC8xMDA5NjQ2OTU=&uuid=7dc4cb44-9e53-11f1-8edd-9dbbca13a54d&vid=&g=b",
+        "asin": null,
+        "title": "Robot or human?",
+        "platform": "business.walmart.com",
+        "matchConfidence": 0.95,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://www.ebay.com/itm/174268627037",
+        "asin": null,
+        "title": "360° Omni-Directional Outdoor TV Antenna Amplified 4K HDTV ...",
+        "platform": "ebay.com",
+        "matchConfidence": 0.96,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": 3
+      },
+      {
+        "url": "https://www.walmart.com/blocked?url=L2lwL0ZpdmUtU3Rhci1JbmRvb3ItT3V0ZG9vci1PbW5pLWRpcmVjdGlvbmFsLUFudGVubmEtNEstSEQtMjAwLU1pbGVzLzExMTkyMzI1OA==&uuid=7dc5ff2c-9e53-11f1-8cef-7c7f70b0fa8d&vid=&g=b",
+        "asin": null,
+        "title": "Robot or human?",
+        "platform": "walmart.com",
+        "matchConfidence": 0.98,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://mara-big-five.com/shop.php?product/category/view_more/4817818931100",
+        "asin": null,
+        "title": "HDTV Antenna - 360° Omnidirectional Amp",
+        "platform": "mara-big-five.com",
+        "matchConfidence": 0.93,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://mobilpcservis.sk/items/Amplified-TV-Antenna-360-Omni-Directional-Digital-HD-1080P-4K/724382",
+        "asin": null,
+        "title": "360 Degree Outdoor TV Antenna HDTV Outdoor Amplified TV ...",
+        "platform": "mobilpcservis.sk",
+        "matchConfidence": 0.86,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      },
+      {
+        "url": "https://fivestarantenna.com/product/fsa-5812/",
+        "asin": null,
+        "title": "FSA-5812 &#8211; Five Star Antenna Official Website",
+        "platform": "fivestarantenna.com",
+        "matchConfidence": 0.99,
+        "verificationMethod": "lens_product+ai",
+        "reviewCount": null
+      }
+    ],
+    "amazonFallbackDiscovery": null,
+    "marketplaceIngestion": {
+      "attemptedSources": 6,
+      "verifiedAmazonSources": 3,
+      "appendedReviews": 49,
+      "pulledReviews": 49,
+      "sources": [
+        {
+          "sourceUrl": "https://www.amazon.com/dp/B0845V5GCK",
+          "asin": "B0845V5GCK",
+          "platform": "amazon.com",
+          "provider": "bright_data_amazon_reviews_v2",
+          "type": "amazon",
+          "budget": 14,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7z3oywvfky1g",
+          "canonicalUrl": "https://www.amazon.com/dp/B0845V5GCK",
+          "requested": 14,
+          "aggregateRatingCount": 407,
+          "rawRows": 14,
+          "parsedBodies": 14,
+          "reviewIdCount": 14,
+          "pulled": 14,
+          "error": ""
         },
-        "sourceImages": null,
-        "lensRequests": null,
-        "lensRequestsSucceeded": null,
-        "rawResults": null,
-        "uniqueCandidates": null,
-        "acceptedCandidates": null,
-        "rejectedCandidates": null,
-        "verifierCandidates": null,
-        "verifierAccepted": null,
-        "verifierRejected": null,
-        "amazonCandidates": null,
-        "amazonAccepted": null,
-        "amazonFallback": {
-          "status": "no_verified_candidate",
-          "baseLensError": "Bright Data account is not active.",
-          "queries": [
-            "omnireach extended range antenna",
-            "antenna instabeam hdtv antennas reception helping"
-          ],
-          "identity": {
-            "title": "InstaBeam OmniReach Extended Range TV Antenna",
-            "descriptionLength": 183,
-            "image": "https://instabeamtv.com/cdn/shop/files/omni1_2048x.png?v=1786849009",
+        {
+          "sourceUrl": "https://www.amazon.es/dp/B0845Y7DGS",
+          "asin": "B0845Y7DGS",
+          "platform": "amazon.es",
+          "provider": "bright_data_amazon_reviews_v2",
+          "type": "amazon",
+          "budget": 13,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7z32k60r4i6ad",
+          "canonicalUrl": "https://www.amazon.com/dp/B0845Y7DGS",
+          "requested": 13,
+          "aggregateRatingCount": 1149,
+          "rawRows": 13,
+          "parsedBodies": 13,
+          "reviewIdCount": 13,
+          "pulled": 13,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.amazon.ae/dp/B0845NYBBJ",
+          "asin": "B0845NYBBJ",
+          "platform": "amazon.ae",
+          "provider": "bright_data_amazon_reviews_v2",
+          "type": "amazon",
+          "budget": 13,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7yj2dyy04fsvt",
+          "canonicalUrl": "https://www.amazon.com/dp/B0845NYBBJ",
+          "requested": 13,
+          "aggregateRatingCount": 330,
+          "rawRows": 13,
+          "parsedBodies": 13,
+          "reviewIdCount": 13,
+          "pulled": 13,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/176327212659",
+          "asin": null,
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "type": "ebay",
+          "budget": 3,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7z92g42krbxbc",
+          "canonicalUrl": null,
+          "requested": 3,
+          "aggregateRatingCount": null,
+          "rawRows": null,
+          "parsedBodies": null,
+          "reviewIdCount": null,
+          "pulled": 3,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/174296548604",
+          "asin": null,
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "type": "ebay",
+          "budget": 3,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7zkhswj375uw",
+          "canonicalUrl": null,
+          "requested": 3,
+          "aggregateRatingCount": null,
+          "rawRows": null,
+          "parsedBodies": null,
+          "reviewIdCount": null,
+          "pulled": 3,
+          "error": ""
+        },
+        {
+          "sourceUrl": "https://www.ebay.com/itm/174268627037",
+          "asin": null,
+          "platform": "ebay.com",
+          "provider": "bright_data_ebay_product",
+          "type": "ebay",
+          "budget": 3,
+          "discoveryOrigin": null,
+          "attempted": 1,
+          "blocked": 0,
+          "failed": 0,
+          "pending": false,
+          "snapshotId": "sd_mt4ot7zcjkqqmjsp5",
+          "canonicalUrl": null,
+          "requested": 3,
+          "aggregateRatingCount": null,
+          "rawRows": null,
+          "parsedBodies": null,
+          "reviewIdCount": null,
+          "pulled": 3,
+          "error": ""
+        }
+      ],
+      "amazonVolumeDiscovery": {
+        "elapsedMs": 88491,
+        "queryMode": "ai",
+        "authoritativePdpIdentity": {
+          "title": "InstaBeam OmniReach Extended Range TV Antenna",
+          "descriptionLength": 183,
+          "image": "https://instabeamtv.com/cdn/shop/files/omni1_2048x.png?v=1786849009",
+          "error": null
+        },
+        "referenceImageUsed": false,
+        "localReferenceImageUsed": true,
+        "referenceImageUrl": "http://instabeamtv.com/cdn/shop/files/omni1.png?v=1786849009",
+        "verificationError": null,
+        "localVisualFallbackUsed": false,
+        "localVisual": [
+          {
+            "index": 5,
+            "ok": true,
+            "score": 0.6019,
+            "averageHash": 0.6299,
+            "differenceHash": 0.5508,
+            "silhouetteIou": 0.617,
+            "pixelCorrelation": 0.6157,
             "error": null
           },
-          "diagnostics": {
-            "elapsedMs": 1230,
-            "queryMode": "deterministic",
-            "authoritativePdpIdentity": {
-              "title": "InstaBeam OmniReach Extended Range TV Antenna",
-              "descriptionLength": 183,
-              "image": "https://instabeamtv.com/cdn/shop/files/omni1_2048x.png?v=1786849009",
-              "error": null
-            },
-            "referenceImageUsed": false,
-            "referenceImageUrl": null,
-            "verificationError": null,
-            "localVisualFallbackUsed": false,
-            "localVisual": [],
-            "searchRuns": [
-              {
-                "ok": false,
-                "rawRows": 0,
-                "error": "trigger_http_400:Customer is not active",
-                "resultCount": 0
-              },
-              {
-                "ok": false,
-                "rawRows": 0,
-                "error": "trigger_http_400:Customer is not active",
-                "resultCount": 0
-              }
-            ],
-            "providerFallback": {
-              "diagnostics": {
-                "error": "AI Gateway 402: A positive credit balance is required for all requests, including BYOK, so fallback providers remain available. Add credits at https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up to continue."
-              },
-              "candidates": []
-            },
-            "publicSearchRuns": [
-              {
-                "query": "omnireach extended range antenna",
-                "ok": false,
-                "error": null,
-                "resultCount": 0,
-                "diagnostics": {
-                  "bing": {
-                    "ok": true,
-                    "status": 200,
-                    "error": null
-                  },
-                  "duckduckgo": {
-                    "ok": false,
-                    "status": 403,
-                    "error": null
-                  },
-                  "rawResults": 0
-                }
-              },
-              {
-                "query": "antenna instabeam hdtv antennas reception helping",
-                "ok": false,
-                "error": null,
-                "resultCount": 0,
-                "diagnostics": {
-                  "bing": {
-                    "ok": true,
-                    "status": 200,
-                    "error": null
-                  },
-                  "duckduckgo": {
-                    "ok": false,
-                    "status": 403,
-                    "error": null
-                  },
-                  "rawResults": 0
-                }
-              }
-            ],
-            "shortlist": [],
-            "verified": [],
-            "deterministicRescueAttempted": true,
-            "deterministicRescueCandidates": 0
+          {
+            "index": 1,
+            "ok": true,
+            "score": 0.5682,
+            "averageHash": 0.6982,
+            "differenceHash": 0.5684,
+            "silhouetteIou": 0.3846,
+            "pixelCorrelation": 0.6455,
+            "error": null
+          },
+          {
+            "index": 6,
+            "ok": true,
+            "score": 0.5612,
+            "averageHash": 0.5732,
+            "differenceHash": 0.543,
+            "silhouetteIou": 0.5358,
+            "pixelCorrelation": 0.6118,
+            "error": null
+          },
+          {
+            "index": 11,
+            "ok": true,
+            "score": 0.5541,
+            "averageHash": 0.6133,
+            "differenceHash": 0.5371,
+            "silhouetteIou": 0.4748,
+            "pixelCorrelation": 0.6104,
+            "error": null
+          },
+          {
+            "index": 0,
+            "ok": true,
+            "score": 0.5274,
+            "averageHash": 0.6289,
+            "differenceHash": 0.5557,
+            "silhouetteIou": 0.3605,
+            "pixelCorrelation": 0.5787,
+            "error": null
+          },
+          {
+            "index": 2,
+            "ok": true,
+            "score": 0.5213,
+            "averageHash": 0.5342,
+            "differenceHash": 0.5508,
+            "silhouetteIou": 0.4817,
+            "pixelCorrelation": 0.5147,
+            "error": null
+          },
+          {
+            "index": 8,
+            "ok": true,
+            "score": 0.5204,
+            "averageHash": 0.6387,
+            "differenceHash": 0.542,
+            "silhouetteIou": 0.329,
+            "pixelCorrelation": 0.5937,
+            "error": null
+          },
+          {
+            "index": 10,
+            "ok": true,
+            "score": 0.5191,
+            "averageHash": 0.6016,
+            "differenceHash": 0.5469,
+            "silhouetteIou": 0.3771,
+            "pixelCorrelation": 0.5633,
+            "error": null
+          },
+          {
+            "index": 3,
+            "ok": true,
+            "score": 0.4965,
+            "averageHash": 0.5537,
+            "differenceHash": 0.5166,
+            "silhouetteIou": 0.3906,
+            "pixelCorrelation": 0.5377,
+            "error": null
+          },
+          {
+            "index": 9,
+            "ok": true,
+            "score": 0.4887,
+            "averageHash": 0.5195,
+            "differenceHash": 0.5195,
+            "silhouetteIou": 0.408,
+            "pixelCorrelation": 0.5152,
+            "error": null
+          },
+          {
+            "index": 4,
+            "ok": true,
+            "score": 0.4781,
+            "averageHash": 0.5986,
+            "differenceHash": 0.5293,
+            "silhouetteIou": 0.2518,
+            "pixelCorrelation": 0.5543,
+            "error": null
+          },
+          {
+            "index": 7,
+            "ok": true,
+            "score": 0.4583,
+            "averageHash": 0.5244,
+            "differenceHash": 0.499,
+            "silhouetteIou": 0.3488,
+            "pixelCorrelation": 0.4563,
+            "error": null
           }
-        },
-        "tabs": null,
-        "transport": []
-      }
-    }
+        ],
+        "searchRuns": [
+          {
+            "keyword": "Five Star FSA-5812 360° omni-directional amplified outdoor HDTV antenna",
+            "ok": true,
+            "rawRows": 10,
+            "error": "",
+            "resultCount": 10
+          },
+          {
+            "keyword": "360° omni-directional amplified outdoor TV antenna 4K 1080P long range",
+            "ok": true,
+            "rawRows": 63,
+            "error": "",
+            "resultCount": 47
+          },
+          {
+            "keyword": "Five Star 360° amplified omni-directional 4K HDTV antenna",
+            "ok": true,
+            "rawRows": 51,
+            "error": "",
+            "resultCount": 47
+          },
+          {
+            "keyword": "amplified outdoor long range omni-directional digital HDTV antenna 150 miles SAK91588",
+            "ok": true,
+            "rawRows": 48,
+            "error": "",
+            "resultCount": 46
+          }
+        ],
+        "providerFallback": null,
+        "publicSearchRuns": [],
+        "shortlist": [
+          {
+            "asin": "B0845V5GCK",
+            "title": "Five Star HDTV Antenna 360° Omni-Directional Reception Amplified Outdoor TV Antenna 150 Miles Long Range for Indoor/Outdoor,RV,Attic Support 4K 1080P UHF VHF 4TVs Installation Kit",
+            "ratingCount": 407,
+            "lexicalOverlap": 0.6190476190476191,
+            "rankOnPage": 3,
+            "pageNumber": 1,
+            "discoveryScore": 4.287046806100521,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5274
+          },
+          {
+            "asin": "B09ND98DM2",
+            "title": "TV Antenna,28-36dB 360° UV Dual-Band Outdoor Digital Amplified HDTV Antenna 150 Miles Range,Without Pole",
+            "ratingCount": 0,
+            "lexicalOverlap": 0.6363636363636364,
+            "rankOnPage": 15,
+            "pageNumber": 1,
+            "discoveryScore": 3.9073863636363635,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5682
+          },
+          {
+            "asin": "B0GXY3YX59",
+            "title": "Digital Outdoor TV Antenna 360° Omni-Directional for Local Channels",
+            "ratingCount": 8,
+            "lexicalOverlap": 0.6666666666666666,
+            "rankOnPage": 9,
+            "pageNumber": 2,
+            "discoveryScore": 3.6892803136799155,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5213
+          },
+          {
+            "asin": "B0FRFKZ27J",
+            "title": "TV Antenna Outdoor,360° Omni-Directional Reception Long 200+ Miles Range Enhance VHF&UHF 4K 1080p Ready HDTV Antenna with Added Stability for Outdoor/Attic,RG6 Coax Cable",
+            "ratingCount": 176,
+            "lexicalOverlap": 0.5,
+            "rankOnPage": 4,
+            "pageNumber": 1,
+            "discoveryScore": 3.6709966582952256,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.4965
+          },
+          {
+            "asin": "B0D7QY69WW",
+            "title": "Omni-Directional Outdoor TV Antenna, Up to 150 Miles | 360° Omni-Directional Reception, J Mount for Outdoor or Attic Installation, Weather-Resistant, ATSC 3.0 Ready",
+            "ratingCount": 71,
+            "lexicalOverlap": 0.5,
+            "rankOnPage": 5,
+            "pageNumber": 1,
+            "discoveryScore": 3.5988332287205753,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.4781
+          },
+          {
+            "asin": "B0GJ5MG8MQ",
+            "title": "RV TV Antenna Outdoor for Camper, TV Antenna for Smart TV Outdoor | 360° Omni-Directional Digital Antenna,4K 1080P Long Range for Local Channels – RV, Truck, Boat, and Camping",
+            "ratingCount": 6,
+            "lexicalOverlap": 0.5,
+            "rankOnPage": 2,
+            "pageNumber": 1,
+            "discoveryScore": 3.5889705883351155,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.6019
+          },
+          {
+            "asin": "B0HBTV245K",
+            "title": "TV Antenna Outdoorr Omni Directional Outdoor TV Antenna Long Range with Signal Amplifier, Compatible with All TVs, Outdoor Antenna for Smart TV, Supports 4K 1080P HD, 10m Cable",
+            "ratingCount": 6,
+            "lexicalOverlap": 0.5,
+            "rankOnPage": 4,
+            "pageNumber": 1,
+            "discoveryScore": 3.495637255001782,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5612
+          },
+          {
+            "asin": "B07YN62TM1",
+            "title": "Outdoor Digital Amplified HDTV Antenna - up to 200 Mile Long Range,Directional 360 Degree Rotation,HD 4K 1080P FM, Supports 5 TVs Plus Installation Kit and Mounting Pole",
+            "ratingCount": 95,
+            "lexicalOverlap": 0.4444444444444444,
+            "rankOnPage": 2,
+            "pageNumber": 1,
+            "discoveryScore": 3.4811172374632795,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.4583
+          },
+          {
+            "asin": "B07YN5ZL17",
+            "title": "Outdoor Digital Amplified HDTV Antenna - up to 200 Mile Long Range, Directional 360 Degree Rotation by Remote Control, Intelligent Gain for HD 4K 1080P FM Support 2 TVs",
+            "ratingCount": 15,
+            "lexicalOverlap": 0.47058823529411764,
+            "rankOnPage": 3,
+            "pageNumber": 1,
+            "discoveryScore": 3.4431620566555203,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5204
+          },
+          {
+            "asin": "B0GJ5NT5B2",
+            "title": "Outdoor Digital TV Antenna for Smart TV,HDTV Antenna for Local Channels | 360° Omni-Directional Long Range,Digital Antenna with Amplified Signal Booster,Weatherproof Design for Outdoor Attic",
+            "ratingCount": 3,
+            "lexicalOverlap": 0.4666666666666667,
+            "rankOnPage": 2,
+            "pageNumber": 1,
+            "discoveryScore": 3.408590832249329,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.4887
+          },
+          {
+            "asin": "B07P9CSWZW",
+            "title": "Five Star Outdoor HDTV Antenna 150 Mile Long Range – 360° Rotating TV Antenna with Amplifier, Dual TV Output, Remote Control, Weatherproof, Support 4K 1080p UHF/VHF for 2–5 TVs",
+            "ratingCount": 475,
+            "lexicalOverlap": 0.45,
+            "rankOnPage": 14,
+            "pageNumber": 1,
+            "discoveryScore": 3.406367535756728,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5191
+          },
+          {
+            "asin": "B089LMG6L4",
+            "title": "1byone Outdoor TV Antenna, 360°Omni-Directional Reception, 100+ Miles Range | 4K Ready HDTV Antenna with Enhanced VHF/UHF Reception, Added Stability for Outdoor/Attic/RV, Includes 39ft RG6 Coax Cable",
+            "ratingCount": 331,
+            "lexicalOverlap": 0.38095238095238093,
+            "rankOnPage": 1,
+            "pageNumber": 1,
+            "discoveryScore": 3.379427974748719,
+            "webSearchConfidence": null,
+            "publicSignals": null,
+            "publicEngineCount": null,
+            "publicQueryCount": null,
+            "localVisual": 0.5541
+          }
+        ],
+        "verified": []
+      },
+      "budget": {
+        "hardCap": 50,
+        "remainingCapacity": 50,
+        "planned": 49,
+        "amazonSources": [
+          {
+            "asin": "B0845V5GCK",
+            "url": "https://www.amazon.com/dp/B0845V5GCK",
+            "budget": 14
+          },
+          {
+            "asin": "B0845Y7DGS",
+            "url": "https://www.amazon.es/dp/B0845Y7DGS",
+            "budget": 13
+          },
+          {
+            "asin": "B0845NYBBJ",
+            "url": "https://www.amazon.ae/dp/B0845NYBBJ",
+            "budget": 13
+          }
+        ],
+        "ebaySources": [
+          {
+            "url": "https://www.ebay.com/itm/176327212659",
+            "budget": 3
+          },
+          {
+            "url": "https://www.ebay.com/itm/174296548604",
+            "budget": 3
+          },
+          {
+            "url": "https://www.ebay.com/itm/174268627037",
+            "budget": 3
+          }
+        ]
+      },
+      "brightDataBalance": 14.57
+    },
+    "errors": [],
+    "error": null
   },
   "checks": {
     "brightDataFunded": true,
     "collectorFixtureExtracted": false,
-    "liveSameProductSourceDiscovered": false,
-    "liveCorpusNeverShrank": false,
-    "liveMarketplaceBodiesExtracted": false,
+    "liveSameProductSourceDiscovered": true,
+    "liveCorpusNeverShrank": true,
+    "liveMarketplaceBodiesExtracted": true,
     "liveCorpusTargetMet": false,
     "liveAmazonTargetMet": false
   },
   "workflow": {
-    "testedAt": "2026-08-21T18:25:37.701Z",
-    "commit": "be0de11b998e3daa134a7fbe26650052666e6006"
+    "testedAt": "2026-08-22T18:04:36.270Z",
+    "commit": "0dff89065781b38eb825abf63d3ebf254a759665"
   }
 }
