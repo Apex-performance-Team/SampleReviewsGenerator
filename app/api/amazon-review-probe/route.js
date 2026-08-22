@@ -5,7 +5,7 @@ import{collectAmazonReviewsV2}from'../../../lib/amazon-review-ingest-v2';
 import{getBrightDataBalance}from'../../../lib/bright-data-status';
 import{amazonReviewsToCsv}from'../../../lib/amazon-review-csv.mjs';
 
-const CONTROL=Object.freeze({asin:'B0CKYX98FX',maxReviews:50,maxBatches:1,runToken:'bounded-50'});
+const CONTROL=Object.freeze({asin:'B00MNV8E0C',maxReviews:50,maxBatches:1,runToken:'bounded-50'});
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const finite=value=>Number.isFinite(Number(value))?Number(value):null;
 const delta=(before,after)=>before===null||after===null?null:Number((before-after).toFixed(8));
