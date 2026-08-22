@@ -29,9 +29,11 @@ const refs=uniqueReferences([
 ]);
 assert.deepEqual(refs.map(x=>x.referenceId),['1','3']);
 
-const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8');
+const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8'),lensRoute=await readFile(new URL('../app/api/reference-scan-v11/route.js',import.meta.url),'utf8'),amazonDiscovery=await readFile(new URL('../lib/amazon-volume-discovery-v2.js',import.meta.url),'utf8');
 assert.match(transport,/x-unblock-data-format'\s*:\s*'parsed_light'/);
 assert.match(transport,/headers=\{'x-brd-session':upload\.session,'x-unblock-data-format':'parsed_light'\}/);
 assert.doesNotMatch(layout,/MarketplaceEnrichmentBridge/);
+assert.match(lensRoute,/resize\(512,512/);
+assert.match(amazonDiscovery,/resize\(512,512/);
 
 console.log(JSON.stringify({ok:true,budgets:{test,balanced,thorough},diverseHosts:hosts,uniqueReferenceCount:refs.length},null,2));
