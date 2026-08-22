@@ -4,7 +4,9 @@ import{candidateHost,referenceBudget,selectDiverseCandidates,uniqueReferences}fr
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
 assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,20]);
+assert.equal(test.maxCandidates,6);
 assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[2,false,false,false]);
+assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
 assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[2,3,50]);
 assert.deepEqual([thorough.maxImages,thorough.maxAmazonQueries,thorough.maxMarketplaceReviews],[4,4,50]);
 assert.equal(referenceBudget('unexpected').id,'test');
