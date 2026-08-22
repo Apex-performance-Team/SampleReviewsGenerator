@@ -45,7 +45,7 @@ async function resumeSnapshot(source,snapshotId){
     if(!row||typeof row!=='object')continue;
     const count=Number(String(row.product_rating_count??'').replace(/[^0-9.]/g,''));if(Number.isFinite(count)&&count>=0)aggregateRatingCount=aggregateRatingCount===null?count:Math.max(aggregateRatingCount,count);
     const productRating=Number(row.product_rating);if(Number.isFinite(productRating)&&productRating>0)aggregateRating=productRating;
-    const body=clean(row.review_text||row.text||row.review_body||row.body||'');if(body.length<10)continue;
+    const body=clean(row.review_text||row.text||row.review_body||row.body||'');if(!body)continue;
     const keyValue=bodyKey(body);if(!keyValue||seenBodies.has(keyValue))continue;seenBodies.add(keyValue);
     const reviewId=snapshotReviewId(row);if(reviewId)reviewIds.push(reviewId);
     reviews.push({body,title:clean(row.review_header||row.review_title||row.title||'').slice(0,220),rating:snapshotRating(row.rating),reviewId,verifiedPurchase:Boolean(row.is_verified??row.verified_purchase),reviewDate:row.review_posted_date||row.review_date||row.date||null,authorName:clean(row.author_name||row.reviewer_name||'')});
