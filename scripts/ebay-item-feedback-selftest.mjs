@@ -3,6 +3,7 @@ import{parseEbayItemFeedback}from'../lib/marketplace-review-ingest.js';
 
 const html=`
 <div id=item-tabpanel-0 aria-labelledby=item-tabs-0 role=tabpanel>
+  <div data-track='{"fdbk_tab":"ITEM"}' action='{"URL":"?page_id_item=1&page_type=FILTER_ITEM"}'></div>
   <ul>
     <li class=fdbk-container>
       <div class=fdbk-container__details__info__username><span>eBay automated feedback</span></div>
@@ -17,7 +18,7 @@ const html=`
     </li>
   </ul>
 </div>
-<div id=all-tabpanel-1 aria-labelledby=all-tabs-1 role=tabpanel>
+<div id=item-tabpanel-1 aria-labelledby=item-tabs-1 role=tabpanel>
   <li class=fdbk-container>
     <div class=fdbk-container__details__info__username><span>seller-wide-buyer</span></div>
     <div class=fdbk-container__details__comment><span>This belongs to a completely different item.</span></div>
