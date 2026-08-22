@@ -1,5 +1,5 @@
 import assert from'node:assert/strict';
-import{parseEbayItemFeedback}from'../lib/marketplace-review-ingest.js';
+import{parseEbayItemFeedback,selectBrightUnlockerZone}from'../lib/marketplace-review-ingest.js';
 
 const html=`
 <div id=item-tabpanel-0 aria-labelledby=item-tabs-0 role=tabpanel>
@@ -34,5 +34,8 @@ assert.equal(result.reviews[0].authorName,'b***r (42)');
 assert.equal(result.reviews[0].reviewDate,'Past year');
 assert.equal(result.reviews[0].verifiedPurchase,true);
 assert.ok(!result.reviews.some(x=>x.body.includes('different item')));
+assert.deepEqual(selectBrightUnlockerZone([{name:'search-zone',type:'serp'},{name:'unlock-zone',type:'unblocker'}]),{zone:'unlock-zone',source:'auto_detected'});
+assert.deepEqual(selectBrightUnlockerZone([{name:'first-unlock',type:'unblocker'},{name:'preferred-unlock',type:'web_unlocker'}],'preferred-unlock'),{zone:'preferred-unlock',source:'environment'});
+assert.equal(selectBrightUnlockerZone([{name:'search-zone',type:'serp'}]),null);
 
 console.log(JSON.stringify({ok:true,itemCards:result.cardCount,automatedExcluded:result.automatedExcluded,accepted:result.reviews.length,sellerWideAccepted:0}));
