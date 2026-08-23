@@ -5,8 +5,8 @@ import{assessLocalLensCandidate}from'../lib/lens-verification.mjs';
 import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
-assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,20]);
-assert.equal(test.maxCandidates,6);
+assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[2,1,20]);
+assert.equal(test.maxCandidates,12);
 assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[2,false,false,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
 assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[2,3,50]);
