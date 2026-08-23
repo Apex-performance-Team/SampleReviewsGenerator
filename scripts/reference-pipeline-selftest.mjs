@@ -3,7 +3,7 @@ import{readFile}from'node:fs/promises';
 import{candidateHost,referenceBudget,selectDiverseCandidates,uniqueReferences}from'../lib/reference-pipeline.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
-assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,50]);
+assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[1,1,20]);
 assert.equal(test.maxCandidates,6);
 assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[2,false,false,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
@@ -29,11 +29,21 @@ const refs=uniqueReferences([
 ]);
 assert.deepEqual(refs.map(x=>x.referenceId),['1','3']);
 
-const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8'),lensRoute=await readFile(new URL('../app/api/reference-scan-v11/route.js',import.meta.url),'utf8'),amazonDiscovery=await readFile(new URL('../lib/amazon-volume-discovery-v2.js',import.meta.url),'utf8');
+const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8'),page=await readFile(new URL('../app/page.js',import.meta.url),'utf8'),bridge=await readFile(new URL('../app/reference-bridge.js',import.meta.url),'utf8'),diagnosticUi=await readFile(new URL('../app/reference-scan-diagnostics.js',import.meta.url),'utf8'),wrapper=await readFile(new URL('../app/api/reference-scan/route.js',import.meta.url),'utf8'),lensRoute=await readFile(new URL('../app/api/reference-scan-v11/route.js',import.meta.url),'utf8'),lensFallback=await readFile(new URL('../app/api/reference-scan-v12/route.js',import.meta.url),'utf8'),amazonDiscovery=await readFile(new URL('../lib/amazon-volume-discovery-v2.js',import.meta.url),'utf8');
 assert.match(transport,/x-unblock-data-format'\s*:\s*'parsed_light'/);
 assert.match(transport,/headers=\{'x-brd-session':upload\.session,'x-unblock-data-format':'parsed_light'\}/);
 assert.doesNotMatch(layout,/MarketplaceEnrichmentBridge/);
 assert.match(lensRoute,/resize\(512,512/);
 assert.match(amazonDiscovery,/resize\(512,512/);
+assert.match(lensRoute,/rejectedCandidates:rejectedCandidateDiagnostics/);
+assert.match(amazonDiscovery,/candidateEvaluations/);
+assert.match(lensFallback,/deterministicRescueAssessments/);
+assert.match(wrapper,/\[reference-scan-empty\]/);
+assert.match(wrapper,/function providerStatus/);
+assert.match(bridge,/ReferenceScanDiagnostics/);
+assert.match(bridge,/error\.diagnostics=json\?\.diagnostics/);
+assert.match(diagnosticUi,/Rejected Lens candidates/);
+assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
+assert.match(page,/20 reviews in Test or 50 in Balanced\/Thorough/);
 
 console.log(JSON.stringify({ok:true,budgets:{test,balanced,thorough},diverseHosts:hosts,uniqueReferenceCount:refs.length},null,2));
