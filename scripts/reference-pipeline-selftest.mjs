@@ -3,6 +3,7 @@ import{readFile}from'node:fs/promises';
 import{candidateFamily,candidateHost,interleaveReferencesBySource,referenceBudget,selectDiverseCandidates,selectRetailerDiverseCandidates,uniqueReferences}from'../lib/reference-pipeline.mjs';
 import{assessLocalLensCandidate}from'../lib/lens-verification.mjs';
 import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
+import{sourceCardCounts}from'../lib/source-card-counts.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
 assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,4,20]);
@@ -13,6 +14,10 @@ assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,
 assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[3,4,50]);
 assert.deepEqual([thorough.maxImages,thorough.maxAmazonQueries,thorough.maxMarketplaceReviews],[4,4,50]);
 assert.equal(referenceBudget('unexpected').id,'test');
+
+assert.deepEqual(sourceCardCounts({publicReviewCount:1150,individualExtractedCount:3}),{extracted:3,listed:1150,headline:1150,sortCount:1150});
+assert.deepEqual(sourceCardCounts({publicReviewCount:null,extractedReviewCount:5}),{extracted:5,listed:null,headline:5,sortCount:5});
+assert.deepEqual(sourceCardCounts({aggregateRatingCount:407,reviewCount:5}),{extracted:5,listed:407,headline:407,sortCount:407});
 
 const rows=[
   ...Array.from({length:8},(_,i)=>({u:`https://www.amazon.com/dp/B00000000${i}`,score:.96,rank:i+1,imageHits:1})),
@@ -88,6 +93,9 @@ assert.match(wrapper,/\[reference-scan-empty\]/);
 assert.match(wrapper,/function providerStatus/);
 assert.match(bridge,/ReferenceScanDiagnostics/);
 assert.match(bridge,/error\.diagnostics=json\?\.diagnostics/);
+assert.match(bridge,/x\.estimate!=null/);
+assert.match(bridge,/public reviews on listing/);
+assert.match(bridge,/b\.sortCount-a\.sortCount/);
 assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
 assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
