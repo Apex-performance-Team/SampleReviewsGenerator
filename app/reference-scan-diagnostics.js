@@ -7,7 +7,7 @@ function safeUrl(value){try{const u=new URL(String(value||''));return /^https?:$
 function metric(label,value){return <span key={label} style={{fontSize:10,padding:'5px 7px',border:'1px solid #4c3f2a',borderRadius:7,color:'#d7c49b'}}><b style={{color:'#f0ddb6'}}>{value}</b> {label}</span>}
 
 function LensCandidate({row}){
-  const href=safeUrl(row?.url),label=row?.title||row?.platform||row?.asin||'Unnamed Lens candidate',meta=[row?.lensTabs?.length?row.lensTabs.join(' + '):null,row?.lensRank!=null?`rank ${row.lensRank}`:null,row?.aiConfidence!=null?`AI ${percent(row.aiConfidence)}`:null,row?.matchScore!=null?`match ${score(row.matchScore)}`:null].filter(Boolean).join(' · ');
+  const href=safeUrl(row?.url),label=row?.title||row?.platform||row?.asin||'Unnamed Lens candidate',meta=[row?.lensTabs?.length?row.lensTabs.join(' + '):null,row?.lensRank!=null?`rank ${row.lensRank}`:null,row?.localVisualScore!=null?`local image ${score(row.localVisualScore)}`:null,row?.lexicalOverlap!=null?`lexical ${percent(row.lexicalOverlap)}`:null,row?.aiConfidence!=null?`AI ${percent(row.aiConfidence)}`:null,row?.matchScore!=null?`match ${score(row.matchScore)}`:null].filter(Boolean).join(' · ');
   return <li style={{display:'flex',flexDirection:'column',gap:3,padding:'8px 9px',background:'#121a21',border:'1px solid #3f3427',borderRadius:7}}>{href?<a href={href} target="_blank" rel="noopener noreferrer" style={{fontSize:11,color:'#9fc8e5',textDecoration:'none'}}>{label} ↗</a>:<b style={{fontSize:11}}>{label}</b>}<small style={{fontSize:10,color:'#9aa6b2'}}>{meta||row?.verificationMethod||'No verifier metadata'}</small><small style={{fontSize:10,color:'#d0b98d'}}>{row?.verificationReason||'Rejected without a model reason.'}</small></li>
 }
 
