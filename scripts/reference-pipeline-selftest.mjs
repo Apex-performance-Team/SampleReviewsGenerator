@@ -6,6 +6,7 @@ import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
 assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,4,20]);
+assert.equal(test.maxAmazonPages,2);
 assert.deepEqual([test.maxCandidates,test.maxSources],[24,20]);
 assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[7,true,true,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
@@ -93,6 +94,8 @@ assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credit
 assert.match(page,/20 reviews in Test or 50 in Balanced\/Thorough/);
 assert.match(budgetControl,/3 images · 9 Lens requests · up to 7 reference AI calls · 4 Amazon queries/);
 assert.match(amazonDiscovery,/ai_plus_deterministic/);
+assert.match(amazonDiscovery,/existingAsins/);
+assert.match(amazonDiscovery,/Number\(x\.ratingCount\)<=0/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
