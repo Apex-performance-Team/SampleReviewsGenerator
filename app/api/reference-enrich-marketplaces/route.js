@@ -1,5 +1,5 @@
 export const runtime='nodejs';
-export const maxDuration=300;
+export const maxDuration=1800;
 
 import{ingestMarketplaceSource}from'../../../lib/marketplace-review-ingest';
 import{collectAmazonReviewsV2,isAmazonV2,amazonAsinV2}from'../../../lib/amazon-review-ingest-v2';
