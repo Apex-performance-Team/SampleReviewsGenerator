@@ -3,7 +3,7 @@ import{useEffect,useRef,useState}from'react';
 import ReferenceScanDiagnostics from'./reference-scan-diagnostics';
 import{sourceCardCounts}from'../lib/source-card-counts.mjs';
 
-const BUDGETS={test:{label:'Test',maxImages:3,lensCalls:9,maxMarketplaceReviews:20},balanced:{label:'Balanced',maxImages:3,lensCalls:9,maxMarketplaceReviews:50},thorough:{label:'Thorough',maxImages:4,lensCalls:12,maxMarketplaceReviews:50}};
+const BUDGETS={test:{label:'Test',maxImages:3,lensCalls:9,maxMarketplaceReviews:20},balanced:{label:'Balanced',maxImages:3,lensCalls:9,maxMarketplaceReviews:200},thorough:{label:'Thorough',maxImages:4,lensCalls:12,maxMarketplaceReviews:200}};
 
 function sourceLabel(platform,provider){const h=String(platform||'unknown').replace(/^www\./,'').toLowerCase();if(h.includes('amazon.'))return'Amazon';if(h.includes('aliexpress.'))return'AliExpress';if(h.includes('walmart.'))return'Walmart';if(h.includes('ebay.'))return'eBay';if(h.includes('temu.'))return'Temu';if(h.includes('etsy.'))return'Etsy';if(provider==='judgeme')return'Judge.me';if(provider==='yotpo')return'Yotpo';if(provider==='loox')return'Loox';if(provider==='stamped')return'Stamped';return String(platform||provider||'Unknown source').replace(/^www\./,'')}
 function safeHttpUrl(x){try{const u=new URL(String(x||''));return /^https?:$/.test(u.protocol)?u.href:null}catch{return null}}

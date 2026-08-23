@@ -3,8 +3,8 @@ import{useEffect,useState}from'react';
 
 const MODES={
   test:{label:'Test',detail:'3 images · 9 Lens requests · up to 7 reference AI calls · 4 Amazon queries · 20 Amazon/eBay reviews'},
-  balanced:{label:'Balanced',detail:'3 images · 9 Lens requests · up to 8 reference AI calls · 4 Amazon queries · 50 Amazon/eBay reviews'},
-  thorough:{label:'Thorough',detail:'4 images · up to 12 Lens requests · 10 reference AI calls · 4 Amazon queries · 50 Amazon/eBay reviews'}
+  balanced:{label:'Balanced',detail:'3 images · 9 Lens requests · up to 8 reference AI calls · 4 Amazon queries · 200 Amazon/eBay reviews'},
+  thorough:{label:'Thorough',detail:'4 images · up to 12 Lens requests · 10 reference AI calls · 4 Amazon queries · 200 Amazon/eBay reviews'}
 };
 
 export default function ReferenceBudgetControl(){
