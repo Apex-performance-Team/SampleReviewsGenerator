@@ -26,7 +26,7 @@ async function amazonFallback(req,body,rs,baseError,baseDiagnostics=null){
 export async function POST(req){
   let body;try{body=await req.json()}catch{return Response.json({error:'Invalid JSON body.'},{status:400})}
   if(body?._lensUnavailableReason)return amazonFallback(req,body,null,String(body._lensUnavailableReason));
-  const lensBody=body?._lensProductUrl?{...body,productUrl:body._lensProductUrl}:body,forwarded=new Request(req.url,{method:'POST',headers:cloneHeaders(req.headers),body:JSON.stringify(lensBody)});
+  const forwarded=new Request(req.url,{method:'POST',headers:cloneHeaders(req.headers),body:JSON.stringify(body)});
   let baseRes,base;try{baseRes=await v11POST(forwarded);try{base=await baseRes.clone().json()}catch{base=null}}catch(e){return amazonFallback(req,body,null,e?.message||String(e))}
   if(!baseRes.ok)return amazonFallback(req,body,null,base?.error||`Lens HTTP ${baseRes.status}`,base?.diagnostics||null);
   const rs=base?.referenceSet;if(!rs)return amazonFallback(req,body,null,'Lens response contained no referenceSet.');

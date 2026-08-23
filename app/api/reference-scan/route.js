@@ -1,7 +1,6 @@
 export const runtime='nodejs';
 export const maxDuration=300;
 
-import{createHmac}from'node:crypto';
 import{withBrightLensNativeContext}from'../../../lib/bright-lens-native';
 import{getBrightDataBalance,classifyBrightDataFailure,cleanBright}from'../../../lib/bright-data-status';
 import{amazonAsinV2}from'../../../lib/amazon-review-ingest-v2';
@@ -12,7 +11,6 @@ let cachedZone=null;
 
 function clean(x){return String(x||'').replace(/\s+/g,' ').trim()}
 function host(x){try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}}
-function sign(x,key){return createHmac('sha256',key).update(x).digest('hex')}
 
 async function accountPreflight(key){
   if(!key)return{ok:false,configured:false,httpStatus:null,error:'Bright Data Lens is not configured.',noCredits:false,balance:null};
@@ -69,8 +67,7 @@ export async function POST(req){
   else if(key){try{zoneInfo=await resolveSerpZone(key);process.env.BRIGHT_DATA_SERP_ZONE=zoneInfo.zone}catch(e){lensUnavailableReason=e?.message||String(e)}}
   else lensUnavailableReason='Bright Data Lens is not configured.';
   if(/bright_data_no_credits/i.test(String(lensUnavailableReason||'')))return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',diagnosticId,brightData:{stage:'zone_resolution',provider}},{status:402,headers:{'cache-control':'no-store'}});
-  const origin=new URL(req.url).origin,stagedProductUrl=lensUnavailableReason?null:`${origin}/api/lens-pdp?u=${encodeURIComponent(originalProductUrl)}&s=${sign(originalProductUrl,key)}`;
-  const forwardedBody={...body,...(stagedProductUrl?{_lensProductUrl:stagedProductUrl}:{}),...(lensUnavailableReason?{_lensUnavailableReason:lensUnavailableReason}:{})},forwarded=new Request(req.url,{method:'POST',headers:req.headers,body:JSON.stringify(forwardedBody)});
+  const forwardedBody={...body,...(lensUnavailableReason?{_lensUnavailableReason:lensUnavailableReason}:{})},forwarded=new Request(req.url,{method:'POST',headers:req.headers,body:JSON.stringify(forwardedBody)});
   const mod=await import('../reference-scan-v12/route.js');
   const transportDiagnostics=[];
   let res;
@@ -81,8 +78,8 @@ export async function POST(req){
   if(res.ok&&json?.referenceSet){
     json.referenceSet.productUrl=originalProductUrl;
     json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);
-    json.referenceSet.provenance={...(json.referenceSet.provenance||{}),diagnosticId,imageTransport:lensUnavailableReason?'lens_skipped':'signed_vercel_relay_with_native_fallback',originalProductUrl,stagedProductUrl,provider};
-    json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:lensUnavailableReason?'skipped_provider_unavailable':'signed_vercel_relay_with_native_fallback'};
+    json.referenceSet.provenance={...(json.referenceSet.provenance||{}),diagnosticId,imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_uploadbyurl_primary',originalProductUrl,provider};
+    json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:lensUnavailableReason?'skipped_provider_unavailable':'uploadbyurl_primary'};
     const lens=json.referenceSet.lensDiscovery||{},prov=json.referenceSet.provenance||{},lensRaw=Number(lens.rawResults??prov.lensRawResults??0),lensAccepted=Number(lens.acceptedCandidates??lens.verifiedAcceptedCandidates??prov.selectedSources??0),amazonFallbackAfterZeroLens=Boolean(prov.amazonFallbackUsed&&lensRaw===0&&lensAccepted===0);
     const requestedSourceCount=Math.max(1,Number(body?.targetSourceCount)||5),fallbackOnly=Boolean(prov.lensFailed||json.referenceSet.provider==='amazon_fallback_after_lens_error'||lens.status==='failed'||amazonFallbackAfterZeroLens);
     if(fallbackOnly&&requestedSourceCount>1&&!body?.allowAmazonFallbackOnly&&!(json.referenceSet.sourceCounts||[]).length){const d=emptyScanDiagnostic(json.referenceSet,transportDiagnostics,providerPreflight),fallbackCount=(json.referenceSet.sourceCounts||[]).length,providerReason=lensUnavailableReason||d.lens?.transport?.[0]?.error||d.amazonFallback?.baseLensError||d.amazonFallback?.error||null;logEmptyScan(diagnosticId,originalProductUrl,d);return Response.json({error:`Lens source discovery failed before the app could verify ${requestedSourceCount} external sources. Amazon fallback found ${fallbackCount} aggregate-only source${fallbackCount===1?'':'s'}, but that is not a valid Lens/source scan.${providerReason?` Provider diagnostic: ${providerReason}`:''}`,code:'lens_source_discovery_failed',diagnosticId,brightData:{stage:'lens_source_discovery_failed',zone:zoneInfo.zone,zoneSource:zoneInfo.source,imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_uploadbyurl_primary',provider},diagnostics:d},{status:400,headers:{'cache-control':'no-store'}})}
