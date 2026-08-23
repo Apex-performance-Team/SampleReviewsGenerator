@@ -5,11 +5,11 @@ import{assessLocalLensCandidate}from'../lib/lens-verification.mjs';
 import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
-assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[2,1,20]);
-assert.equal(test.maxCandidates,12);
-assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[2,false,false,false]);
+assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,1,20]);
+assert.deepEqual([test.maxCandidates,test.maxSources],[24,20]);
+assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[5,true,false,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
-assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[2,3,50]);
+assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[3,3,50]);
 assert.deepEqual([thorough.maxImages,thorough.maxAmazonQueries,thorough.maxMarketplaceReviews],[4,4,50]);
 assert.equal(referenceBudget('unexpected').id,'test');
 
@@ -23,6 +23,12 @@ const selected=selectDiverseCandidates(rows,{limit:6,maxPerHost:3}),hosts=select
 assert.equal(selected.length,6);
 assert.deepEqual(hosts.slice(0,4),['amazon.com','walmart.com','ebay.com','retailer.example']);
 assert.ok(hosts.filter(x=>x==='amazon.com').length<=3);
+
+const volumeRanked=selectDiverseCandidates([
+  {u:'https://www.amazon.com/dp/B000000001',score:.96,rank:2,publicCount:12},
+  {u:'https://www.amazon.com/dp/B000000002',score:.96,rank:2,publicCount:1148}
+],{limit:2,maxPerHost:2});
+assert.equal(volumeRanked[0].publicCount,1148);
 
 const retailerSelected=selectRetailerDiverseCandidates([
   {u:'https://www.amazon.com/dp/B000000001',score:.96},
@@ -63,7 +69,7 @@ const repaired=await repairGeneratedCorpus({reviews:[{id:'1',body:'same'},{id:'2
 assert.equal(qaCalls,1);
 assert.deepEqual(repaired.reviews.map(x=>x.body),['same','different']);
 
-const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8'),page=await readFile(new URL('../app/page.js',import.meta.url),'utf8'),bridge=await readFile(new URL('../app/reference-bridge.js',import.meta.url),'utf8'),diagnosticUi=await readFile(new URL('../app/reference-scan-diagnostics.js',import.meta.url),'utf8'),wrapper=await readFile(new URL('../app/api/reference-scan/route.js',import.meta.url),'utf8'),lensRoute=await readFile(new URL('../app/api/reference-scan-v11/route.js',import.meta.url),'utf8'),lensFallback=await readFile(new URL('../app/api/reference-scan-v12/route.js',import.meta.url),'utf8'),amazonDiscovery=await readFile(new URL('../lib/amazon-volume-discovery-v2.js',import.meta.url),'utf8');
+const transport=await readFile(new URL('../lib/bright-lens-native.js',import.meta.url),'utf8'),layout=await readFile(new URL('../app/layout.js',import.meta.url),'utf8'),page=await readFile(new URL('../app/page.js',import.meta.url),'utf8'),bridge=await readFile(new URL('../app/reference-bridge.js',import.meta.url),'utf8'),budgetControl=await readFile(new URL('../app/reference-budget-control.js',import.meta.url),'utf8'),diagnosticUi=await readFile(new URL('../app/reference-scan-diagnostics.js',import.meta.url),'utf8'),wrapper=await readFile(new URL('../app/api/reference-scan/route.js',import.meta.url),'utf8'),lensRoute=await readFile(new URL('../app/api/reference-scan-v11/route.js',import.meta.url),'utf8'),lensFallback=await readFile(new URL('../app/api/reference-scan-v12/route.js',import.meta.url),'utf8'),amazonDiscovery=await readFile(new URL('../lib/amazon-volume-discovery-v2.js',import.meta.url),'utf8');
 assert.match(transport,/x-unblock-data-format'\s*:\s*'parsed_light'/);
 assert.match(transport,/headers=\{'x-brd-session':upload\.session,'x-unblock-data-format':'parsed_light'\}/);
 assert.doesNotMatch(layout,/MarketplaceEnrichmentBridge/);
@@ -72,6 +78,8 @@ assert.match(amazonDiscovery,/resize\(512,512/);
 assert.match(lensRoute,/rejectedCandidates:rejectedCandidateDiagnostics/);
 assert.match(lensRoute,/assessLocalLensCandidate/);
 assert.match(lensRoute,/selectRetailerDiverseCandidates/);
+assert.match(lensRoute,/maxPerHost:8,maxPerFamily:8/);
+assert.doesNotMatch(lensRoute,/diag\.stoppedEarly=true/);
 assert.match(lensRoute,/interleaveReferencesBySource/);
 assert.match(amazonDiscovery,/candidateEvaluations/);
 assert.match(lensFallback,/deterministicRescueAssessments/);
@@ -83,6 +91,7 @@ assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
 assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
 assert.match(page,/20 reviews in Test or 50 in Balanced\/Thorough/);
+assert.match(budgetControl,/3 images · 9 Lens requests/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
