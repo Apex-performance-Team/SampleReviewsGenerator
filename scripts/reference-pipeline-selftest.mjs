@@ -111,6 +111,8 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/strategy:'sequential_highest_volume_fill'/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/fillRemaining=marketplaceLimit/);
 assert.doesNotMatch(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Promise\.all\(jobs/);
+assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/perBatchReviews=Math\.min\(50,requested\)/);
+assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/max_reviews:batchReviews/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
