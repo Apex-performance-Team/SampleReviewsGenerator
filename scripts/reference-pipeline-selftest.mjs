@@ -97,6 +97,7 @@ assert.match(amazonDiscovery,/ai_plus_deterministic/);
 assert.match(amazonDiscovery,/existingAsins/);
 assert.match(amazonDiscovery,/Number\(x\.ratingCount\)<=0/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/targetSourceCount-existingAsins\.size-candidateAsins\.size/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/related_category_fallback/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
