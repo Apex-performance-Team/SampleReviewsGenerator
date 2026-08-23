@@ -108,6 +108,9 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/related_category_fallback/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/MAX_MARKETPLACE_PULLS=250/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/amazonBatchLimit\(budget\)/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/strategy:'sequential_highest_volume_fill'/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/fillRemaining=marketplaceLimit/);
+assert.doesNotMatch(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Promise\.all\(jobs/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
