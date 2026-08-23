@@ -50,9 +50,9 @@ export default function ReferenceBridge(){
       if(alive)setInfo({status:'error',text:`Reference health check failed · ${e.message}`});
     });
     window.fetch=async(input,init)=>{
-      const url=typeof input==='string'?input:(input instanceof URL?input.toString():input?.url||''),isScan=/\/api\/scan(?:\?|$)/.test(url),isGenerate=/\/api\/generate(?:\?|$)/.test(url);
+      const url=typeof input==='string'?input:(input instanceof URL?input.toString():input?.url||''),isScan=/\/api\/scan(?:\?|$)/.test(url),isGeneration=/\/api\/(?:generate|generation-plan)(?:\?|$)/.test(url);
       if(isScan){const r=await original(input,init);try{const j=await r.clone().json();if(r.ok)remember(j)}catch{}return r}
-      if(isGenerate){
+      if(isGeneration){
         try{
           const raw=init?.body;
           if(typeof raw!=='string')return original(input,init);

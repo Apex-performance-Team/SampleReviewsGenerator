@@ -83,6 +83,10 @@ assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
 assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
 assert.match(page,/20 reviews in Test or 50 in Balanced\/Thorough/);
-assert.match(page,/repairGeneratedCorpus/);
+assert.match(page,/\/api\/generation-plan/);
+assert.match(page,/runQualityPipeline/);
+assert.match(page,/corpusQualitySignals/);
+assert.match(page,/syntheticReviewCsv/);
+assert.match(page,/syntheticReviewBulkCsv/);
 
 console.log(JSON.stringify({ok:true,budgets:{test,balanced,thorough},diverseHosts:hosts,retailerFamilies:retailerSelected.map(candidateFamily),uniqueReferenceCount:refs.length,maxActiveWorkers},null,2));
