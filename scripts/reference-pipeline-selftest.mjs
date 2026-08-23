@@ -5,11 +5,11 @@ import{assessLocalLensCandidate}from'../lib/lens-verification.mjs';
 import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
-assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,1,20]);
+assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,4,20]);
 assert.deepEqual([test.maxCandidates,test.maxSources],[24,20]);
-assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[5,true,false,false]);
+assert.deepEqual([test.maxReferenceAiCalls,test.useAiCountEnrichment,test.useAiAmazonQueries,test.useAiAmazonWebFallback],[7,true,true,false]);
 assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,10]);
-assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[3,3,50]);
+assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[3,4,50]);
 assert.deepEqual([thorough.maxImages,thorough.maxAmazonQueries,thorough.maxMarketplaceReviews],[4,4,50]);
 assert.equal(referenceBudget('unexpected').id,'test');
 
@@ -91,7 +91,8 @@ assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
 assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
 assert.match(page,/20 reviews in Test or 50 in Balanced\/Thorough/);
-assert.match(budgetControl,/3 images · 9 Lens requests/);
+assert.match(budgetControl,/3 images · 9 Lens requests · up to 7 reference AI calls · 4 Amazon queries/);
+assert.match(amazonDiscovery,/ai_plus_deterministic/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
