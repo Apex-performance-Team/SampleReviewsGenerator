@@ -4,6 +4,7 @@ import{candidateFamily,candidateHost,interleaveReferencesBySource,referenceBudge
 import{assessLocalLensCandidate}from'../lib/lens-verification.mjs';
 import{repairGeneratedCorpus,runPool}from'../lib/generation-coordinator.mjs';
 import{sourceCardCounts}from'../lib/source-card-counts.mjs';
+import{createManualAmazonSeed,mergeManualAmazonSeed}from'../lib/manual-amazon-seed.mjs';
 
 const test=referenceBudget('test'),balanced=referenceBudget('balanced'),thorough=referenceBudget('thorough');
 assert.deepEqual([test.maxImages,test.maxAmazonQueries,test.maxMarketplaceReviews],[3,4,20]);
@@ -14,6 +15,26 @@ assert.deepEqual([balanced.maxReferenceAiCalls,thorough.maxReferenceAiCalls],[8,
 assert.deepEqual([balanced.maxImages,balanced.maxAmazonQueries,balanced.maxMarketplaceReviews],[3,4,200]);
 assert.deepEqual([thorough.maxImages,thorough.maxAmazonQueries,thorough.maxMarketplaceReviews],[4,4,200]);
 assert.equal(referenceBudget('unexpected').id,'test');
+
+const manualSeed=createManualAmazonSeed({amazonListingUrl:'https://www.amazon.com/dp/B089LMG6L4',productTitle:'InstaBeam OmniReach Extended Range Outdoor TV Antenna',productUrl:'https://instabeamtv.com/products/outdoor-omni-antenna-2'},balanced);
+assert.equal(manualSeed.asin,'B089LMG6L4');
+assert.equal(manualSeed.source.title,'InstaBeam OmniReach Extended Range Outdoor TV Antenna');
+assert.equal(createManualAmazonSeed({amazonListingUrl:''},balanced),null);
+assert.throws(()=>createManualAmazonSeed({amazonListingUrl:'https://www.amazon.com/not-an-asin'},balanced),/valid 10-character ASIN/);
+const lensSet={provider:'bright_data_google_lens_first',productTitle:'InstaBeam OmniReach Extended Range Outdoor TV Antenna',sourceCounts:[{asin:'B089LMG6L4',sourceUrl:'https://www.amazon.com/dp/B089LMG6L4',directSourceUrl:'https://www.amazon.com/dp/B089LMG6L4',title:'Outdoor TV Antenna 360° Omni-Directional',linkVerified:true,matchConfidence:.93},{sourceUrl:'https://www.ebay.com/itm/123',directSourceUrl:'https://www.ebay.com/itm/123',title:'Outdoor Omni TV Antenna',linkVerified:true,matchConfidence:.9}],lensDiscovery:{enabled:true,status:'complete',acceptedCandidates:2},provenance:{lensRequests:9},references:[],pulledReferences:[]};
+const mergedLensSet=mergeManualAmazonSeed(lensSet,manualSeed);
+assert.equal(mergedLensSet.provider,'bright_data_google_lens_first');
+assert.equal(mergedLensSet.sourceCounts.length,2);
+assert.equal(mergedLensSet.sourceCounts[0].title,'Outdoor TV Antenna 360° Omni-Directional');
+assert.equal(mergedLensSet.sourceCounts[0].manualSeed,true);
+assert.equal(mergedLensSet.lensDiscovery.enabled,true);
+assert.equal(mergedLensSet.lensDiscovery.status,'complete');
+assert.equal(mergedLensSet.lensDiscovery.manualSeedIncluded,true);
+assert.equal(mergedLensSet.manualAmazonSeed.mergedIntoExisting,true);
+assert.equal(lensSet.sourceCounts[0].manualSeed,undefined);
+const distinctSeed=createManualAmazonSeed({amazonListingUrl:'https://www.amazon.com/dp/B012345678',productTitle:'Outdoor Omni TV Antenna'},balanced),mergedDistinct=mergeManualAmazonSeed(lensSet,distinctSeed);
+assert.equal(mergedDistinct.sourceCounts.length,3);
+assert.equal(mergedDistinct.manualAmazonSeed.mergedIntoExisting,false);
 
 assert.deepEqual(sourceCardCounts({publicReviewCount:1150,individualExtractedCount:3}),{extracted:3,listed:1150,headline:1150,sortCount:1150});
 assert.deepEqual(sourceCardCounts({publicReviewCount:null,extractedReviewCount:5}),{extracted:5,listed:null,headline:5,sortCount:5});
@@ -91,6 +112,8 @@ assert.match(amazonDiscovery,/candidateEvaluations/);
 assert.match(lensFallback,/deterministicRescueAssessments/);
 assert.match(wrapper,/\[reference-scan-empty\]/);
 assert.match(wrapper,/function providerStatus/);
+assert.match(wrapper,/mergeManualAmazonSeed/);
+assert.doesNotMatch(wrapper,/if\(manual\)return Response\.json/);
 assert.match(bridge,/ReferenceScanDiagnostics/);
 assert.match(bridge,/error\.diagnostics=json\?\.diagnostics/);
 assert.match(bridge,/x\.estimate!=null/);
@@ -103,11 +126,14 @@ assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
 assert.match(diagnosticUi,/viewing this saved diagnostic uses no provider credits/);
 assert.match(page,/20 reviews in Test or 200 in Balanced\/Thorough/);
+assert.match(page,/Lens still runs from the Shopify product/);
 assert.match(budgetControl,/3 images · 9 Lens requests · up to 7 reference AI calls · 4 Amazon queries/);
 assert.match(amazonDiscovery,/ai_plus_deterministic/);
 assert.match(amazonDiscovery,/existingAsins/);
 assert.match(amazonDiscovery,/Number\(x\.ratingCount\)<=0/);
 const enrichRoute=await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8');
+assert.doesNotMatch(enrichRoute,/manual_amazon_listing_supplied/);
+assert.doesNotMatch(enrichRoute,/hasManualAmazon/);
 assert.match(enrichRoute,/plannedReviewCount/);
 assert.match(enrichRoute,/plannedRank/);
 assert.match(enrichRoute,/marketplaceIngestionHistory/);

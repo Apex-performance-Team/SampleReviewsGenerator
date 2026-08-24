@@ -3,8 +3,8 @@ export const maxDuration=300;
 
 import{withBrightLensNativeContext}from'../../../lib/bright-lens-native';
 import{getBrightDataBalance,classifyBrightDataFailure,cleanBright}from'../../../lib/bright-data-status';
-import{amazonAsinV2}from'../../../lib/amazon-review-ingest-v2';
 import{referenceBudget}from'../../../lib/reference-pipeline.mjs';
+import{createManualAmazonSeed,mergeManualAmazonSeed}from'../../../lib/manual-amazon-seed.mjs';
 
 const BD='https://api.brightdata.com';
 let cachedZone=null;
@@ -51,7 +51,6 @@ async function resolveSerpZone(key){
 
 function recomputePlatformCounts(refs){const m=new Map();for(const r of refs||[]){const k=`${r.platform}|${r.provider||''}`,x=m.get(k)||{platform:r.platform,provider:r.provider,reviewCount:0,pages:new Set()};x.reviewCount++;x.pages.add(r.sourceUrl);m.set(k,x)}return[...m.values()].map(x=>({platform:x.platform,provider:x.provider,reviewCount:x.reviewCount,pageCount:x.pages.size})).sort((a,b)=>b.reviewCount-a.reviewCount)}
 function stripOriginalStore(rs,originalProductUrl){const h=host(originalProductUrl);if(!h||!rs)return rs;rs.sourceCounts=(rs.sourceCounts||[]).filter(x=>host(x.directSourceUrl||x.sourceUrl)!==h);rs.aggregateOnlySources=(rs.aggregateOnlySources||[]).filter(x=>host(x.directSourceUrl||x.sourceUrl)!==h);rs.references=(rs.references||[]).filter(x=>host(x.sourceUrl)!==h);rs.pulledReferences=(rs.pulledReferences||rs.references||[]).filter(x=>host(x.sourceUrl)!==h);rs.platformCounts=recomputePlatformCounts(rs.references);rs.totalIndividualReviews=rs.references.length;rs.totalPulledReviews=rs.pulledReferences.length;rs.availableForGeneration=Math.min(250,rs.references.length);rs.matchedPages=rs.sourceCounts.length;rs.verifiedSourceLinks=rs.sourceCounts.filter(x=>x.linkVerified).length;return rs}
-function manualAmazonReferenceSet(body,originalProductUrl){const raw=clean(body?.amazonListingUrl),asin=amazonAsinV2(raw);if(!raw)return null;if(!asin)throw Error('Known Amazon listing must contain a valid 10-character ASIN.');const budget=referenceBudget(body?.referenceBudget),sourceUrl=`https://www.amazon.com/dp/${asin}`,source={platform:'amazon.com',provider:'user_supplied_amazon_listing',sourceUrl,directSourceUrl:sourceUrl,asin,title:'User-supplied Amazon listing',status:'found',matchConfidence:1,confidence:'high',publicReviewCount:null,extractedReviewCount:0,individualExtractedCount:0,pageCount:1,aggregateOnly:true,ratingEstimate:null,error:null,linkVerified:true,linkVerification:'user_supplied_amazon_listing',lensTabs:['manual_amazon_listing'],lensRank:null,verificationMethod:'user_supplied_amazon_listing',verificationReason:'Amazon listing supplied directly for this product scan.',discoveryOrigin:'manual_verified_amazon'};return{version:'individual-reference-v13',provider:'user_supplied_amazon_listing',referenceBudget:budget,productUrl:originalProductUrl,productTitle:clean(body?.productTitle),productDescription:clean(body?.productDescription),references:[],pulledReferences:[],sourceCounts:[source],aggregateOnlySources:[],platformCounts:[],totalIndividualReviews:0,totalPulledReviews:0,availableForGeneration:0,confidence:'high',matchedPages:1,verifiedSourceLinks:1,lensDiscovery:{enabled:false,status:'skipped',reason:'user_supplied_amazon_listing',budget},provenance:{manualAmazonListing:true,originalProductUrl,amazonListingUrl:sourceUrl},syntheticUseOnly:true,sourceReviewTextExported:true}}
 
 function providerStatus(x){return{configured:Boolean(x?.configured),ok:x?.ok??null,httpStatus:x?.httpStatus??null,noCredits:Boolean(x?.noCredits),error:x?.error?cleanBright(x.error).slice(0,180):null}}
 function safeCandidate(x){return{platform:clean(x?.platform).slice(0,100)||null,url:x?.url||null,asin:clean(x?.asin).slice(0,10)||null,title:clean(x?.title).slice(0,180)||null,merchant:clean(x?.merchant).slice(0,120)||null,lensTabs:Array.isArray(x?.lensTabs)?x.lensTabs.slice(0,3):[],lensRank:x?.lensRank??null,lensScore:x?.lensScore??null,imageHits:x?.imageHits??null,candidateImageAvailable:Boolean(x?.candidateImageAvailable),localVisualScore:x?.localVisualScore??null,localDifferenceHash:x?.localDifferenceHash??null,localSilhouetteIou:x?.localSilhouetteIou??null,lexicalOverlap:x?.lexicalOverlap??null,aiConfidence:x?.aiConfidence??null,matchScore:x?.matchScore??null,accepted:Boolean(x?.accepted),verificationMethod:clean(x?.verificationMethod).slice(0,100)||null,verificationReason:clean(x?.verificationReason).slice(0,260)||null}}
@@ -67,7 +66,7 @@ export async function POST(req){
   let body;try{body=await req.json()}catch{return Response.json({error:'Invalid JSON body.'},{status:400})}
   const diagnosticId=`ref-${crypto.randomUUID()}`;
   const originalProductUrl=String(body?.productUrl||'').trim();if(!originalProductUrl)return Response.json({error:'Product URL is required.'},{status:400});
-  let manual;try{manual=manualAmazonReferenceSet(body,originalProductUrl)}catch(e){return Response.json({error:e?.message||String(e)},{status:400,headers:{'cache-control':'no-store'}})}if(manual)return Response.json({referenceSet:manual},{headers:{'cache-control':'no-store'}});
+  let manualSeed;try{manualSeed=createManualAmazonSeed({...body,productUrl:originalProductUrl},referenceBudget(body?.referenceBudget))}catch(e){return Response.json({error:e?.message||String(e)},{status:400,headers:{'cache-control':'no-store'}})}
   const key=process.env.BRIGHT_DATA_API_KEY||'',providerPreflight=await accountPreflight(key),provider=providerStatus(providerPreflight);
   if(providerPreflight.noCredits)return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then rescan.',code:'bright_data_no_credits',diagnosticId,brightData:{stage:'account_preflight',provider}},{status:402,headers:{'cache-control':'no-store'}});
   let zoneInfo={zone:clean(process.env.BRIGHT_DATA_SERP_ZONE)||null,source:'not_resolved',activeSerpZones:[]},lensUnavailableReason=null;
@@ -86,6 +85,7 @@ export async function POST(req){
   if(res.ok&&json?.referenceSet){
     json.referenceSet.productUrl=originalProductUrl;
     json.referenceSet=stripOriginalStore(json.referenceSet,originalProductUrl);
+    json.referenceSet=mergeManualAmazonSeed(json.referenceSet,manualSeed);
     json.referenceSet.provenance={...(json.referenceSet.provenance||{}),diagnosticId,imageTransport:lensUnavailableReason?'lens_skipped':'bright_data_uploadbyurl_primary',originalProductUrl,provider};
     json.referenceSet.lensDiscovery={...(json.referenceSet.lensDiscovery||{}),transport:lensUnavailableReason?'skipped_provider_unavailable':'uploadbyurl_primary'};
     const lens=json.referenceSet.lensDiscovery||{},prov=json.referenceSet.provenance||{},lensRaw=Number(lens.rawResults??prov.lensRawResults??0),lensAccepted=Number(lens.acceptedCandidates??lens.verifiedAcceptedCandidates??prov.selectedSources??0),amazonFallbackAfterZeroLens=Boolean(prov.amazonFallbackUsed&&lensRaw===0&&lensAccepted===0);
