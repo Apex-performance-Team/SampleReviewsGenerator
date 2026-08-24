@@ -130,6 +130,9 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(page,/corpusQualitySignals/);
+assert.match(page,/quarantineFailedReviews/);
+assert.match(page,/allowShortfall:true/);
+assert.doesNotMatch(page,/reached its capped allowance/);
 assert.match(page,/syntheticReviewCsv/);
 assert.match(page,/syntheticReviewBulkCsv/);
 

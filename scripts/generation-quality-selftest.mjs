@@ -1,5 +1,6 @@
 import assert from'node:assert/strict';
 import{corpusQualitySignals,createBlueprintPlan,createPersonaProfiles,requestedThemeCount,sanitizePlanItems,solveNaturalRatingDistribution}from'../lib/review-blueprint.mjs';
+import{quarantineFailedReviews,reviewRatingSummary}from'../lib/review-quality-finalize.mjs';
 import{SYNTHETIC_REVIEW_HEADERS,syntheticReviewCsv}from'../lib/synthetic-review-export.mjs';
 
 const solved=solveNaturalRatingDistribution(100,4.7);
@@ -63,13 +64,30 @@ const diverse=[
 ];
 assert.equal(corpusQualitySignals(diverse).passed,true);
 
+const purgeInput=Array.from({length:50},(_,index)=>({id:`SYN-${String(index+1).padStart(4,'0')}`,rating:index<42?5:index<46?4:index<48?3:index===48?2:1,title:`Purge fixture ${index+1}`,body:`Distinct purge behavior validation body number ${index+1}.`})),purged=quarantineFailedReviews(purgeInput,{deterministicDiagnostics:{repairIds:['SYN-0008'],repairReasons:{'SYN-0008':['lexical_near_duplicate']}},semanticRepairIds:['SYN-0017'],semanticRepairReasons:{'SYN-0017':['semantic_near_duplicate with SYN-0016']}});
+assert.equal(purged.generatedReviewCount,50);
+assert.equal(purged.finalReviewCount,48);
+assert.equal(purged.purgedReviewCount,2);
+assert.deepEqual(purged.purgedReviewIds,['SYN-0008','SYN-0017']);
+assert(!purged.reviews.some(review=>purged.purgedReviewIds.includes(review.id)));
+assert(purged.purgedReviews.every(review=>review.excludedFromFinalOutput&&review.qualityPurgeReasons.length));
+assert.deepEqual(reviewRatingSummary(purged.reviews).distribution,{1:1,2:1,3:2,4:4,5:40});
+assert.equal(purged.actualAverage,225/48);
+
 const reviews=plan.items.map((item,index)=>({...item,title:index===0?'=formula-like title':`Export fixture ${index+1}`,body:`Synthetic QA export validation body ${index+1} with enough distinct text for this fixture.`,referenceLed:index===0,referenceId:index===0?'REF-1':null,referencePlatform:index===0?'example.com':null,referenceProvider:index===0?'test':null,referenceSourceUrl:index===0?'https://example.com/review/1':null,referenceRating:index===0?5:null,plausibilityAction:'self_audited',plausibilityFlags:[],fixtureType:'synthetic_review_qa'})),result={input:{productTitle:'Test product',productUrl:'https://example.com/products/test',reviewCount:100,targetAverage:4.7},runId:plan.runId,planId:plan.planId,planGeneratedAt:plan.generatedAt,distribution:plan.distribution,actualAverage:plan.actualAverage,planDiagnostics:plan.diagnostics,referenceCoverage:{available:20,referenceLedTotal:1,pdpOnlyTotal:99,scope:'dataset'},generationCallBudget:{aiCallsAttempted:12,expected:12,capped:17},model:'test-model',plannerModel:'test-planner',datasetPurpose:'internal_qa_modeling',corpusDiagnostics:{qaStatus:'completed',overallDiversityScore:94},reviews},csv=syntheticReviewCsv(result);
 assert.equal(csv.split('\r\n').length,101);
-for(const header of['product_title','product_url','run_id','plan_id','reference_available','reference_led_total','pdp_only_total','generation_ai_calls_attempted','persona_voice','scenario_id','theme_focus','reference_id','corpus_qa_status','style_action','style_flags'])assert(SYNTHETIC_REVIEW_HEADERS.includes(header));
+for(const header of['product_title','product_url','run_id','plan_id','requested_review_count','generated_review_count','final_review_count','purged_review_count','purged_review_ids','reference_available','reference_led_total','pdp_only_total','generation_ai_calls_attempted','persona_voice','scenario_id','theme_focus','reference_id','corpus_qa_status','style_action','style_flags'])assert(SYNTHETIC_REVIEW_HEADERS.includes(header));
 assert(csv.includes('https://example.com/products/test'));
 assert(csv.includes('https://example.com/review/1'));
 assert(csv.includes('publication_allowed'));
 assert(csv.includes("'=formula-like title"));
+
+const purgeCsv=syntheticReviewCsv({...result,reviews:purged.reviews,purgedReviews:purged.purgedReviews,generatedReviewCount:purged.generatedReviewCount,finalReviewCount:purged.finalReviewCount,purgedReviewCount:purged.purgedReviewCount,distribution:purged.distribution,originalDistribution:plan.distribution,actualAverage:purged.actualAverage,corpusDiagnostics:{qaStatus:'completed_with_purge',overallDiversityScore:81}});
+assert.equal(purgeCsv.split('\r\n').length,49);
+assert(!purgeCsv.includes('Distinct purge behavior validation body number 8.'));
+assert(!purgeCsv.includes('Distinct purge behavior validation body number 17.'));
+assert(purgeCsv.includes('SYN-0008'));
+assert(purgeCsv.includes('completed_with_purge'));
 
 const sourceFirstRefs=[...Array.from({length:12},(_,index)=>({referenceId:`LOW-${index+1}`,sourceRating:5,sourceUrl:'https://www.amazon.com/dp/B000000001',sourcePublicReviewCount:100,sourceTitle:`Low source ${index+1}`,sourceBody:`Lower source review ${index+1} has enough individual customer text to be eligible.`})),...Array.from({length:12},(_,index)=>({referenceId:`HIGH-${index+1}`,sourceRating:5,sourceUrl:'https://www.amazon.com/dp/B000000002',sourcePublicReviewCount:900,sourceTitle:`High source ${index+1}`,sourceBody:`Higher source review ${index+1} has enough individual customer text to be eligible.`}))],sourceFirstPlan=createBlueprintPlan({productTitle:'Source priority product',productDescription:'Context',reviewCount:10,targetAverage:5,themes,references:sourceFirstRefs,now,nonce:'source-first'});
 assert.equal(sourceFirstPlan.diagnostics.referenceLedTotal,10);
