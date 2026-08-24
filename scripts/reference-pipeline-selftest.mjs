@@ -144,6 +144,7 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/MAX_MARKETPLACE_PULLS=250/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/maxDuration=1800/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/amazonBatchLimit\(budget\)/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Math\.min\(3,Math\.ceil\(\(Number\(reviewBudget\)\|\|0\)\/80\)\+1\)/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/strategy:'sequential_highest_volume_fill'/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/fillRemaining=passCapacity/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/targetReviews-Math\.min\(MAX_EXPORT_REFS,preExistingExport\.length\)/);
@@ -156,6 +157,8 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/excludedReviewIds/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
+assert.match(bridge,/Math\.min\(60,remaining\)/);
+assert.match(bridge,/Math\.ceil\(targetReviews\*\.03\)/);
 assert.match(page,/corpusQualitySignals/);
 assert.match(page,/quarantineFailedReviews/);
 assert.match(page,/allowShortfall:true/);
