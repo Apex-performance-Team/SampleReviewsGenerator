@@ -46,7 +46,7 @@ export async function GET(req){
     const scanRes=await scanPOST(scanReq),scan=await jsonFrom(scanRes);
     scanFailure=!scanRes.ok||!scan?.referenceSet?{status:scanRes.status,error:scan?.error||'referenceSet missing',diagnostics:scan?.diagnostics||null,brightData:scan?.brightData||null}:null;
     selftestLog('scan_complete',{ok:!scanFailure,status:scanRes.status,elapsedMs:Date.now()-started,error:scanFailure?.error||null});
-    if(scanFailure&&url.searchParams.get('knownFallback')==='off')return Response.json({ok:false,stage:'reference_scan',...scanFailure,elapsedMs:Date.now()-started},{status:scanRes.status||500,headers:{'cache-control':'no-store'}}});
+    if(scanFailure&&url.searchParams.get('knownFallback')==='off')return Response.json({ok:false,stage:'reference_scan',...scanFailure,elapsedMs:Date.now()-started},{status:scanRes.status||500,headers:{'cache-control':'no-store'}});
     current=scanFailure?knownReferenceSet(scanFailure):scan.referenceSet;
   }else{
     current=knownReferenceSet(null);
