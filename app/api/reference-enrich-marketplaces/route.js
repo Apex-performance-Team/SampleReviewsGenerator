@@ -13,6 +13,7 @@ const MAX_MARKETPLACE_PULLS=250;
 const MIN_AMAZON_PER_SOURCE=5;
 
 function clean(x){return String(x||'').replace(/\s+/g,' ').trim()}
+function datasetKey(){return process.env.BRIGHT_DATA_DATASET_API_KEY||process.env.BRIGHT_DATA_SCRAPER_API_KEY||process.env.BRIGHT_DATA_API_KEY||''}
 function host(x){try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}}
 function hash(s){let h=2166136261;for(let i=0;i<String(s).length;i++){h^=String(s).charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36).toUpperCase()}
 function sent(s){return Math.max(1,(String(s).match(/[.!?]+(?:\s|$)/g)||[]).length)}
@@ -48,7 +49,7 @@ function toReference(src,r,provider){const sourceUrl=src.directSourceUrl||src.so
 export async function POST(req){
   let body;try{body=await req.json()}catch{return Response.json({error:'Invalid JSON body.'},{status:400})}
   let rs=body?.referenceSet;if(!rs||!Array.isArray(rs.references))return Response.json({error:'referenceSet is required.'},{status:400});
-  const key=process.env.BRIGHT_DATA_API_KEY||'',balance=await getBrightDataBalance(key,{force:true});
+  const key=datasetKey(),balance=await getBrightDataBalance(key,{force:true});
   if(balance.noCredits)return Response.json({error:'Bright Data has insufficient credits/balance. Add funds in Bright Data, then retry marketplace enrichment.',code:'bright_data_no_credits',brightData:{stage:'marketplace_preflight',noCredits:true}},{status:402,headers:{'cache-control':'no-store'}});
   let discovery={candidates:[],queries:[],diagnostics:{skipped:false}};
   const targetSourceCountForDiscovery=Number(body?.targetSourceCount||rs?.targetSourceCount)||5;
