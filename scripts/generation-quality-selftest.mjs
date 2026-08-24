@@ -10,6 +10,7 @@ for(const n of[5,17,50,100,250])for(const target of[1,1.3,2,3,4,4.7,4.9,5])asser
 const profiles=createPersonaProfiles(250,'selftest');
 assert.equal(profiles.length,250);
 assert.equal(new Set(profiles.map(x=>x.signature)).size,250);
+assert(!profiles.some(profile=>/\b(verdict|caveat|overall|tradeoff|final judgment|final judgement)\b/i.test(profile.signature)));
 
 const themes=Array.from({length:25},(_,index)=>({id:`THEME-${String(index+1).padStart(2,'0')}`,focus:`Distinct product focus ${index+1}`,scenarioVariants:Array.from({length:4},(__,variant)=>`Scenario ${index+1}.${variant+1}`),evidenceBoundary:`Do not exceed evidence boundary ${index+1}`,allowedRatings:[1,2,3,4,5]}));
 const now=Date.UTC(2030,4,27),references=Array.from({length:20},(_,index)=>({referenceId:`REF-${index+1}`,sourceRating:index%5+1,sourceUrl:index<12?'https://example.com/products/high-volume':'https://example.com/products/lower-volume',sourceTitle:`Reference title ${index+1}`,sourceBody:`Reference body ${index+1} contains a distinct enough customer experience for assignment testing.`})),plan=createBlueprintPlan({productTitle:'Test product',productDescription:'Authoritative context',reviewCount:100,targetAverage:4.7,themes,references,now,nonce:'selftest'});
@@ -64,7 +65,7 @@ assert.equal(corpusQualitySignals(diverse).passed,true);
 
 const reviews=plan.items.map((item,index)=>({...item,title:index===0?'=formula-like title':`Export fixture ${index+1}`,body:`Synthetic QA export validation body ${index+1} with enough distinct text for this fixture.`,referenceLed:index===0,referenceId:index===0?'REF-1':null,referencePlatform:index===0?'example.com':null,referenceProvider:index===0?'test':null,referenceSourceUrl:index===0?'https://example.com/review/1':null,referenceRating:index===0?5:null,plausibilityAction:'self_audited',plausibilityFlags:[],fixtureType:'synthetic_review_qa'})),result={input:{productTitle:'Test product',productUrl:'https://example.com/products/test',reviewCount:100,targetAverage:4.7},runId:plan.runId,planId:plan.planId,planGeneratedAt:plan.generatedAt,distribution:plan.distribution,actualAverage:plan.actualAverage,planDiagnostics:plan.diagnostics,referenceCoverage:{available:20,referenceLedTotal:1,pdpOnlyTotal:99,scope:'dataset'},generationCallBudget:{aiCallsAttempted:12,expected:12,capped:17},model:'test-model',plannerModel:'test-planner',datasetPurpose:'internal_qa_modeling',corpusDiagnostics:{qaStatus:'completed',overallDiversityScore:94},reviews},csv=syntheticReviewCsv(result);
 assert.equal(csv.split('\r\n').length,101);
-for(const header of['product_title','product_url','run_id','plan_id','reference_available','reference_led_total','pdp_only_total','generation_ai_calls_attempted','persona_voice','scenario_id','theme_focus','reference_id','corpus_qa_status'])assert(SYNTHETIC_REVIEW_HEADERS.includes(header));
+for(const header of['product_title','product_url','run_id','plan_id','reference_available','reference_led_total','pdp_only_total','generation_ai_calls_attempted','persona_voice','scenario_id','theme_focus','reference_id','corpus_qa_status','style_action','style_flags'])assert(SYNTHETIC_REVIEW_HEADERS.includes(header));
 assert(csv.includes('https://example.com/products/test'));
 assert(csv.includes('https://example.com/review/1'));
 assert(csv.includes('publication_allowed'));
