@@ -159,6 +159,8 @@ assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(bridge,/Math\.min\(60,remaining\)/);
 assert.match(bridge,/Math\.ceil\(targetReviews\*\.03\)/);
+assert.match(bridge,/currentBudgetMode/);
+assert.match(budgetControl,/dispatchEvent\(new CustomEvent\('srl-reference-budget'/);
 assert.match(page,/corpusQualitySignals/);
 assert.match(page,/quarantineFailedReviews/);
 assert.match(page,/allowShortfall:true/);
