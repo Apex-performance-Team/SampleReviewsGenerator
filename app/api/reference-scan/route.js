@@ -11,6 +11,13 @@ let cachedZone=null;
 
 function clean(x){return String(x||'').replace(/\s+/g,' ').trim()}
 function host(x){try{return new URL(x).hostname.replace(/^www\./,'').toLowerCase()}catch{return''}}
+function parseStatus(raw){
+  try{return JSON.parse(String(raw||''))}catch{return null}
+}
+function statusNeedsZoneResolution(raw){
+  const j=parseStatus(raw),auth=String(j?.auth_fail_reason||'').toLowerCase();
+  return auth==='zone_not_found'||/zone_not_found|zone not found/i.test(String(raw||''));
+}
 
 async function accountPreflight(key){
   if(!key)return{ok:false,configured:false,httpStatus:null,error:'Bright Data Lens is not configured.',noCredits:false,balance:null};
@@ -19,6 +26,7 @@ async function accountPreflight(key){
   try{
     const r=await fetch(`${BD}/status`,{headers:{authorization:`Bearer ${key}`},cache:'no-store',signal:AbortSignal.timeout(12000)}),raw=await r.text();
     if(!r.ok){const f=classifyBrightDataFailure({status:r.status,body:raw,headers:r.headers,service:'account'});return{ok:false,configured:true,httpStatus:r.status,error:f?.code||`Bright Data account API ${r.status}: ${clean(raw).slice(0,180)}`,message:f?.message||null,noCredits:f?.code==='bright_data_no_credits',balance:balance.balance,pendingBalance:balance.pendingBalance}}
+    if(statusNeedsZoneResolution(raw))return{ok:null,configured:true,httpStatus:r.status,error:'Bright Data status requires SERP zone resolution.',noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance};
     if(/invalid status|not active|inactive|suspended/i.test(raw))return{ok:false,configured:true,httpStatus:r.status,error:'Bright Data account is not active.',noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance};
     return{ok:true,configured:true,httpStatus:r.status,error:null,noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance};
   }catch(e){return{ok:null,configured:true,httpStatus:null,error:`Bright Data account preflight failed: ${clean(e?.message||e).slice(0,180)}`,noCredits:false,balance:balance.balance,pendingBalance:balance.pendingBalance}}
