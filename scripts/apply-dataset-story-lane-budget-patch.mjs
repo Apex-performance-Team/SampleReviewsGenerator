@@ -14,7 +14,10 @@ function assertIncludes(text, needle, label) {
 function patchBlueprint() {
   const path = 'lib/review-blueprint.mjs';
   let text = fs.readFileSync(path, 'utf8');
-  if (text.includes('export function fallbackProductThemes(')) return false;
+  let changed = false;
+  if (text.includes('export function fallbackProductThemes(')) {
+    // Continue below; this patch also tightens the reference-story role budget.
+  } else {
   const anchor = "export function requestedThemeCount(reviewCount){const n=Math.max(1,Number(reviewCount)||1);return Math.min(n,Math.max(12,Math.ceil(n/4)))}";
   assertIncludes(text, anchor, `${path}: requestedThemeCount`);
   const fallback = [
@@ -54,7 +57,15 @@ function patchBlueprint() {
     "}"
   ].join('\n');
   text = text.replace(anchor, fallback);
-  return writeIfChanged(path, text);
+  changed = true;
+  }
+  const oldRoleCap = 'const sourceRewriteCap=Math.max(3,Math.min(Number(caps.storyFamilySoftCap)||5,Math.ceil(items.length*.08),8));';
+  const newRoleCap = 'const datasetSize=items.length;\n  const sourceRewriteCap=datasetSize>=100?1:datasetSize>=50?2:Math.max(3,Math.min(Number(caps.storyFamilySoftCap)||5,Math.ceil(datasetSize*.08),8));';
+  if (text.includes(oldRoleCap)) {
+    text = text.replace(oldRoleCap, newRoleCap);
+    changed = true;
+  }
+  return changed ? writeIfChanged(path, text) : false;
 }
 
 function patchPlanner() {
@@ -99,17 +110,48 @@ function patchPlanner() {
 function patchGenerator() {
   const path = 'app/api/generate/route.js';
   let text = fs.readFileSync(path, 'utf8');
-  if (text.includes('central-story contract')) return false;
+  let changed = false;
   const titleRule = '- Titles and first-six-word openings must be unique within this batch. Avoid stock titles and conclusions.';
-  assertIncludes(text, titleRule, `${path}: title rule`);
-  const replacement = [
-    titleRule,
-    "- The corpus_blueprint focus and scenario are the central-story contract for that fixture. Do not substitute the product category's easiest story if the assigned blueprint points somewhere else.",
-    "- Treat obvious setup steps, first-use mechanics, troubleshooting actions, adjustments, scans, pairing, charging, cleaning, fitting, or other category-default actions as background facts unless the corpus_blueprint explicitly makes that action the fixture's focus.",
-    '- Do not solve most positive reviews with the same structure: initial problem, adjustment, then success. Vary the evidence type across purchase reason, first impression, ordinary routine, value, compatibility, household context, appearance, logistics, support, upkeep, limitations, and recommendation-with-caveat.',
+  if (!text.includes('central-story contract')) {
+    assertIncludes(text, titleRule, `${path}: title rule`);
+    const replacement = [
+      titleRule,
+      "- The corpus_blueprint focus and scenario are the central-story contract for that fixture. Do not substitute the product category's easiest story if the assigned blueprint points somewhere else.",
+      "- Treat obvious setup steps, first-use mechanics, troubleshooting actions, adjustments, scans, pairing, charging, cleaning, fitting, or other category-default actions as background facts unless the corpus_blueprint explicitly makes that action the fixture's focus.",
+      '- Do not solve most positive reviews with the same structure: initial problem, adjustment, then success. Vary the evidence type across purchase reason, first impression, ordinary routine, value, compatibility, household context, appearance, logistics, support, upkeep, limitations, and recommendation-with-caveat.',
+    ].join('\n');
+    text = text.split(titleRule).join(replacement);
+    changed = true;
+  }
+  const oldSupportedSeed = "sourceReviewFingerprint:{...fingerprint,title:compactText(item.reference.sourceTitle,160),rating:sourceRating,experienceSeed:compactText(item.reference.sourceBody,360)},";
+  const newSupportedSeed = "sourceReviewFingerprint:{...fingerprint,title:compactText(item.reference.sourceTitle,140),rating:sourceRating,experienceSeed:compactText(item.reference.sourceBody,220)},";
+  if (text.includes(oldSupportedSeed)) {
+    text = text.replace(oldSupportedSeed, newSupportedSeed);
+    changed = true;
+  }
+  const oldCompactReference = "function compactReference(x){return x?.reference?{referenceId:x.reference.referenceId,platform:x.reference.platform,provider:x.reference.provider,sourceRating:x.reference.sourceRating,title:compactText(x.reference.sourceTitle,180),body:compactText(x.reference.sourceBody,900),fingerprint:x.referenceFingerprint||x.reference.referenceFingerprint||null,wordCount:x.reference.wordCount,sentenceCount:x.reference.sentenceCount}:null}";
+  const newCompactReference = "function compactReference(x){if(!x?.reference)return null;const blueprintLed=x.referenceRole==='reference_supported_blueprint';return{referenceId:x.reference.referenceId,platform:x.reference.platform,provider:x.reference.provider,sourceRating:x.reference.sourceRating,title:compactText(x.reference.sourceTitle,blueprintLed?120:180),body:compactText(x.reference.sourceBody,blueprintLed?220:900),fingerprint:x.referenceFingerprint||x.reference.referenceFingerprint||null,wordCount:x.reference.wordCount,sentenceCount:x.reference.sentenceCount,sourceUse:blueprintLed?'support_only':'central_fingerprint'}}";
+  if (text.includes(oldCompactReference)) {
+    text = text.replace(oldCompactReference, newCompactReference);
+    changed = true;
+  }
+  const referenceRulesAnchor = 'REFERENCE-LED RULES:\n- If rewrite_strategy.mode is source_fingerprint_rewrite, source_review_fingerprint is the primary uniqueness engine.';
+  const referenceRulesReplacement = 'REFERENCE-LED RULES:\n- Every reference-led fixture must still obey its corpus_blueprint as the central-story contract unless rewrite_strategy explicitly says the source fingerprint is central. The reference proves plausible sentiment and texture; it is not permission to repeat the same category-default story across the corpus.\n- If rewrite_strategy.mode is source_fingerprint_rewrite, source_review_fingerprint is the primary uniqueness engine.';
+  if (text.includes(referenceRulesAnchor) && !text.includes('The reference proves plausible sentiment and texture')) {
+    text = text.replace(referenceRulesAnchor, referenceRulesReplacement);
+    changed = true;
+  }
+  const tropeRule = '- Do not normalize reference-led rows into the same product-level trope. The fingerprint lane decides what the review is about; the product category must not collapse every row into one common feature, failure mode, or use case.';
+  const tropeReplacement = [
+    tropeRule,
+    '- In a 10-row batch, no more than two reviews may make the same category-default action, setup step, troubleshooting move, or obvious headline benefit the main story. If more assignments point there, demote that action to a background clause and center the blueprint/persona instead.',
+    '- For reference_supported_blueprint rows, carry forward at most one broad source-compatible detail. Do not carry forward source chronology, setup sequence, or topic center unless the blueprint explicitly asks for it.',
   ].join('\n');
-  text = text.split(titleRule).join(replacement);
-  return writeIfChanged(path, text);
+  if (text.includes(tropeRule) && !text.includes('no more than two reviews may make the same category-default action')) {
+    text = text.replace(tropeRule, tropeReplacement);
+    changed = true;
+  }
+  return changed ? writeIfChanged(path, text) : false;
 }
 
 const changed = [patchBlueprint(), patchPlanner(), patchGenerator()].some(Boolean);
