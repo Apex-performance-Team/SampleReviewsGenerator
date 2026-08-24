@@ -120,7 +120,7 @@ assert.match(bridge,/x\.estimate!=null/);
 assert.match(bridge,/public reviews on listing/);
 assert.match(bridge,/b\.sortCount-a\.sortCount/);
 assert.match(bridge,/enrichMarketplaceReferences/);
-assert.match(bridge,/maxMarketplaceReviews:step/);
+assert.match(bridge,/maxMarketplaceReviews:pullLimit/);
 assert.match(bridge,/pass<=10/);
 assert.doesNotMatch(bridge,/run\.parts\.size>=run\.expected/);
 assert.match(diagnosticUi,/Rejected Lens candidates/);
@@ -161,7 +161,8 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/excludedReviewIds/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
-assert.match(bridge,/Math\.min\(60,remaining\)/);
+assert.match(bridge,/Math\.ceil\(needed\*1\.25\)/);
+assert.match(bridge,/passTarget=targetReviews/);
 assert.match(bridge,/Math\.ceil\(targetReviews\*\.03\)/);
 assert.match(bridge,/currentBudgetMode/);
 assert.match(budgetControl,/dispatchEvent\(new CustomEvent\('srl-reference-budget'/);
