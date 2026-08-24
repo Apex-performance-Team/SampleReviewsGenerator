@@ -145,7 +145,11 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/maxDuration=1800/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/amazonBatchLimit\(budget\)/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Math\.min\(3,Math\.ceil\(\(Number\(reviewBudget\)\|\|0\)\/80\)\+1\)/);
-assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/strategy:'sequential_highest_volume_fill'/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/sourceAttemptStats/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/rankSourcesForPass/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/strategy:'rotating_highest_volume_fill_with_exhaustion_tracking'/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/sourceRotation:plan\.sourceRotation/);
+assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/priorZeroNewStreak/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/fillRemaining=passCapacity/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/targetReviews-Math\.min\(MAX_EXPORT_REFS,preExistingExport\.length\)/);
 assert.doesNotMatch(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Promise\.all\(jobs/);
