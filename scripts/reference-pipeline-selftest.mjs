@@ -148,9 +148,10 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/fillRemaining=passCapacity/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/targetReviews-Math\.min\(MAX_EXPORT_REFS,preExistingExport\.length\)/);
 assert.doesNotMatch(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/Promise\.all\(jobs/);
-assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/perBatchReviews=Math\.min\(50,requested\)/);
+assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/perBatchReviews=Math\.min\(200,requested\)/);
 assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/max_reviews:batchReviews/);
 assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/excludeReviewIds=\[\]/);
+assert.match(await readFile(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8'),/excludeReviewBodies=\[\]/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/existingReviewIdsForSource/);
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/excludedReviewIds/);
 assert.match(page,/\/api\/generation-plan/);

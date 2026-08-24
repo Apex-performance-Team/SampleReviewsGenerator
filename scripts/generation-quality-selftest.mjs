@@ -1,6 +1,7 @@
 import assert from'node:assert/strict';
+import{readFileSync}from'node:fs';
 import{corpusQualitySignals,createBlueprintPlan,createPersonaProfiles,requestedThemeCount,sanitizePlanItems,solveNaturalRatingDistribution}from'../lib/review-blueprint.mjs';
-import{quarantineFailedReviews,reviewRatingSummary}from'../lib/review-quality-finalize.mjs';
+import{generationFailureAudit,quarantineFailedReviews,reviewRatingSummary}from'../lib/review-quality-finalize.mjs';
 import{SYNTHETIC_REVIEW_HEADERS,syntheticReviewCsv}from'../lib/synthetic-review-export.mjs';
 
 const solved=solveNaturalRatingDistribution(100,4.7);
@@ -74,6 +75,13 @@ assert(purged.purgedReviews.every(review=>review.excludedFromFinalOutput&&review
 assert.deepEqual(reviewRatingSummary(purged.reviews).distribution,{1:1,2:1,3:2,4:4,5:40});
 assert.equal(purged.actualAverage,225/48);
 
+const failedGenerationAudit=generationFailureAudit([{batchIndex:2,error:'provider timeout',items:plan.items.slice(20,30)}]);
+assert.equal(failedGenerationAudit.length,10);
+assert.equal(failedGenerationAudit[0].id,'SYN-0021');
+assert.equal(failedGenerationAudit[0].generationFailureBatch,3);
+assert.equal(failedGenerationAudit[0].excludedFromFinalOutput,true);
+assert.match(failedGenerationAudit[0].qualityPurgeReasons[0],/provider timeout/);
+
 const reviews=plan.items.map((item,index)=>({...item,title:index===0?'=formula-like title':`Export fixture ${index+1}`,body:`Synthetic QA export validation body ${index+1} with enough distinct text for this fixture.`,referenceLed:index===0,referenceId:index===0?'REF-1':null,referencePlatform:index===0?'example.com':null,referenceProvider:index===0?'test':null,referenceSourceUrl:index===0?'https://example.com/review/1':null,referenceRating:index===0?5:null,plausibilityAction:'self_audited',plausibilityFlags:[],fixtureType:'synthetic_review_qa'})),result={input:{productTitle:'Test product',productUrl:'https://example.com/products/test',reviewCount:100,targetAverage:4.7},runId:plan.runId,planId:plan.planId,planGeneratedAt:plan.generatedAt,distribution:plan.distribution,actualAverage:plan.actualAverage,planDiagnostics:plan.diagnostics,referenceCoverage:{available:20,referenceLedTotal:1,pdpOnlyTotal:99,scope:'dataset'},generationCallBudget:{aiCallsAttempted:12,expected:12,capped:17},model:'test-model',plannerModel:'test-planner',datasetPurpose:'internal_qa_modeling',corpusDiagnostics:{qaStatus:'completed',overallDiversityScore:94},reviews},csv=syntheticReviewCsv(result);
 assert.equal(csv.split('\r\n').length,101);
 for(const header of['product_title','product_url','run_id','plan_id','requested_review_count','generated_review_count','final_review_count','purged_review_count','purged_review_ids','reference_available','reference_led_total','pdp_only_total','generation_ai_calls_attempted','persona_voice','scenario_id','theme_focus','reference_id','corpus_qa_status','style_action','style_flags'])assert(SYNTHETIC_REVIEW_HEADERS.includes(header));
@@ -107,5 +115,18 @@ const reviews50=plan50.items.map((item,index)=>({...item,title:`Reference covera
 assert.equal(csv50.split('\r\n').length,101);
 assert.equal((csv50.match(/"AMZ-/g)||[]).length,50);
 assert(csv50.includes('"50","50","50"'));
+
+const generateRouteSource=readFileSync(new URL('../app/api/generate/route.js',import.meta.url),'utf8'),pageSource=readFileSync(new URL('../app/page.js',import.meta.url),'utf8');
+assert.match(generateRouteSource,/if\(input\.generationMode==='blueprint_v2'\)return finalize\(styleGateLocally\(input,drafts\)\)/);
+assert.match(generateRouteSource,/modelCalls:blueprintMode\?1:3/);
+assert.match(pageSource,/failedBatches\.push\(/);
+assert.match(pageSource,/generationFailureAudit\(generated\.failedBatches\)/);
+assert(generateRouteSource.includes("HARD_LOCAL_STYLE_WARNINGS=new Set(['product_context_conflict','template_phrase','analysis_framing'])"));
+assert(generateRouteSource.includes("styleAction:hardWarnings.length?'deferred_to_corpus_qa':warnings.length?'advisory':'pass'"));
+assert(generateRouteSource.includes('local_hard_warnings:hardWarnings'));
+assert(pageSource.includes("STYLE_REPAIR_CALL_CAP=1,DETERMINISTIC_REPAIR_CALL_CAP=1"));
+assert(pageSource.includes("HARD_LOCAL_STYLE_FLAG_TYPES=new Set(['PRODUCT_CONTEXT_CONFLICT','TEMPLATE_PHRASE','ANALYSIS_FRAMING'])"));
+assert(pageSource.includes("repairCallAllowance(budget,STYLE_REPAIR_CALL_CAP,2)*10"));
+assert(pageSource.includes("repairCallAllowance(budget,DETERMINISTIC_REPAIR_CALL_CAP,1)*10"));
 
 console.log('generation blueprint, diversity, rating, date, persona, and CSV self-tests passed');

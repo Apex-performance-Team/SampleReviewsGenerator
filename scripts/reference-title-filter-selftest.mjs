@@ -24,6 +24,6 @@ assert.deepEqual(filtered.accepted.map(x=>x.referenceId),['OUTDOOR-1','OUTDOOR-2
 assert.equal(filtered.diagnostics.rejectedCount,3);
 assert.equal(filtered.diagnostics.version,'shopify-product-title-v1');
 const amazonIngestSource=readFileSync(new URL('../lib/amazon-review-ingest-v2.js',import.meta.url),'utf8');
-assert.equal((amazonIngestSource.match(/variation_specific:true/g)||[]).length,3);
-assert.doesNotMatch(amazonIngestSource,/variation_specific:false/);
+assert.match(amazonIngestSource,/name:'exact_variant',variationSpecific:true/);
+assert.match(amazonIngestSource,/name:'listing_family',variationSpecific:false/);
 console.log('reference title filter self-test passed');
