@@ -17,7 +17,42 @@ function patchBlueprint() {
   if (text.includes('export function fallbackProductThemes(')) return false;
   const anchor = "export function requestedThemeCount(reviewCount){const n=Math.max(1,Number(reviewCount)||1);return Math.min(n,Math.max(12,Math.ceil(n/4)))}";
   assertIncludes(text, anchor, `${path}: requestedThemeCount`);
-  const fallback = `${anchor}\n\nconst FALLBACK_THEME_FOCI=[\n  'purchase rationale','expectations before use','first impression','shipping or packaging','instructions clarity',\n  'setup time and effort','compatibility check','daily routine use','replacement for prior solution','value for price',\n  'ongoing cost or subscription expectation','family or shared use','nontechnical buyer experience','experienced user perspective','space or placement constraint',\n  'appearance and discretion','handling and materials impression','maintenance or upkeep','performance under normal conditions','performance limitation',\n  'minor annoyance','return or keep decision','support or seller interaction','longer-term observation','gift or recommendation context',\n  'portability or moving between spots','size and fit','household friction or lack of it','learning curve','comparison to cheaper alternative',\n  'comparison to more expensive alternative','installation hardware or included parts','single-user or single-device setup','multi-user or multi-device expectations','weather or environment caveat',\n  'quality control concern','simple satisfaction','balanced pros and cons','surprise benefit','not for every situation',\n  'failed expectation','partial success','ease after setup','storage between uses','small defect tolerated',\n  'small defect not tolerated','repeat purchase or second location','practical tip','customer mistake corrected','plain negative review',\n  'plain positive review','overall recommendation','buyer-specific constraint','ordinary convenience','caveated recommendation',\n  'reason for rating','unmet use case','works as expected','better than expected','worse than expected'\n];\nexport function fallbackProductThemes(reviewCount){\n  const count=requestedThemeCount(reviewCount);\n  return Array.from({length:count},(_,index)=>{\n    const base=FALLBACK_THEME_FOCI[index%FALLBACK_THEME_FOCI.length],suffix=index>=FALLBACK_THEME_FOCI.length?\\` ${Math.floor(index/FALLBACK_THEME_FOCI.length)+1}\\`:'';\n    const focus=\\`${base}${suffix}\\`;\n    return{\n      id:\\`THEME-${String(index+1).padStart(2,'0')}\\`,focus,\n      scenarioVariants:[\n        \\`customer explains ${focus} with one concrete context detail\\`,\n        \\`customer describes a practical tradeoff around ${focus}\\`,\n        \\`customer compares expectations to the result for ${focus}\\`,\n        \\`customer gives a rating-appropriate verdict centered on ${focus}\\`,\n      ],\n      evidenceBoundary:'Keep claims within authoritative product facts and verified reference plausibility. Do not let one obvious setup step, troubleshooting action, headline feature, or marketing phrase dominate the corpus unless this theme explicitly makes it central.',\n      allowedRatings:[1,2,3,4,5],\n    };\n  });\n}`;
+  const fallback = [
+    anchor,
+    '',
+    "const FALLBACK_THEME_FOCI=[",
+    "  'purchase rationale','expectations before use','first impression','shipping or packaging','instructions clarity',",
+    "  'setup time and effort','compatibility check','daily routine use','replacement for prior solution','value for price',",
+    "  'ongoing cost or subscription expectation','family or shared use','nontechnical buyer experience','experienced user perspective','space or placement constraint',",
+    "  'appearance and discretion','handling and materials impression','maintenance or upkeep','performance under normal conditions','performance limitation',",
+    "  'minor annoyance','return or keep decision','support or seller interaction','longer-term observation','gift or recommendation context',",
+    "  'portability or moving between spots','size and fit','household friction or lack of it','learning curve','comparison to cheaper alternative',",
+    "  'comparison to more expensive alternative','installation hardware or included parts','single-user or single-device setup','multi-user or multi-device expectations','weather or environment caveat',",
+    "  'quality control concern','simple satisfaction','balanced pros and cons','surprise benefit','not for every situation',",
+    "  'failed expectation','partial success','ease after setup','storage between uses','small defect tolerated',",
+    "  'small defect not tolerated','repeat purchase or second location','practical tip','customer mistake corrected','plain negative review',",
+    "  'plain positive review','overall recommendation','buyer-specific constraint','ordinary convenience','caveated recommendation',",
+    "  'reason for rating','unmet use case','works as expected','better than expected','worse than expected'",
+    "];",
+    "export function fallbackProductThemes(reviewCount){",
+    "  const count=requestedThemeCount(reviewCount);",
+    "  return Array.from({length:count},(_,index)=>{",
+    "    const base=FALLBACK_THEME_FOCI[index%FALLBACK_THEME_FOCI.length],suffix=index>=FALLBACK_THEME_FOCI.length?' '+(Math.floor(index/FALLBACK_THEME_FOCI.length)+1):'';",
+    "    const focus=base+suffix;",
+    "    return{",
+    "      id:'THEME-'+String(index+1).padStart(2,'0'),focus,",
+    "      scenarioVariants:[",
+    "        'customer explains '+focus+' with one concrete context detail',",
+    "        'customer describes a practical tradeoff around '+focus,",
+    "        'customer compares expectations to the result for '+focus,",
+    "        'customer gives a rating-appropriate verdict centered on '+focus,",
+    "      ],",
+    "      evidenceBoundary:'Keep claims within authoritative product facts and verified reference plausibility. Do not let one obvious setup step, troubleshooting action, headline feature, or marketing phrase dominate the corpus unless this theme explicitly makes it central.',",
+    "      allowedRatings:[1,2,3,4,5],",
+    "    };",
+    "  });",
+    "}"
+  ].join('\n');
   text = text.replace(anchor, fallback);
   return writeIfChanged(path, text);
 }
@@ -70,9 +105,9 @@ function patchGenerator() {
   const replacement = [
     titleRule,
     "- The corpus_blueprint focus and scenario are the central-story contract for that fixture. Do not substitute the product category's easiest story if the assigned blueprint points somewhere else.",
-    '- Treat obvious setup steps, first-use mechanics, troubleshooting actions, adjustments, scans, pairing, charging, cleaning, fitting, or other category-default actions as background facts unless the corpus_blueprint explicitly makes that action the fixture\'s focus.',
+    "- Treat obvious setup steps, first-use mechanics, troubleshooting actions, adjustments, scans, pairing, charging, cleaning, fitting, or other category-default actions as background facts unless the corpus_blueprint explicitly makes that action the fixture's focus.",
     '- Do not solve most positive reviews with the same structure: initial problem, adjustment, then success. Vary the evidence type across purchase reason, first impression, ordinary routine, value, compatibility, household context, appearance, logistics, support, upkeep, limitations, and recommendation-with-caveat.',
-  ].join('\\n');
+  ].join('\n');
   text = text.split(titleRule).join(replacement);
   return writeIfChanged(path, text);
 }
