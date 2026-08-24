@@ -161,7 +161,7 @@ assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/ro
 assert.match(await readFile(new URL('../app/api/reference-enrich-marketplaces/route.js',import.meta.url),'utf8'),/excludedReviewIds/);
 assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
-assert.match(bridge,/Math\.ceil\(needed\*1\.25\)/);
+assert.match(bridge,/pullLimit=Math\.min\(250,needed\)/);
 assert.match(bridge,/passTarget=targetReviews/);
 assert.match(bridge,/Math\.ceil\(targetReviews\*\.03\)/);
 assert.match(bridge,/currentBudgetMode/);
