@@ -1,0 +1,4 @@
+Production redeploy trigger for Supabase environment activation.
+
+Updated: 2026-08-25T19:35:00Z
+Reason: apply SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to Vercel runtime.
