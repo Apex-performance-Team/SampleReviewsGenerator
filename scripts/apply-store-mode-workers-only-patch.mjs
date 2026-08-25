@@ -16,6 +16,9 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
 {
   const path='app/studio/page.js';
   let s=read(path);
+  if(s.includes('ACTIVE_CATALOG_KEY')&&s.includes('startDurableCatalog')){
+    console.log('Studio durable workflow detected; legacy browser-worker patch skipped.');
+  }else{
   const cleanNumber="function cleanNumber(value, fallback){const n=Number(value);return Number.isFinite(n)?n:fallback}\n";
   const helperBlock=cleanNumber+
     "function cleanReviewCount(value, fallback=100){const n=Math.round(Number(value));return Number.isFinite(n)?Math.max(5,Math.min(250,n)):fallback}\n"+
@@ -93,7 +96,8 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
   s=s.replaceAll('<label className="workers">Parallel AI<select','<label className="workers">Concurrent products<select');
   s=s.replace(">{genBusy?'Generating…':`Generate ${products.filter(x=>x.enabled&&x.status==='done').length} SKUs →`}</button>",">{genBusy?'Generating…':`Generate ${selectedStoreProducts.length} SKUs / ${storeRequestedTotal.toLocaleString()} reviews →`}</button>");
   s=replaceOnce(path,s,"<div className={`reviewCount ${p.status==='done'&&p.extracted?.existingReviewCount!=null?'known':''}`}><span>Live reviews · reference only</span><strong>{p.status==='done'?(p.extracted?.existingReviewCount==null?'Unavailable':p.extracted.existingReviewCount.toLocaleString()):p.status==='scanning'?'Checking…':'—'}</strong></div>","<div className={`reviewCount ${p.status==='done'&&p.extracted?.existingReviewCount!=null?'known':''}`}><span>Generate reviews</span><input type=\"number\" min=\"5\" max=\"250\" value={reviewCountValue(p,f.reviewCount)} onChange={e=>setProductReviewCount(p.index,e.target.value)} disabled={busy||genBusy}/><small>Live: {p.status==='done'?(p.extracted?.existingReviewCount==null?'Unavailable':p.extracted.existingReviewCount.toLocaleString()):p.status==='scanning'?'Checking…':'—'}</small></div>");
-  write(path,s);
+    write(path,s);
+  }
 }
 
 {
