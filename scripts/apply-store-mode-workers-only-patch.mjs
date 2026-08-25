@@ -103,12 +103,16 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
 {
   const path='app/page.js';
   let s=read(path);
+  if(s.includes('redirect("/studio")')){
+    console.log('Main route redirects to Studio; legacy browser-worker patch skipped.');
+  }else{
   s=replaceOnce(path,s,"const BATCH_RETRY_CAP=8,REPAIR_CALL_CAP=4,STYLE_REPAIR_CALL_CAP=2,DETERMINISTIC_REPAIR_CALL_CAP=1;","const BATCH_RETRY_CAP=8,REPAIR_CALL_CAP=4,STYLE_REPAIR_CALL_CAP=2,DETERMINISTIC_REPAIR_CALL_CAP=1;\nconst SINGLE_PRODUCT_WORKERS=1;",{skipIf:x=>x.includes('SINGLE_PRODUCT_WORKERS=1')});
   s=replaceOnce(path,s,"const groups=chunks(plan.items,10),parts=Array(groups.length),failedBatches=[];let cursor=0,completed=0,settled=0,generated=[];setProgress({done:0,total,status:`Blueprint ready · starting ${Math.min(concurrency,groups.length)} coordinated AI workers…`});","const groups=chunks(plan.items,10),parts=Array(groups.length),failedBatches=[],workerCount=Math.min(SINGLE_PRODUCT_WORKERS,groups.length);let cursor=0,completed=0,settled=0,generated=[];setProgress({done:0,total,status:'Blueprint ready · generating single-product batches sequentially…'});");
   s=s.replace("await Promise.all(Array.from({length:Math.min(concurrency,groups.length)},worker));return{parts:parts.filter(Boolean),failedBatches}}","await Promise.all(Array.from({length:workerCount},worker));return{parts:parts.filter(Boolean),failedBatches}}");
   s=s.replace("runPool(groups,Math.min(concurrency,groups.length),async(items,index)=>","runPool(groups,Math.min(SINGLE_PRODUCT_WORKERS,groups.length),async(items,index)=>");
   s=s.replaceAll('<label className="workers">Parallel AI<select','<label className="workers">Concurrent products<select');
   write(path,s);
+  }
 }
 
 {
