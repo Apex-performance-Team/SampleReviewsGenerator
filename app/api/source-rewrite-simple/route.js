@@ -109,7 +109,11 @@ RULES:
 For every SOURCE REVIEW return exactly:
 {"id":"SRC-0001","referenceId":"...","title":"rewritten title","body":"rewritten body"}`;
       const model=await gateway(req,prompt,115000),arr=parseArray(model.text),byRef=new Map(arr.map(x=>[clean(x?.referenceId,120),x]));
-      reviews=accepted.map((item,index)=>finalizeReview(item,byRef.get(item.referenceId),index));
+      reviews=[];
+      accepted.forEach((item,index)=>{
+        try{reviews.push(finalizeReview(item,byRef.get(item.referenceId),index))}
+        catch(e){rejected.push({...item,rewriteStatus:'rejected',rejectReason:`rewrite_failed: ${clean(e?.message||e,260)}`})}
+      });
     }
     return Response.json({productTitle,mode:'source_rewrite_simple',inputCount:references.length,acceptedCount:accepted.length,rejectedCount:rejected.length,reviews,rejected,synthetic:true,publicationAllowed:false,datasetPurpose:'internal_qa_modeling'},{headers:{'cache-control':'no-store'}});
   }catch(error){return Response.json({error:error?.message||'Simple source rewrite failed.'},{status:500,headers:{'cache-control':'no-store'}})}
