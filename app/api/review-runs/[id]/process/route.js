@@ -1,5 +1,5 @@
 export const runtime='nodejs';
-export const maxDuration=180;
+export const maxDuration=1200;
 
 import{processRun}from'../../../../../lib/review-run-engine.mjs';
 import{runStoreMode}from'../../../../../lib/review-run-store.mjs';
