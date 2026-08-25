@@ -63,7 +63,7 @@ export default function StudioPage() {
     [busy, setBusy] = useState(false),
     [genBusy, setGenBusy] = useState(false),
     [progress, setProgress] = useState({ done: 0, total: 0, status: "" }),
-    [concurrency, setConcurrency] = useState(2),
+    [concurrency, setConcurrency] = useState(12),
     [err, setErr] = useState(""),
     [result, setResult] = useState(null),
     [bulkResult, setBulkResult] = useState(null),
@@ -1030,12 +1030,12 @@ export default function StudioPage() {
                           value={concurrency}
                           onChange={(e) => setConcurrency(+e.target.value)}
                         >
-                          <option value="2">2 workers</option>
-                          <option value="4">4 workers</option>
-                          <option value="6">6 workers</option>
-                          <option value="8">8 workers</option>
-                          <option value="10">10 workers</option>
                           <option value="12">12 workers</option>
+                          <option value="10">10 workers</option>
+                          <option value="8">8 workers</option>
+                          <option value="6">6 workers</option>
+                          <option value="4">4 workers</option>
+                          <option value="2">2 workers</option>
                         </select>
                       </label>
                       <button className="ghost" onClick={exportJson}>
@@ -1197,12 +1197,12 @@ export default function StudioPage() {
                 value={concurrency}
                 onChange={(e) => setConcurrency(+e.target.value)}
               >
-                <option value="2">2 workers</option>
-                <option value="4">4 workers</option>
-                <option value="6">6 workers</option>
-                <option value="8">8 workers</option>
-                <option value="10">10 workers</option>
                 <option value="12">12 workers</option>
+                <option value="10">10 workers</option>
+                <option value="8">8 workers</option>
+                <option value="6">6 workers</option>
+                <option value="4">4 workers</option>
+                <option value="2">2 workers</option>
               </select>
             </label>
           </div>
