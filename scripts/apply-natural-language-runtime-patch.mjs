@@ -65,7 +65,7 @@ const HARD_LOCAL_STYLE_WARNINGS=new Set(['template_phrase','analysis_framing','c
 const hardLocalStyleWarnings=warnings=>(Array.isArray(warnings)?warnings:[]).filter(flag=>HARD_LOCAL_STYLE_WARNINGS.has(String(flag||'').toLowerCase()));
 
 `;
-route=replaceBetween(route,'function localStyleWarnings(review,input={}){','function softenUniformCadence',localGate+'function softenUniformCadence');
+route=replaceBetween(route,'function localStyleWarnings(review,input={}){','function softenUniformCadence',localGate);
 route=route.replace('Never leave hard product-context conflicts, obvious template phrases, or analysis-style grading language in a final draft.','Never leave obvious template phrases, product-category explaining, persona leakage, or analysis-style grading language in a final draft.');
 route=route.replace('It uses placement, installation, or usage context that conflicts with the authoritative PDP. Marketplace review pages can mix product variants, so keep only source details that fit this exact product and rewrite incompatible variant details.','It uses any context that conflicts with the authoritative PDP. Marketplace review pages can mix product variants, so keep only source details that fit this exact product and rewrite incompatible variant details.');
 writeFileSync('app/api/generate/route.js',route);
