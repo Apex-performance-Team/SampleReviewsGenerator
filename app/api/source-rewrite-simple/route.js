@@ -32,7 +32,7 @@ function safeReferences(values){
       sourceAuthorName:clean(raw?.sourceAuthorName,160),
       sourceVerifiedPurchase:raw?.sourceVerifiedPurchase==null?null:Boolean(raw.sourceVerifiedPurchase),
     });
-    if(out.length>=10)break;
+    if(out.length>=250)break;
   }
   return out;
 }
@@ -72,7 +72,7 @@ function finalizeReview(item,modelRow,index){
 
 export async function POST(req){
   try{
-    const input=await req.json(),productTitle=clean(input?.productTitle,240),productDescription=clean(input?.productDescription,9000),references=safeReferences(input?.references);
+    const input=await req.json(),productTitle=clean(input?.productTitle,240),productDescription=clean(input?.productDescription,9000),allReferences=safeReferences(input?.references),offset=Math.max(0,Math.floor(Number(input?.offset)||0)),batchSize=Math.min(10,Math.max(1,Math.floor(Number(input?.batchSize)||10))),references=allReferences.slice(offset,offset+batchSize);
     if(!productTitle||!productDescription)throw Error('Product title and PDP facts are required.');
     if(!references.length)throw Error('At least one source review is required.');
     const rejected=[],accepted=[];
@@ -92,7 +92,7 @@ HARD PDP FACTS ONLY FOR CONTRADICTION CHECKING:
 ${productDescription}
 
 SOURCE REVIEWS:
-${JSON.stringify(accepted.map((x,index)=>({id:`SRC-${String(index+1).padStart(4,'0')}`,referenceId:x.referenceId,rating:x.sourceRating,title:x.sourceTitle,body:x.sourceBody,sourceReviewProductTitle:x.sourceReviewProductTitle,sourceVariantTitle:x.sourceVariantTitle})))}
+${JSON.stringify(accepted.map((x,index)=>({id:`SRC-${String(offset+index+1).padStart(4,'0')}`,referenceId:x.referenceId,rating:x.sourceRating,title:x.sourceTitle,body:x.sourceBody,sourceReviewProductTitle:x.sourceReviewProductTitle,sourceVariantTitle:x.sourceVariantTitle})))}
 
 RULES:
 - Rewrite what is there. Do not create a new story.
@@ -111,10 +111,10 @@ For every SOURCE REVIEW return exactly:
       const model=await gateway(req,prompt,115000),arr=parseArray(model.text),byRef=new Map(arr.map(x=>[clean(x?.referenceId,120),x]));
       reviews=[];
       accepted.forEach((item,index)=>{
-        try{reviews.push(finalizeReview(item,byRef.get(item.referenceId),index))}
+        try{reviews.push(finalizeReview(item,byRef.get(item.referenceId),offset+index))}
         catch(e){rejected.push({...item,rewriteStatus:'rejected',rejectReason:`rewrite_failed: ${clean(e?.message||e,260)}`})}
       });
     }
-    return Response.json({productTitle,mode:'source_rewrite_simple',inputCount:references.length,acceptedCount:accepted.length,rejectedCount:rejected.length,reviews,rejected,synthetic:true,publicationAllowed:false,datasetPurpose:'internal_qa_modeling'},{headers:{'cache-control':'no-store'}});
+    return Response.json({productTitle,mode:'source_rewrite_simple',availableCount:allReferences.length,inputCount:allReferences.length,attemptedCount:references.length,offset,batchSize,nextOffset:Math.min(allReferences.length,offset+batchSize),done:offset+batchSize>=allReferences.length,acceptedCount:accepted.length,rejectedCount:rejected.length,reviews,rejected,synthetic:true,publicationAllowed:false,datasetPurpose:'internal_qa_modeling'},{headers:{'cache-control':'no-store'}});
   }catch(error){return Response.json({error:error?.message||'Simple source rewrite failed.'},{status:500,headers:{'cache-control':'no-store'}})}
 }
