@@ -1218,6 +1218,7 @@ export default function StudioPage() {
                 : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
             </span>
           </div>
+          <AreviewsExportControls showExport={false} />
           {genBusy && (
             <div className="progressWrap">
               <div className="progressTop">

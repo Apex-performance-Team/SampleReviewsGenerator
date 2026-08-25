@@ -427,8 +427,8 @@ export default function RunsPage() {
             </span>
           </div>
           <div className="actions">
-            <a className="ghost" style={linkButton} href="/">
-              Generator
+            <a className="ghost" style={linkButton} href="/studio">
+              Studio
             </a>
             <button
               className="ghost"
@@ -752,9 +752,10 @@ export default function RunsPage() {
                           Export CSV
                         </a>
                       )}
-                      {canExport && (
-                        <AreviewsExportControls onExport={exportAreviews} />
-                      )}
+                      <AreviewsExportControls
+                        onExport={exportAreviews}
+                        disabled={!canExport}
+                      />
                     </div>
                     <div className="qaNotice" style={{ margin: 0 }}>
                       <b>Server-side behavior</b>
