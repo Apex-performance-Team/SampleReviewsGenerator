@@ -163,7 +163,7 @@ assert.match(page,/\/api\/generation-plan/);
 assert.match(page,/runQualityPipeline/);
 assert.match(bridge,/pullLimit=Math\.min\(250,needed\)/);
 assert.match(bridge,/passTarget=targetReviews/);
-assert.match(bridge,/Math\.ceil\(targetReviews\*\.03\)/);
+assert.match(bridge,/Math\.ceil\(targetReviews\*\.10\)/);
 assert.match(bridge,/currentBudgetMode/);
 assert.match(budgetControl,/dispatchEvent\(new CustomEvent\('srl-reference-budget'/);
 assert.match(page,/corpusQualitySignals/);
