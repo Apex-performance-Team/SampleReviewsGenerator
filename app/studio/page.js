@@ -5,6 +5,12 @@ import {
   syntheticReviewCsv,
   syntheticReviewFilename,
 } from "../../lib/synthetic-review-export.mjs";
+import {
+  areviewsReviewBulkCsv,
+  areviewsReviewCsv,
+  areviewsReviewFilename,
+} from "../../lib/areviews-export.mjs";
+import AreviewsExportControls from "../areviews-export-controls";
 
 const start = {
   productUrl: "",
@@ -607,6 +613,25 @@ export default function StudioPage() {
       type === "json" ? "application/json" : "text/csv;charset=utf-8",
     );
   }
+  function dlAreviews(dateRange) {
+    if (!result) return;
+    downloadData(
+      areviewsReviewCsv(result, dateRange),
+      areviewsReviewFilename(result),
+      "text/csv;charset=utf-8",
+    );
+  }
+  function dlBulkAreviews(dateRange) {
+    if (!bulkResult) return;
+    downloadData(
+      areviewsReviewBulkCsv(bulkResult, dateRange),
+      areviewsReviewFilename(
+        { productTitle: "shopify-catalog" },
+        { bulk: true },
+      ),
+      "text/csv;charset=utf-8",
+    );
+  }
   const resultQaStatus = result?.corpusDiagnostics?.qaStatus,
     resultQaComplete = completedQaStatuses.has(resultQaStatus),
     resultQaLabel =
@@ -674,6 +699,7 @@ export default function StudioPage() {
                 JSON + purge audit
               </button>
               <button onClick={() => dlBulk("csv")}>Clean CSV</button>
+              <AreviewsExportControls onExport={dlBulkAreviews} />
             </div>
           </div>
           <div className="stats">
@@ -759,6 +785,7 @@ export default function StudioPage() {
                 JSON + purge audit
               </button>
               <button onClick={() => dl("csv")}>Clean CSV</button>
+              <AreviewsExportControls onExport={dlAreviews} />
             </div>
           </div>
           <div className="stats">

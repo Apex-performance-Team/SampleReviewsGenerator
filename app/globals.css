@@ -4,3 +4,4 @@
 form .grid label:nth-child(3){display:none}
 .reviewCount input{width:92px;text-align:right;padding:8px 9px}
 .reviewCount small{color:#788593;font-size:10px;text-transform:none}
+.areviewsExport{display:flex;align-items:end;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #31553c;border-radius:10px;background:#0d1511}.areviewsExport label{margin:0;gap:4px;color:#9aa6b2;font-size:10px;white-space:nowrap}.areviewsExport input{width:142px;padding:8px 9px}.areviewsExport button{background:#dcefe2;color:#102015;white-space:nowrap}@media(max-width:760px){.areviewsExport{width:100%;align-items:stretch;flex-direction:column}.areviewsExport input{width:100%}}

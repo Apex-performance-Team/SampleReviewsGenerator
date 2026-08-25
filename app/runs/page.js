@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AreviewsExportControls from "../areviews-export-controls";
 
 const start = {
   mode: "pdp_only",
@@ -399,6 +400,13 @@ export default function RunsPage() {
     setAuto(false);
     setNotice("Live watching stopped. The server workflow is still running.");
   }
+  function exportAreviews({ startDate, endDate }) {
+    if (!selectedRun) return;
+    const query = new URLSearchParams({ startDate, endDate });
+    window.location.assign(
+      `/api/review-runs/${selectedRun.id}/areviews.csv?${query.toString()}`,
+    );
+  }
   return (
     <main>
       <header>
@@ -743,6 +751,9 @@ export default function RunsPage() {
                         >
                           Export CSV
                         </a>
+                      )}
+                      {canExport && (
+                        <AreviewsExportControls onExport={exportAreviews} />
                       )}
                     </div>
                     <div className="qaNotice" style={{ margin: 0 }}>
