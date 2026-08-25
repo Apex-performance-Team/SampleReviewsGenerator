@@ -2,6 +2,7 @@ export const runtime='nodejs';
 export const maxDuration=180;
 
 import{createRun,listRuns,runStoreMode}from'../../../lib/review-run-store.mjs';
+import{publicRunRateLimit}from'../../../lib/public-run-rate-limit.mjs';
 
 function clean(value,max=1000){return String(value||'').replace(/\s+/g,' ').trim().slice(0,max)}
 function mode(value){return value==='source_rewrite'?'source_rewrite':'pdp_only'}
@@ -18,6 +19,7 @@ export async function GET(req){
   catch(error){return Response.json({error:error.message||'Could not list runs.'},{status:500,headers:{'cache-control':'no-store'}})}
 }
 export async function POST(req){
+  const limited=publicRunRateLimit(req,{label:'review-run-create',limit:30,windowMs:15*60*1000});if(limited)return limited;
   try{const body=await req.json(),run=await createRun(inputFrom(body));return Response.json({run,store:runStoreMode()},{headers:{'cache-control':'no-store'}})}
   catch(error){return Response.json({error:error.message||'Could not create run.'},{status:400,headers:{'cache-control':'no-store'}})}
 }
