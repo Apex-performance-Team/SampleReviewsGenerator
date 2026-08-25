@@ -28,6 +28,29 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
   }
   s=replaceOnce(path,s,"const rows=j.products.map(p=>({...p,enabled:true,status:'queued'}));setProducts(rows);setMeta({...j,scanned:0,failed:0});","const defaultReviewCount=cleanReviewCount(f.reviewCount,100),rows=j.products.map(p=>({...p,enabled:true,status:'queued',reviewCount:defaultReviewCount}));setProducts(rows);setMeta({...j,scanned:0,failed:0});");
   s=replaceOnce(path,s,"function useProduct(p){if(p.status!=='done')return;setF(x=>({...x,productUrl:p.url,productTitle:p.productTitle,productDescription:p.productDescription}));form.current?.scrollIntoView({behavior:'smooth'})}","function useProduct(p){if(p.status!=='done')return;setF(x=>({...x,productUrl:p.url,productTitle:p.productTitle,productDescription:p.productDescription,reviewCount:reviewCountValue(p,x.reviewCount)}));form.current?.scrollIntoView({behavior:'smooth'})}\n  function setProductReviewCount(index,value){setProducts(a=>a.map(x=>x.index===index?{...x,reviewCount:value}:x))}",{skipIf:x=>x.includes('function setProductReviewCount(')});
+  const processServerRun=[
+    "  async function processServerRun(id,label,total,{base=0,grandTotal=total,onProgress=null}={}){",
+    "    const report=run=>{",
+    "      const next={done:Math.min(grandTotal,base+(run.completed_count||0)),total:grandTotal,status:`${label} · ${run.progress_message||statusLine(run)}`};",
+    "      if(onProgress)onProgress(run,next);else setProgress(next);",
+    "    };",
+    "    let run=await fetchRun(id);",
+    "    setActiveRun(run);report(run);",
+    "    for(let i=0;i<140;i++){",
+    "      if(run.status==='completed')return finalResultFromRun(run);",
+    "      if(run.status==='failed')throw Error(run.error||run.progress_message||'Supabase run failed.');",
+    "      const r=await fetch(`/api/review-runs/${id}/process`,{method:'POST',cache:'no-store'}),j=await r.json().catch(()=>({}));",
+    "      if(!r.ok)throw Error(j.error||'Could not process Supabase run.');",
+    "      run=j.run;setActiveRun(run);report(run);",
+    "      if(run.status==='completed')return finalResultFromRun(run);",
+    "      if(run.status==='failed')throw Error(run.error||run.progress_message||'Supabase run failed.');",
+    "      await sleep(750);",
+    "    }",
+    "    throw Error('Supabase run did not finish before the safety loop ended. Refresh /studio and resume from Recent runs.');",
+    "  }"
+  ].join('\n');
+  s=replaceRegex(path,s,/  async function processServerRun\(id,label,total,\{base=0,grandTotal=total\}=\{\}\)\{[\s\S]*?\n  \}\n  async function ensureSupabase/,processServerRun+"\n  async function ensureSupabase",{skipIf:x=>x.includes('onProgress=null')});
+  s=s.replace("setResult(final);setProgress({done:final.reviews?.length||total,total,status:(final.purgedReviewCount||0)?`Complete · ${final.purgedReviewCount} purged`:'Complete'});","setResult(final);setProgress({done:total,total,status:(final.purgedReviewCount||0)?`Complete · ${(final.reviews?.length||0).toLocaleString()}/${total.toLocaleString()} final · ${final.purgedReviewCount} purged`:'Complete'});");
   const generateStore=[
     "  async function generateStore(){",
     "    const selected=products.filter(x=>x.enabled&&x.status==='done');if(!selected.length){setErr('Select at least one successfully scanned product.');return}",
@@ -38,20 +61,29 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
     "    const total=selectedWithCounts.reduce((n,p)=>n+p.requestedReviewCount,0);",
     "    try{",
     "      await ensureSupabase();",
-    "      let finished=0;",
+    "      const productProgress={};let maxDone=0;",
+    "      const reportStoreProgress=(index,label,run,next={})=>{",
+    "        const requested=selectedWithCounts[index]?.requestedReviewCount||0,current=productProgress[index]||0,rawDone=Number(next.done??run?.completed_count??0)||0;",
+    "        productProgress[index]=Math.min(requested,Math.max(current,rawDone));",
+    "        const aggregate=Math.min(total,Object.values(productProgress).reduce((n,v)=>n+(Number(v)||0),0));",
+    "        maxDone=Math.max(maxDone,aggregate);",
+    "        setProgress({done:maxDone,total,status:`${label} · ${run?.progress_message||statusLine(run)}`});",
+    "      };",
     "      const workerCount=storeWorkerCount(concurrency,externalReferencesEnabled,selectedWithCounts.length);",
     "      setProgress({done:0,total,status:`Starting ${workerCount} concurrent product${workerCount===1?'':'s'} across ${selectedWithCounts.length} SKU${selectedWithCounts.length===1?'':'s'} / ${total.toLocaleString()} reviews…`});",
     "      const grouped=await runPool(selectedWithCounts,workerCount,async(p,pi)=>{",
     "        const perSku=p.requestedReviewCount;",
+    "        const label=`${pi+1}/${selectedWithCounts.length} · ${p.productTitle}`;",
+    "        productProgress[pi]=productProgress[pi]||0;",
     "        const input={productUrl:p.url,productTitle:p.productTitle,productDescription:p.productDescription,reviewCount:perSku,targetAverage:target,externalReferencesEnabled};",
     "        const run=await createServerRun(input);",
-    "        const final=await processServerRun(run.id,`${pi+1}/${selectedWithCounts.length} · ${p.productTitle}`,perSku,{base:finished,grandTotal:total});",
-    "        finished+=final.reviews?.length||0;",
+    "        const final=await processServerRun(run.id,label,perSku,{grandTotal:total,onProgress:(run,next)=>reportStoreProgress(pi,label,run,next)});",
+    "        reportStoreProgress(pi,label,{...run,completed_count:perSku,progress_message:`Product complete · ${(final.reviews?.length||0).toLocaleString()}/${perSku.toLocaleString()} final`},{done:perSku});",
     "        return{...final,productUrl:p.url,productTitle:p.productTitle,existingReviewCount:p.extracted?.existingReviewCount??null,requestedReviewCount:perSku,reviewCount:final.reviews?.length||0,targetAverage:target};",
     "      });",
     "      const totalReviews=grouped.reduce((n,p)=>n+(p.reviews?.length||0),0),totalPurgedReviews=grouped.reduce((n,p)=>n+(p.purgedReviewCount||0),0);",
     "      setBulkResult({runId:`SUPABASE-CATALOG-${Date.now().toString(36)}`,products:grouped,skuCount:grouped.length,generatedReviewCount:total,totalReviews,totalPurgedReviews,targetAverage:target,reviewCountPerSku:null,customReviewCounts:true,reviewCountsBySku:grouped.map(p=>({productTitle:p.productTitle,productUrl:p.productUrl,requestedReviewCount:p.requestedReviewCount})),synthetic:true,fixtureType:'synthetic_review_qa',publicationAllowed:false,datasetPurpose:'internal_qa_modeling'});",
-    "      setProgress({done:totalReviews,total,status:totalPurgedReviews?`Complete · ${totalPurgedReviews} purged`:'Complete'});",
+    "      setProgress({done:total,total,status:totalPurgedReviews?`Complete · ${totalReviews.toLocaleString()}/${total.toLocaleString()} final · ${totalPurgedReviews} purged`:'Complete'});",
     "    }catch(e){setErr(e.message||'Bulk generation failed.')}",
     "    finally{setGenBusy(false)}",
     "  }"
