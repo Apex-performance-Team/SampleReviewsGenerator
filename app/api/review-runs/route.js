@@ -2,6 +2,7 @@ export const runtime='nodejs';
 export const maxDuration=180;
 
 import{createRun,listRuns,runStoreMode}from'../../../lib/review-run-store.mjs';
+import{runAccessDenied,runAccessHeaders}from'../../../lib/review-run-auth.mjs';
 
 function clean(value,max=1000){return String(value||'').replace(/\s+/g,' ').trim().slice(0,max)}
 function mode(value){return value==='source_rewrite'?'source_rewrite':'pdp_only'}
@@ -13,11 +14,13 @@ function inputFrom(body){
   if(!productUrl&&(!productTitle||!productDescription))throw Error('Provide a product URL or product title/context.');
   return{productUrl,amazonListingUrl:clean(body.amazonListingUrl,1000),productTitle,productDescription,mode:mode(body.mode),reviewCount,targetAverage,referenceBudget:body.referenceBudget||'balanced',references:Array.isArray(body.references)?body.references:undefined};
 }
-export async function GET(){
-  try{return Response.json({runs:await listRuns(75),store:runStoreMode()},{headers:{'cache-control':'no-store'}})}
-  catch(error){return Response.json({error:error.message||'Could not list runs.'},{status:500,headers:{'cache-control':'no-store'}})}
+export async function GET(req){
+  const denied=runAccessDenied(req);if(denied)return denied;
+  try{return Response.json({runs:await listRuns(75),store:runStoreMode()},{headers:runAccessHeaders()})}
+  catch(error){return Response.json({error:error.message||'Could not list runs.'},{status:500,headers:runAccessHeaders()})}
 }
 export async function POST(req){
-  try{const body=await req.json(),run=await createRun(inputFrom(body));return Response.json({run,store:runStoreMode()},{headers:{'cache-control':'no-store'}})}
-  catch(error){return Response.json({error:error.message||'Could not create run.'},{status:400,headers:{'cache-control':'no-store'}})}
+  const denied=runAccessDenied(req);if(denied)return denied;
+  try{const body=await req.json(),run=await createRun(inputFrom(body));return Response.json({run,store:runStoreMode()},{headers:runAccessHeaders()})}
+  catch(error){return Response.json({error:error.message||'Could not create run.'},{status:400,headers:runAccessHeaders()})}
 }
