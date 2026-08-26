@@ -1,6 +1,7 @@
 'use client';
 
 import{useEffect,useRef,useState}from'react';
+import{usePathname}from'next/navigation';
 
 const EMPTY_BASELINE={vercel:null,brightData:null};
 function money(value){return Number.isFinite(Number(value))?`$${Number(value).toFixed(2)}`:'—'}
@@ -20,8 +21,8 @@ function timeLabel(value){
   try{return new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit',second:'2-digit'}).format(new Date(value))}catch{return''}
 }
 
-export default function CreditBalanceBar(){
-  const[state,setState]=useState('loading'),[data,setData]=useState(null),[accessKey,setAccessKey]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),baseline=useRef({...EMPTY_BASELINE});
+export default function CreditBalanceBar({embedded=false}){
+  const pathname=usePathname(),[state,setState]=useState('loading'),[data,setData]=useState(null),[accessKey,setAccessKey]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),baseline=useRef({...EMPTY_BASELINE});
   function rememberBaseline(value){
     if(baseline.current.vercel===null&&Number.isFinite(Number(value?.vercel?.balance)))baseline.current.vercel=Number(value.vercel.balance);
     if(baseline.current.brightData===null&&Number.isFinite(Number(value?.brightData?.balance)))baseline.current.brightData=Number(value.brightData.balance);
@@ -50,6 +51,7 @@ export default function CreditBalanceBar(){
   useEffect(()=>{refresh()},[]);
   useEffect(()=>{if(state!=='ready')return;const id=setInterval(()=>refresh({quiet:true}),60000);return()=>clearInterval(id)},[state]);
 
+  if(!embedded&&pathname?.startsWith('/studio'))return null;
   if(state==='loading')return <aside className="creditMonitor creditMonitorCompact"><b>Credit monitor</b><span>Checking access…</span></aside>;
   if(state!=='ready')return <aside className="creditMonitor creditMonitorLocked"><div><b>Credit monitor</b><span>{state==='unconfigured'?'Setup required':'Balances are locked'}</span></div>{state!=='unconfigured'&&<form onSubmit={unlock}><label htmlFor="credit-access-key">Admin access key</label><input id="credit-access-key" type="password" autoComplete="off" spellCheck="false" value={accessKey} onChange={event=>setAccessKey(event.target.value)} placeholder="Enter access key" required/><button className="ghost" disabled={busy}>{busy?'Unlocking…':'Unlock'}</button></form>}{error&&<small className="creditError">{error}</small>}</aside>;
 

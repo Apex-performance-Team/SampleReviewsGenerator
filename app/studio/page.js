@@ -11,6 +11,8 @@ import {
   areviewsReviewFilename,
 } from "../../lib/areviews-export.mjs";
 import AreviewsExportControls from "../areviews-export-controls";
+import CreditBalanceBar from "../credit-balance-bar";
+import ReferenceBudgetControl from "../reference-budget-control";
 
 const start = {
   productUrl: "",
@@ -63,32 +65,42 @@ function GenerationQueue({
   onCancel,
   onView,
   onRefresh,
+  variant = "full",
 }) {
-  const activeCount = runs.filter((run) =>
-    activeGenerationStatuses.has(run.catalog?.status),
-  ).length;
+  const activeRuns = runs.filter((run) =>
+      activeGenerationStatuses.has(run.catalog?.status),
+    ),
+    inactiveRuns = runs.filter(
+      (run) => !activeGenerationStatuses.has(run.catalog?.status),
+    ),
+    activeCount = activeRuns.length,
+    displayRuns =
+      variant === "rail" ? [...activeRuns, ...inactiveRuns.slice(0, 3)] : runs,
+    compact = variant === "rail";
   return (
-    <section className="generationQueue">
+    <section className={`generationQueue ${compact ? "queueRailPanel" : ""}`}>
       <div className="queueHead">
         <div>
-          <span>SERVER-SIDE GENERATIONS</span>
-          <h2>Generation queue</h2>
+          <span>{compact ? "ALWAYS VISIBLE" : "SERVER-SIDE GENERATIONS"}</span>
+          <h2>{compact ? "Server queue" : "Generation queue"}</h2>
           <p>
             {activeCount
               ? `${activeCount} generation${activeCount === 1 ? "" : "s"} currently in process. You can close this tab safely.`
               : "No generations are currently running. Recent generations remain available below."}
           </p>
         </div>
-        <button className="ghost" onClick={onRefresh} disabled={loading}>
-          {loading ? "Refreshing…" : "Refresh"}
-        </button>
+        {!compact && (
+          <button className="ghost" onClick={onRefresh} disabled={loading}>
+            {loading ? "Refreshing…" : "Refresh"}
+          </button>
+        )}
       </div>
       {error && <div className="queueError">{error}</div>}
-      {!runs.length && !loading ? (
+      {!displayRuns.length && !loading ? (
         <div className="emptyQueue">No server generations yet.</div>
       ) : (
         <div className="generationJobs">
-          {runs.map((run) => {
+          {displayRuns.map((run) => {
             const catalog = run.catalog || {},
               progress = run.progress || {},
               active = activeGenerationStatuses.has(catalog.status),
@@ -136,7 +148,7 @@ function GenerationQueue({
                 <div className="jobActions">
                   {catalog.status === "completed" && (
                     <button className="ghost" onClick={() => onView(run)}>
-                      View generated reviews
+                      {compact ? "View" : "View generated reviews"}
                     </button>
                   )}
                   {active && (
@@ -147,7 +159,9 @@ function GenerationQueue({
                     >
                       {cancelingId === catalog.id
                         ? "Canceling…"
-                        : "Cancel whole generation"}
+                        : compact
+                          ? "Cancel"
+                          : "Cancel whole generation"}
                     </button>
                   )}
                 </div>
@@ -181,7 +195,9 @@ export default function StudioPage() {
     [catalogRuns, setCatalogRuns] = useState([]),
     [queueLoading, setQueueLoading] = useState(true),
     [queueError, setQueueError] = useState(""),
-    [cancelingId, setCancelingId] = useState("");
+    [cancelingId, setCancelingId] = useState(""),
+    [screen, setScreen] = useState("generate"),
+    [resultsPage, setResultsPage] = useState(1);
   const form = useRef(null);
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
   const setExternalReferencesEnabled = (v) => {
@@ -222,7 +238,7 @@ export default function StudioPage() {
   }, []);
   const refreshCatalogRuns = useCallback(async () => {
     try {
-      const response = await fetch("/api/store-review-workflows?limit=20", {
+      const response = await fetch("/api/store-review-workflows?limit=30", {
           cache: "no-store",
         }),
         data = await response.json().catch(() => ({}));
@@ -451,6 +467,7 @@ export default function StudioPage() {
         "Generation accepted by the server. It is now visible in the queue.",
     });
     await refreshCatalogRuns().catch(() => {});
+    setScreen("queue");
     return accepted;
   }
   async function cancelCatalogGeneration(run) {
@@ -500,6 +517,7 @@ export default function StudioPage() {
         setBulkResult(null);
         setResult(data.result?.products?.[0] || null);
       }
+      setScreen("results");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       setQueueError(error.message || "Could not load generated reviews.");
@@ -716,7 +734,27 @@ export default function StudioPage() {
       "text/csv;charset=utf-8",
     );
   }
-  const generationQueue = (
+  const activeRuns = catalogRuns.filter((run) =>
+      activeGenerationStatuses.has(run.catalog?.status),
+    ),
+    queuedRuns = catalogRuns.filter((run) => run.catalog?.status === "queued"),
+    completedRuns = catalogRuns.filter(
+      (run) => run.catalog?.status === "completed",
+    ),
+    failedOrCanceledRuns = catalogRuns.filter((run) =>
+      ["failed", "canceled"].includes(run.catalog?.status),
+    ),
+    resultsPageSize = 10,
+    totalResultPages = Math.max(
+      1,
+      Math.ceil(completedRuns.length / resultsPageSize),
+    ),
+    safeResultsPage = Math.min(resultsPage, totalResultPages),
+    pagedCompletedRuns = completedRuns.slice(
+      (safeResultsPage - 1) * resultsPageSize,
+      safeResultsPage * resultsPageSize,
+    ),
+    generationQueue = (
       <GenerationQueue
         runs={catalogRuns}
         loading={queueLoading}
@@ -728,6 +766,21 @@ export default function StudioPage() {
           setQueueLoading(true);
           refreshCatalogRuns().catch(() => {});
         }}
+      />
+    ),
+    queueRail = (
+      <GenerationQueue
+        runs={catalogRuns}
+        loading={queueLoading}
+        error={queueError}
+        cancelingId={cancelingId}
+        onCancel={cancelCatalogGeneration}
+        onView={viewCatalogResult}
+        onRefresh={() => {
+          setQueueLoading(true);
+          refreshCatalogRuns().catch(() => {});
+        }}
+        variant="rail"
       />
     ),
     resultQaStatus = result?.corpusDiagnostics?.qaStatus,
@@ -765,401 +818,448 @@ export default function StudioPage() {
         (product) =>
           !completedQaStatuses.has(product?.corpusDiagnostics?.qaStatus),
       ),
-    );
+    ),
+    bulkPreviewReviews = (bulkResult?.products || [])
+      .flatMap((product) =>
+        (product.reviews || []).slice(0, 2).map((review) => ({
+          ...review,
+          productTitle: product.productTitle,
+        })),
+      )
+      .slice(0, 8),
+    resultPreviewReviews = result ? (result.reviews || []).slice(0, 12) : [],
+    loadedResultLabel = bulkResult
+      ? `${bulkResult.skuCount} SKU batch`
+      : result
+        ? result.input?.productTitle || "Single product"
+        : "No batch loaded",
+    healthLabel = health.loading
+      ? "Checking…"
+      : health.ok && storageReady
+        ? `Connected · ${health.model} · durable server workflows active`
+        : !storageReady
+          ? `Supabase inactive · current store: ${store}`
+          : `Unavailable · ${health.error || "unknown error"}`,
+    navItems = [
+      ["generate", "Generate", "Scan + configure"],
+      ["queue", "Queue", `${activeRuns.length} active`],
+      ["results", "Results", `${completedRuns.length} completed`],
+      ["settings", "Settings", "Exports + sourcing"],
+    ];
 
-  if (bulkResult)
-    return (
-      <main>
-        <header>
-          <b>SR</b>
-          <span>Synthetic Review Lab</span>
-        </header>
-        <section className="wrap">
-          <div className="resultHead">
-            <div>
-              <small>
-                {bulkNeedsReview
-                  ? "BULK QA DATASET NEEDS REVIEW"
-                  : "BULK QA DATASET COMPLETE"}
-              </small>
-              <h1>{bulkResult.skuCount} SKUs generated in parallel</h1>
-              <p>
-                {bulkResult.totalReviews.toLocaleString()} final synthetic
-                fixtures · {bulkResult.totalPurgedReviews.toLocaleString()}{" "}
-                purged
-              </p>
-            </div>
-            <div className="actions">
-              <button className="ghost" onClick={() => setBulkResult(null)}>
-                Back to catalog
-              </button>
-              <button className="ghost" onClick={() => dlBulk("json")}>
-                JSON + purge audit
-              </button>
-              <button onClick={() => dlBulk("csv")}>Clean CSV</button>
-              <AreviewsExportControls onExport={dlBulkAreviews} />
-            </div>
-          </div>
-          {generationQueue}
-          <div className="stats">
-            <article>
-              <span>SKUs</span>
-              <strong>{bulkResult.skuCount}</strong>
-            </article>
-            <article>
-              <span>Requested</span>
-              <strong>
-                {bulkResult.generatedReviewCount.toLocaleString()}
-              </strong>
-            </article>
-            <article>
-              <span>Final fixtures</span>
-              <strong>{bulkResult.totalReviews.toLocaleString()}</strong>
-            </article>
-            <article>
-              <span>Purged</span>
-              <strong>{bulkResult.totalPurgedReviews.toLocaleString()}</strong>
-            </article>
-            <article>
-              <span>Reference-led</span>
-              <strong>{bulkReferenceLed.toLocaleString()}</strong>
-            </article>
-            <article>
-              <span>PDP-only</span>
-              <strong>{bulkPdpOnly.toLocaleString()}</strong>
-            </article>
-          </div>
-          <div className="bulkGrid">
-            {bulkResult.products.map((p) => (
-              <article key={p.productUrl}>
-                <div>
-                  <b>{p.productTitle}</b>
-                  <span>
-                    {p.reviews.length} final · {p.purgedReviewCount || 0} purged
-                  </span>
-                </div>
-                <small>{p.productUrl}</small>
-                <footer>
-                  {formatAverage(p.actualAverage)}★ actual · existing count{" "}
-                  {p.existingReviewCount ?? "unavailable"} · refs{" "}
-                  {Number(
-                    p.referenceCoverage?.referenceLedTotal || 0,
-                  ).toLocaleString()}
-                  /{p.reviews.length.toLocaleString()} · QA{" "}
-                  {p.corpusDiagnostics?.qaStatus || "unknown"}
-                </footer>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-    );
-  if (result)
-    return (
-      <main>
-        <header>
-          <b>SR</b>
-          <span>Synthetic Review Lab</span>
-        </header>
-        <section className="wrap">
-          <div className="resultHead">
-            <div>
-              <small>
-                {resultQaComplete
-                  ? "QA DATASET COMPLETE"
-                  : "QA DATASET NEEDS REVIEW"}
-              </small>
-              <h1>{result.input?.productTitle}</h1>
-              <p>
-                {result.reviews.length} final synthetic fixtures ·{" "}
-                {result.purgedReviewCount || 0} purged ·{" "}
-                {formatAverage(result.actualAverage)}★ actual
-              </p>
-            </div>
-            <div className="actions">
-              <button className="ghost" onClick={() => setResult(null)}>
-                New experiment
-              </button>
-              <button className="ghost" onClick={() => dl("json")}>
-                JSON + purge audit
-              </button>
-              <button onClick={() => dl("csv")}>Clean CSV</button>
-              <AreviewsExportControls onExport={dlAreviews} />
-            </div>
-          </div>
-          {generationQueue}
-          <div className="stats">
-            <article>
-              <span>Requested</span>
-              <strong>{result.input?.reviewCount}</strong>
-            </article>
-            <article>
-              <span>Final fixtures</span>
-              <strong>{result.reviews.length}</strong>
-            </article>
-            <article>
-              <span>Purged</span>
-              <strong>{result.purgedReviewCount || 0}</strong>
-            </article>
-            <article>
-              <span>Average</span>
-              <strong>{formatAverage(result.actualAverage)}★</strong>
-            </article>
-            <article>
-              <span>Reference-led</span>
-              <strong>{resultReferenceLed.toLocaleString()}</strong>
-              <small>
-                {resultReferenceAvailable.toLocaleString()} imported usable
-                references
-              </small>
-            </article>
-            <article>
-              <span>PDP-only</span>
-              <strong>{resultPdpOnly.toLocaleString()}</strong>
-              <small>product details only</small>
-            </article>
-            <article>
-              <span>Model</span>
-              <strong>AI</strong>
-              <small>{result.model}</small>
-            </article>
-            <article>
-              <span>Unique bodies</span>
-              <strong>{result.diagnostics?.uniqueBodies ?? "—"}</strong>
-            </article>
-            <article>
-              <span>Unique titles</span>
-              <strong>{result.diagnostics?.uniqueTitles ?? "—"}</strong>
-            </article>
-            <article>
-              <span>Persona profiles</span>
-              <strong>
-                {result.diagnostics?.uniquePersonaProfiles ?? "—"}
-              </strong>
-            </article>
-            <article>
-              <span>Corpus QA</span>
-              <strong>{resultQaLabel}</strong>
-              <small>{resultQaDetail}</small>
-            </article>
-            <article>
-              <span>Generation calls</span>
-              <strong>
-                {result.generationCallBudget?.aiCallsAttempted ?? "—"}
-              </strong>
-              <small>
-                hard cap {result.generationCallBudget?.capped ?? "—"} ·
-                references separate
-              </small>
-            </article>
-          </div>
-          <div className="reviews">
-            {result.reviews.map((x) => (
-              <article key={x.id}>
-                <div>
-                  <span>
-                    {"★".repeat(Number(x.rating) || 0)}
-                    {"☆".repeat(5 - (Number(x.rating) || 0))}
-                  </span>
-                  <small>
-                    {x.referenceLed
-                      ? "SYNTHETIC · REFERENCE-LED"
-                      : "SYNTHETIC · PDP-ONLY"}
-                  </small>
-                  <time>{x.date}</time>
-                </div>
-                <h3>{x.title}</h3>
-                <p>{x.body}</p>
-                <footer>
-                  {x.personaId} · {x.persona}
-                  {x.referenceLed
-                    ? ` · ${x.referencePlatform || "external reference"}`
-                    : ""}
-                </footer>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-    );
   return (
-    <main>
-      <header>
-        <b>SR</b>
-        <span>Synthetic Review Lab</span>
-        <i>QA / modeling</i>
-      </header>
-      <section className="wrap">
-        <div className={`health ${health.ok && storageReady ? "good" : "bad"}`}>
+    <main className="studioShell">
+      <header className="studioTopbar">
+        <div className="studioBrand">
+          <b>SR</b>
           <div>
-            <b>AI Gateway + Supabase</b>
-            <span>
-              {health.loading
-                ? "Checking…"
-                : health.ok && storageReady
-                  ? `Connected · ${health.model} · durable server workflows active`
-                  : !storageReady
-                    ? `Supabase inactive · current store: ${store}`
-                    : `Unavailable · ${health.error || "unknown error"}`}
-            </span>
+            <span>Synthetic Review Lab</span>
+            <small>Review operations</small>
           </div>
-          <button
-            className="ghost"
-            onClick={() => {
-              healthCheck();
-              refreshStore().catch((e) => setErr(e.message));
-            }}
-          >
-            Recheck
-          </button>
         </div>
-        <div className="qaNotice">
-          <b>Internal synthetic QA fixtures only.</b>
-          <span>
-            Not genuine customer feedback. Exports are permanently tagged
-            synthetic and publication_allowed=false.
-          </span>
+        <div className={`studioConnection ${health.ok && storageReady ? "good" : "bad"}`}>
+          <span />
+          {healthLabel}
         </div>
-        {generationQueue}
-        <div className="hero">
-          <div>
-            <small>SYNTHETIC QA / MODELING DATA ONLY</small>
-            <h1>Build the synthetic review fixtures you want to test.</h1>
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => {
+            healthCheck();
+            refreshStore().catch((e) => setErr(e.message));
+            setQueueLoading(true);
+            refreshCatalogRuns().catch(() => {});
+          }}
+        >
+          Recheck
+        </button>
+      </header>
+
+      <section className="studioLayout">
+        <aside className="studioNav">
+          <div className="studioNavIntro">
+            <small>WORKFLOW</small>
+            <h1>Review ops</h1>
             <p>
-              Scan one product or a whole Shopify catalog. AI keeps only
-              consumer-relevant PDP context for synthetic UI, search,
-              summarization, moderation, and rating tests.
+              Prepare batches, monitor server jobs, and export completed review
+              sets from one workspace.
             </p>
           </div>
-          <aside>
-            <span>Example target</span>
-            <strong>4.70★</strong>
-            <em>100 synthetic fixtures</em>
-          </aside>
-        </div>
-        <section className="panel">
-          <div className="scannerHead">
-            <h2>Scan product content</h2>
-            <div className="tabs">
+          <nav>
+            {navItems.map(([id, label, detail]) => (
               <button
-                className={mode === "product" ? "active" : ""}
-                onClick={() => setMode("product")}
+                type="button"
+                key={id}
+                className={screen === id ? "active" : ""}
+                onClick={() => setScreen(id)}
               >
-                Single product
+                <span>{label}</span>
+                <small>{detail}</small>
               </button>
-              <button
-                className={mode === "store" ? "active" : ""}
-                onClick={() => setMode("store")}
-              >
-                Whole Shopify store
-              </button>
-            </div>
+            ))}
+          </nav>
+          <div className="studioNavSummary">
+            <span>Loaded result</span>
+            <strong>{loadedResultLabel}</strong>
+            <small>
+              {selectedStoreProducts.length
+                ? `${selectedStoreProducts.length} scanned SKUs selected`
+                : f.productTitle
+                  ? "Single product ready"
+                  : "Nothing selected yet"}
+            </small>
           </div>
-          <div className="scannerBody">
-            {mode === "product" ? (
-              <>
-                <label>
-                  Product URL
-                  <div className="row">
-                    <input
-                      value={f.productUrl}
-                      onChange={(e) => set("productUrl", e.target.value)}
-                      placeholder="https://store.com/products/product"
-                    />
-                    <button onClick={() => scanOne()} disabled={busy}>
-                      {busy ? "Scanning…" : "Scan product"}
+        </aside>
+
+        <section className="studioWorkspace">
+          {screen === "generate" && (
+            <div className="screenStack">
+              <div className="studioHero">
+                <div>
+                  <small>SYNTHETIC QA / MODELING DATA ONLY</small>
+                  <h2>Prepare a batch</h2>
+                  <p>
+                    Scan one product or a catalog, confirm the output settings,
+                    then queue the work server-side.
+                  </p>
+                </div>
+                <aside>
+                  <span>Default run</span>
+                  <strong>{concurrency} workers</strong>
+                  <em>{f.targetAverage}★ target average</em>
+                </aside>
+              </div>
+
+              <div className="qaNotice">
+                <b>Internal synthetic QA fixtures only.</b>
+                <span>
+                  Not genuine customer feedback. Exports are permanently tagged
+                  synthetic and publication_allowed=false.
+                </span>
+              </div>
+
+              <section className="panel studioCard">
+                <div className="scannerHead">
+                  <div>
+                    <small>SOURCE</small>
+                    <h2>Product input</h2>
+                  </div>
+                  <div className="tabs">
+                    <button
+                      type="button"
+                      className={mode === "product" ? "active" : ""}
+                      onClick={() => setMode("product")}
+                    >
+                      Single product
+                    </button>
+                    <button
+                      type="button"
+                      className={mode === "store" ? "active" : ""}
+                      onClick={() => setMode("store")}
+                    >
+                      Whole Shopify store
                     </button>
                   </div>
-                </label>
-                <label>
-                  Verified Amazon starting source <small>(optional)</small>
-                  <div className="row">
-                    <input
-                      value={f.amazonListingUrl}
-                      onChange={(e) => set("amazonListingUrl", e.target.value)}
-                      placeholder="https://www.amazon.com/dp/ASIN"
-                    />
-                  </div>
-                  <small>
-                    Use a verified listing as the first trusted source. Lens
-                    still runs from the Shopify product and searches for
-                    additional matching sources. The selected reference budget
-                    caps marketplace review pulls at 20 reviews in Test or 200
-                    in Balanced/Thorough.
-                  </small>
-                </label>
-              </>
-            ) : (
-              <>
-                <label>
-                  Shopify store URL
-                  <div className="row">
-                    <input
-                      value={storeUrl}
-                      onChange={(e) => setStoreUrl(e.target.value)}
-                      placeholder="instabeamtv.com"
-                    />
-                    <button onClick={scanStore} disabled={busy}>
-                      {busy ? "Scanning…" : "Scan whole store"}
-                    </button>
-                  </div>
-                </label>
-                {meta && (
-                  <div className="summary">
-                    <div>
-                      <b>{meta.productCount} products</b>
-                      <span>
-                        {meta.scanned || 0} scanned · {meta.failed || 0} failed
-                        · {enabled} included
-                      </span>
-                    </div>
-                    <div className="actions">
-                      <span>All</span>
-                      <button
-                        className={`switch ${allOn ? "on" : ""}`}
-                        onClick={() => all(!allOn)}
-                      />
-                      <input
-                        className="search"
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        placeholder="Search products, handles, URLs…"
-                      />
-                      <label className="workers">
-                        Concurrent products
-                        <select
-                          value={concurrency}
-                          onChange={(e) => setConcurrency(+e.target.value)}
-                        >
-                          <option value="12">12 workers</option>
-                          <option value="10">10 workers</option>
-                          <option value="8">8 workers</option>
-                          <option value="6">6 workers</option>
-                          <option value="4">4 workers</option>
-                          <option value="2">2 workers</option>
-                        </select>
+                </div>
+                <div className="scannerBody">
+                  {mode === "product" ? (
+                    <>
+                      <label>
+                        Product URL
+                        <div className="row">
+                          <input
+                            value={f.productUrl}
+                            onChange={(e) => set("productUrl", e.target.value)}
+                            placeholder="https://store.com/products/product"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => scanOne()}
+                            disabled={busy}
+                          >
+                            {busy ? "Scanning…" : "Scan product"}
+                          </button>
+                        </div>
                       </label>
-                      <button className="ghost" onClick={exportJson}>
-                        Export included JSON
-                      </button>
-                      <button
-                        onClick={generateStore}
-                        disabled={
-                          genBusy ||
-                          !storageReady ||
-                          !products.some(
-                            (x) => x.enabled && x.status === "done",
-                          )
-                        }
-                      >
-                        {genBusy
-                          ? "Generating…"
-                          : `Generate ${selectedStoreProducts.length} SKUs / ${storeRequestedTotal.toLocaleString()} reviews →`}
-                      </button>
-                    </div>
+                      <label>
+                        Verified Amazon starting source <small>(optional)</small>
+                        <div className="row">
+                          <input
+                            value={f.amazonListingUrl}
+                            onChange={(e) =>
+                              set("amazonListingUrl", e.target.value)
+                            }
+                            placeholder="https://www.amazon.com/dp/ASIN"
+                          />
+                        </div>
+                        <small>
+                          Use a verified listing as the first trusted source.
+                          Lens still runs from the Shopify product and searches
+                          for additional matching sources.
+                        </small>
+                      </label>
+                    </>
+                  ) : (
+                    <>
+                      <label>
+                        Shopify store URL
+                        <div className="row">
+                          <input
+                            value={storeUrl}
+                            onChange={(e) => setStoreUrl(e.target.value)}
+                            placeholder="instabeamtv.com"
+                          />
+                          <button
+                            type="button"
+                            onClick={scanStore}
+                            disabled={busy}
+                          >
+                            {busy ? "Scanning…" : "Scan whole store"}
+                          </button>
+                        </div>
+                      </label>
+                      {meta && (
+                        <div className="summary">
+                          <div>
+                            <b>{meta.productCount} products</b>
+                            <span>
+                              {meta.scanned || 0} scanned · {meta.failed || 0}{" "}
+                              failed · {enabled} included
+                            </span>
+                          </div>
+                          <div className="actions">
+                            <span>All</span>
+                            <button
+                              type="button"
+                              className={`switch ${allOn ? "on" : ""}`}
+                              onClick={() => all(!allOn)}
+                            />
+                            <input
+                              className="search"
+                              value={filter}
+                              onChange={(e) => setFilter(e.target.value)}
+                              placeholder="Search products, handles, URLs…"
+                            />
+                            <label className="workers">
+                              Concurrent products
+                              <select
+                                value={concurrency}
+                                onChange={(e) => setConcurrency(+e.target.value)}
+                              >
+                                <option value="12">12 workers</option>
+                                <option value="10">10 workers</option>
+                                <option value="8">8 workers</option>
+                                <option value="6">6 workers</option>
+                                <option value="4">4 workers</option>
+                                <option value="2">2 workers</option>
+                              </select>
+                            </label>
+                            <button
+                              type="button"
+                              className="ghost"
+                              onClick={exportJson}
+                            >
+                              Export included JSON
+                            </button>
+                            <button
+                              type="button"
+                              onClick={generateStore}
+                              disabled={
+                                genBusy ||
+                                !storageReady ||
+                                !products.some(
+                                  (x) => x.enabled && x.status === "done",
+                                )
+                              }
+                            >
+                              {genBusy
+                                ? "Starting…"
+                                : `Queue ${selectedStoreProducts.length} SKUs / ${storeRequestedTotal.toLocaleString()} reviews →`}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {mode === "store" && genBusy && (
+                        <div className="progressWrap">
+                          <div className="progressTop">
+                            <span>{progress.status}</span>
+                            <b>
+                              {progress.total
+                                ? Math.round(
+                                    (progress.done / progress.total) * 100,
+                                  )
+                                : 0}
+                              %
+                            </b>
+                          </div>
+                          <div className="bar">
+                            <span
+                              style={{
+                                width: `${progress.total ? Math.max(2, (progress.done / progress.total) * 100) : 2}%`,
+                              }}
+                            />
+                          </div>
+                          <small>
+                            Durable server workflow continues if this tab closes.
+                          </small>
+                        </div>
+                      )}
+                      {products.length > 0 && (
+                        <div className="catalog">
+                          {shown.map((p) => (
+                            <div
+                              className={`item ${p.status} ${p.enabled ? "" : "off"}`}
+                              key={p.index}
+                            >
+                              <button
+                                type="button"
+                                className={`switch ${p.enabled ? "on" : ""}`}
+                                onClick={() => toggle(p.index)}
+                              />
+                              <span className="dot" />
+                              <div>
+                                <div className="titleLine">
+                                  <b>{p.productTitle || p.title}</b>
+                                  <span className="badge">{p.status}</span>
+                                </div>
+                                <a href={p.url} target="_blank" rel="noreferrer">
+                                  {p.url}
+                                </a>
+                                {p.status === "done" && (
+                                  <small>
+                                    AI kept {p.extracted.lines}/
+                                    {p.extracted.candidateLines} QA-useful lines
+                                  </small>
+                                )}
+                                {p.error && <small>{p.error}</small>}
+                              </div>
+                              <div
+                                className={`reviewCount ${p.status === "done" && p.extracted?.existingReviewCount != null ? "known" : ""}`}
+                              >
+                                <span>Generate reviews</span>
+                                <input
+                                  type="number"
+                                  min="5"
+                                  max="250"
+                                  value={reviewCountValue(p, f.reviewCount)}
+                                  onChange={(e) =>
+                                    setProductReviewCount(
+                                      p.index,
+                                      e.target.value,
+                                    )
+                                  }
+                                  disabled={busy || genBusy}
+                                />
+                                <small>
+                                  Live:{" "}
+                                  {p.status === "done"
+                                    ? p.extracted?.existingReviewCount == null
+                                      ? "Unavailable"
+                                      : p.extracted.existingReviewCount.toLocaleString()
+                                    : p.status === "scanning"
+                                      ? "Checking…"
+                                      : "—"}
+                                </small>
+                              </div>
+                              <div>
+                                {p.status === "done" && (
+                                  <button
+                                    type="button"
+                                    onClick={() => useProduct(p)}
+                                  >
+                                    Use product →
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </section>
+
+              <form ref={form} onSubmit={generate} className="generationForm">
+                <div className="formHead">
+                  <div>
+                    <small>OUTPUT</small>
+                    <h2>Batch settings</h2>
                   </div>
-                )}
-                {mode === "store" && genBusy && (
+                  <span>
+                    {mode === "store"
+                      ? "Bulk uses the selected SKUs above."
+                      : "Single product creates one server job."}
+                  </span>
+                </div>
+                <label>
+                  Product title
+                  <input
+                    value={f.productTitle}
+                    onChange={(e) => set("productTitle", e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Consumer-relevant QA context
+                  <textarea
+                    rows="12"
+                    value={f.productDescription}
+                    onChange={(e) => set("productDescription", e.target.value)}
+                    required
+                  />
+                </label>
+                <div className="grid">
+                  <label>
+                    Fixture count
+                    <input
+                      type="number"
+                      min="5"
+                      max="250"
+                      value={f.reviewCount}
+                      onChange={(e) => set("reviewCount", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Test rating average
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      step=".1"
+                      value={f.targetAverage}
+                      onChange={(e) => set("targetAverage", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Parallel AI
+                    <select
+                      value={concurrency}
+                      onChange={(e) => setConcurrency(+e.target.value)}
+                    >
+                      <option value="12">12 workers</option>
+                      <option value="10">10 workers</option>
+                      <option value="8">8 workers</option>
+                      <option value="6">6 workers</option>
+                      <option value="4">4 workers</option>
+                      <option value="2">2 workers</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="generationBudget">
+                  <b>
+                    {externalReferencesEnabled
+                      ? "Output mode: Lens/Amazon simple rewrite"
+                      : "Output mode: PDP-only generator"}
+                  </b>
+                  <span>
+                    {externalReferencesEnabled
+                      ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
+                      : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
+                  </span>
+                </div>
+                <AreviewsExportControls showExport={false} />
+                {genBusy && mode === "product" && (
                   <div className="progressWrap">
                     <div className="progressTop">
                       <span>{progress.status}</span>
@@ -1178,195 +1278,500 @@ export default function StudioPage() {
                       />
                     </div>
                     <small>
-                      Durable server workflow continues if this tab closes;
-                      Supabase stores every checkpoint and the final export.
+                      Starting one durable server workflow. It will remain
+                      visible in the generation queue after acceptance.
                     </small>
                   </div>
                 )}
-                {products.length > 0 && (
-                  <div className="catalog">
-                    {shown.map((p) => (
-                      <div
-                        className={`item ${p.status} ${p.enabled ? "" : "off"}`}
-                        key={p.index}
-                      >
-                        <button
-                          className={`switch ${p.enabled ? "on" : ""}`}
-                          onClick={() => toggle(p.index)}
-                        />
-                        <span className="dot" />
-                        <div>
-                          <div className="titleLine">
-                            <b>{p.productTitle || p.title}</b>
-                            <span className="badge">{p.status}</span>
-                          </div>
-                          <a href={p.url} target="_blank" rel="noreferrer">
-                            {p.url}
-                          </a>
-                          {p.status === "done" && (
-                            <small>
-                              AI kept {p.extracted.lines}/
-                              {p.extracted.candidateLines} QA-useful lines
-                            </small>
-                          )}
-                          {p.error && <small>{p.error}</small>}
-                        </div>
-                        <div
-                          className={`reviewCount ${p.status === "done" && p.extracted?.existingReviewCount != null ? "known" : ""}`}
-                        >
-                          <span>Generate reviews</span>
-                          <input
-                            type="number"
-                            min="5"
-                            max="250"
-                            value={reviewCountValue(p, f.reviewCount)}
-                            onChange={(e) =>
-                              setProductReviewCount(p.index, e.target.value)
-                            }
-                            disabled={busy || genBusy}
-                          />
-                          <small>
-                            Live:{" "}
-                            {p.status === "done"
-                              ? p.extracted?.existingReviewCount == null
-                                ? "Unavailable"
-                                : p.extracted.existingReviewCount.toLocaleString()
-                              : p.status === "scanning"
-                                ? "Checking…"
-                                : "—"}
-                          </small>
-                        </div>
-                        <div>
-                          {p.status === "done" && (
-                            <button onClick={() => useProduct(p)}>
-                              Use product →
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                {err && <div className="error">{err}</div>}
+                <div className="formActions">
+                  <button
+                    className="primary"
+                    disabled={
+                      mode !== "product" ||
+                      genBusy ||
+                      health.ok === false ||
+                      !storageReady
+                    }
+                  >
+                    {genBusy && mode === "product"
+                      ? "Starting…"
+                      : externalReferencesEnabled
+                        ? "Queue single source rewrite →"
+                        : "Queue single PDP-only run →"}
+                  </button>
+                </div>
+                {!storageReady && (
+                  <div className="qaNotice">
+                    <b>Supabase required for /studio.</b>
+                    <span>
+                      Current production store is {store}. Set Vercel env vars
+                      SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then redeploy.
+                    </span>
                   </div>
                 )}
-              </>
-            )}
-          </div>
-        </section>
-        <form ref={form} onSubmit={generate}>
-          <h2>Synthetic fixture generation</h2>
-          <label>
-            Product title
-            <input
-              value={f.productTitle}
-              onChange={(e) => set("productTitle", e.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Consumer-relevant QA context
-            <textarea
-              rows="12"
-              value={f.productDescription}
-              onChange={(e) => set("productDescription", e.target.value)}
-              required
-            />
-          </label>
-          <div className="grid">
-            <label>
-              Fixture count
-              <input
-                type="number"
-                min="5"
-                max="250"
-                value={f.reviewCount}
-                onChange={(e) => set("reviewCount", e.target.value)}
-              />
-            </label>
-            <label>
-              Test rating average
-              <input
-                type="number"
-                min="1"
-                max="5"
-                step=".1"
-                value={f.targetAverage}
-                onChange={(e) => set("targetAverage", e.target.value)}
-              />
-            </label>
-            <label>
-              Parallel AI
-              <select
-                value={concurrency}
-                onChange={(e) => setConcurrency(+e.target.value)}
-              >
-                <option value="12">12 workers</option>
-                <option value="10">10 workers</option>
-                <option value="8">8 workers</option>
-                <option value="6">6 workers</option>
-                <option value="4">4 workers</option>
-                <option value="2">2 workers</option>
-              </select>
-            </label>
-          </div>
-          <div className="generationBudget">
-            <b>
-              {externalReferencesEnabled
-                ? "Output mode: Lens/Amazon simple rewrite"
-                : "Output mode: PDP-only generator"}
-            </b>
-            <span>
-              {externalReferencesEnabled
-                ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
-                : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
-            </span>
-          </div>
-          <AreviewsExportControls showExport={false} />
-          {genBusy && (
-            <div className="progressWrap">
-              <div className="progressTop">
-                <span>{progress.status}</span>
-                <b>
-                  {progress.total
-                    ? Math.round((progress.done / progress.total) * 100)
-                    : 0}
-                  %
-                </b>
+              </form>
+            </div>
+          )}
+
+          {screen === "queue" && (
+            <div className="screenStack">
+              <div className="studioPageHead">
+                <div>
+                  <small>SERVER OPERATIONS</small>
+                  <h2>Server queue</h2>
+                  <p>
+                    Track active jobs, cancel full generations, and open
+                    completed batches into Results.
+                  </p>
+                </div>
               </div>
-              <div className="bar">
-                <span
-                  style={{
-                    width: `${progress.total ? Math.max(2, (progress.done / progress.total) * 100) : 2}%`,
+              <div className="studioStats">
+                <article>
+                  <span>Active</span>
+                  <strong>{activeRuns.length}</strong>
+                </article>
+                <article>
+                  <span>Queued</span>
+                  <strong>{queuedRuns.length}</strong>
+                </article>
+                <article>
+                  <span>Completed</span>
+                  <strong>{completedRuns.length}</strong>
+                </article>
+                <article>
+                  <span>Stopped / failed</span>
+                  <strong>{failedOrCanceledRuns.length}</strong>
+                </article>
+              </div>
+              {generationQueue}
+            </div>
+          )}
+
+          {screen === "results" && (
+            <div className="screenStack">
+              <div className="studioPageHead">
+                <div>
+                  <small>RESULTS ARCHIVE</small>
+                  <h2>Batch archive</h2>
+                  <p>
+                    Latest 30 completed server batches, paged 10 at a time.
+                    Open any batch to preview and export.
+                  </p>
+                </div>
+              </div>
+
+              <section className="studioCard archiveCard">
+                <div className="cardHead">
+                  <div>
+                    <small>COMPLETED SERVER BATCHES</small>
+                    <h3>Batch archive</h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => {
+                      setQueueLoading(true);
+                      refreshCatalogRuns().catch(() => {});
+                    }}
+                    disabled={queueLoading}
+                  >
+                    {queueLoading ? "Refreshing…" : "Refresh"}
+                  </button>
+                </div>
+                {!completedRuns.length ? (
+                  <div className="emptyQueue">
+                    No completed server batches yet. Start a generation, then
+                    it will appear here when finished.
+                  </div>
+                ) : (
+                  <>
+                    <div className="archiveList">
+                      {pagedCompletedRuns.map((run) => {
+                        const catalog = run.catalog || {},
+                          progress = run.progress || {},
+                          label = catalog.bulk
+                            ? `${progress.totalSkus || 0} SKU catalog`
+                            : catalog.productTitle ||
+                              run.children?.[0]?.productTitle ||
+                              "Single product generation";
+                        return (
+                          <article key={catalog.id} className="archiveRow">
+                            <div>
+                              <span className="jobStatus">{catalog.status}</span>
+                              <h4>{label}</h4>
+                              <small>
+                                {generationTime(catalog.createdAt)} ET ·{" "}
+                                {(progress.total || 0).toLocaleString()} reviews
+                              </small>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => viewCatalogResult(run)}
+                            >
+                              Open
+                            </button>
+                          </article>
+                        );
+                      })}
+                    </div>
+                    <div className="paginationControls">
+                      <button
+                        type="button"
+                        className="ghost"
+                        disabled={safeResultsPage <= 1}
+                        onClick={() =>
+                          setResultsPage((page) => Math.max(1, page - 1))
+                        }
+                      >
+                        Previous
+                      </button>
+                      <span>
+                        Page {safeResultsPage} of {totalResultPages}
+                      </span>
+                      <button
+                        type="button"
+                        className="ghost"
+                        disabled={safeResultsPage >= totalResultPages}
+                        onClick={() =>
+                          setResultsPage((page) =>
+                            Math.min(totalResultPages, page + 1),
+                          )
+                        }
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </>
+                )}
+              </section>
+
+              <section className="studioCard resultDetailCard">
+                {bulkResult ? (
+                  <>
+                    <div className="resultHead">
+                      <div>
+                        <small>
+                          {bulkNeedsReview
+                            ? "BULK QA DATASET NEEDS REVIEW"
+                            : "BULK QA DATASET COMPLETE"}
+                        </small>
+                        <h2>{bulkResult.skuCount} SKUs generated in parallel</h2>
+                        <p>
+                          {bulkResult.totalReviews.toLocaleString()} final
+                          synthetic fixtures ·{" "}
+                          {bulkResult.totalPurgedReviews.toLocaleString()} purged
+                        </p>
+                      </div>
+                      <div className="actions">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => setBulkResult(null)}
+                        >
+                          Clear detail
+                        </button>
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => dlBulk("json")}
+                        >
+                          JSON + purge audit
+                        </button>
+                        <button type="button" onClick={() => dlBulk("csv")}>
+                          Clean CSV
+                        </button>
+                        <AreviewsExportControls onExport={dlBulkAreviews} />
+                      </div>
+                    </div>
+                    <div className="studioStats detailStats">
+                      <article>
+                        <span>SKUs</span>
+                        <strong>{bulkResult.skuCount}</strong>
+                      </article>
+                      <article>
+                        <span>Requested</span>
+                        <strong>
+                          {bulkResult.generatedReviewCount.toLocaleString()}
+                        </strong>
+                      </article>
+                      <article>
+                        <span>Final fixtures</span>
+                        <strong>{bulkResult.totalReviews.toLocaleString()}</strong>
+                      </article>
+                      <article>
+                        <span>Purged</span>
+                        <strong>
+                          {bulkResult.totalPurgedReviews.toLocaleString()}
+                        </strong>
+                      </article>
+                      <article>
+                        <span>Reference-led</span>
+                        <strong>{bulkReferenceLed.toLocaleString()}</strong>
+                      </article>
+                      <article>
+                        <span>PDP-only</span>
+                        <strong>{bulkPdpOnly.toLocaleString()}</strong>
+                      </article>
+                    </div>
+                    <div className="bulkGrid resultSkuGrid">
+                      {bulkResult.products.map((p) => (
+                        <article key={p.productUrl}>
+                          <div>
+                            <b>{p.productTitle}</b>
+                            <span>
+                              {p.reviews.length} final ·{" "}
+                              {p.purgedReviewCount || 0} purged
+                            </span>
+                          </div>
+                          <small>{p.productUrl}</small>
+                          <footer>
+                            {formatAverage(p.actualAverage)}★ actual · existing
+                            count {p.existingReviewCount ?? "unavailable"} · refs{" "}
+                            {Number(
+                              p.referenceCoverage?.referenceLedTotal || 0,
+                            ).toLocaleString()}
+                            /{p.reviews.length.toLocaleString()} · QA{" "}
+                            {p.corpusDiagnostics?.qaStatus || "unknown"}
+                          </footer>
+                        </article>
+                      ))}
+                    </div>
+                    <div className="reviewPreviewList">
+                      <div className="cardHead">
+                        <div>
+                          <small>PREVIEW</small>
+                          <h3>Review samples</h3>
+                        </div>
+                        <span>First samples across SKUs</span>
+                      </div>
+                      {bulkPreviewReviews.map((review, index) => (
+                        <article key={`${review.productTitle}-${review.id || index}`}>
+                          <div>
+                            <span>
+                              {"★".repeat(Number(review.rating) || 0)}
+                              {"☆".repeat(5 - (Number(review.rating) || 0))}
+                            </span>
+                            <small>{review.productTitle}</small>
+                            <time>{review.date}</time>
+                          </div>
+                          <h4>{review.title}</h4>
+                          <p>{review.body}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </>
+                ) : result ? (
+                  <>
+                    <div className="resultHead">
+                      <div>
+                        <small>
+                          {resultQaComplete
+                            ? "QA DATASET COMPLETE"
+                            : "QA DATASET NEEDS REVIEW"}
+                        </small>
+                        <h2>{result.input?.productTitle}</h2>
+                        <p>
+                          {result.reviews.length} final synthetic fixtures ·{" "}
+                          {result.purgedReviewCount || 0} purged ·{" "}
+                          {formatAverage(result.actualAverage)}★ actual
+                        </p>
+                      </div>
+                      <div className="actions">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => setResult(null)}
+                        >
+                          Clear detail
+                        </button>
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => dl("json")}
+                        >
+                          JSON + purge audit
+                        </button>
+                        <button type="button" onClick={() => dl("csv")}>
+                          Clean CSV
+                        </button>
+                        <AreviewsExportControls onExport={dlAreviews} />
+                      </div>
+                    </div>
+                    <div className="studioStats detailStats">
+                      <article>
+                        <span>Requested</span>
+                        <strong>{result.input?.reviewCount}</strong>
+                      </article>
+                      <article>
+                        <span>Final fixtures</span>
+                        <strong>{result.reviews.length}</strong>
+                      </article>
+                      <article>
+                        <span>Purged</span>
+                        <strong>{result.purgedReviewCount || 0}</strong>
+                      </article>
+                      <article>
+                        <span>Average</span>
+                        <strong>{formatAverage(result.actualAverage)}★</strong>
+                      </article>
+                      <article>
+                        <span>Reference-led</span>
+                        <strong>{resultReferenceLed.toLocaleString()}</strong>
+                        <small>
+                          {resultReferenceAvailable.toLocaleString()} imported
+                          usable references
+                        </small>
+                      </article>
+                      <article>
+                        <span>PDP-only</span>
+                        <strong>{resultPdpOnly.toLocaleString()}</strong>
+                        <small>product details only</small>
+                      </article>
+                      <article>
+                        <span>Corpus QA</span>
+                        <strong>{resultQaLabel}</strong>
+                        <small>{resultQaDetail}</small>
+                      </article>
+                      <article>
+                        <span>Generation calls</span>
+                        <strong>
+                          {result.generationCallBudget?.aiCallsAttempted ?? "—"}
+                        </strong>
+                        <small>
+                          hard cap {result.generationCallBudget?.capped ?? "—"}
+                        </small>
+                      </article>
+                    </div>
+                    <div className="reviewPreviewList">
+                      <div className="cardHead">
+                        <div>
+                          <small>PREVIEW</small>
+                          <h3>Generated reviews</h3>
+                        </div>
+                        <span>Showing first {resultPreviewReviews.length}</span>
+                      </div>
+                      {resultPreviewReviews.map((review) => (
+                        <article key={review.id}>
+                          <div>
+                            <span>
+                              {"★".repeat(Number(review.rating) || 0)}
+                              {"☆".repeat(5 - (Number(review.rating) || 0))}
+                            </span>
+                            <small>
+                              {review.referenceLed
+                                ? "SYNTHETIC · REFERENCE-LED"
+                                : "SYNTHETIC · PDP-ONLY"}
+                            </small>
+                            <time>{review.date}</time>
+                          </div>
+                          <h4>{review.title}</h4>
+                          <p>{review.body}</p>
+                          <footer>
+                            {review.personaId} · {review.persona}
+                            {review.referenceLed
+                              ? ` · ${review.referencePlatform || "external reference"}`
+                              : ""}
+                          </footer>
+                        </article>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="emptyResultDetail">
+                    <small>NO RESULT OPEN</small>
+                    <h2>Open a completed batch from the archive.</h2>
+                    <p>
+                      This keeps old batches easy to inspect without losing your
+                      Generate setup or hiding jobs that are still running.
+                    </p>
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+
+          {screen === "settings" && (
+            <div className="screenStack">
+              <div className="studioPageHead">
+                <div>
+                  <small>SETTINGS</small>
+                  <h2>Defaults and controls</h2>
+                  <p>
+                    Configure new jobs and export defaults. Completed batches
+                    remain unchanged.
+                  </p>
+                </div>
+              </div>
+              <section className={`health ${health.ok && storageReady ? "good" : "bad"}`}>
+                <div>
+                  <b>AI Gateway + Supabase</b>
+                  <span>{healthLabel}</span>
+                </div>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    healthCheck();
+                    refreshStore().catch((e) => setErr(e.message));
                   }}
-                />
-              </div>
-              <small>
-                Starting one durable server workflow. It will remain visible in
-                the generation queue after this request is accepted.
-              </small>
+                >
+                  Recheck
+                </button>
+              </section>
+              <section className="studioCard settingsGrid">
+                <article>
+                  <small>SOURCING MODE</small>
+                  <h3>External source rewrites</h3>
+                  <p>
+                    When enabled, server jobs pull matching source reviews,
+                    rewrite only source-supported claims, and purge bad fits.
+                  </p>
+                  <label className="toggleLine">
+                    <input
+                      type="checkbox"
+                      checked={externalReferencesEnabled}
+                      onChange={(e) =>
+                        setExternalReferencesEnabled(e.target.checked)
+                      }
+                    />
+                    {externalReferencesEnabled ? "Reference mode On" : "PDP-only"}
+                  </label>
+                </article>
+                <article>
+                  <small>AREVIEWS EXPORT</small>
+                  <h3>Date range</h3>
+                  <p>
+                    Default is today. Exports randomize review dates inside the
+                    selected range so multiple SKUs do not appear strictly
+                    chronological.
+                  </p>
+                  <AreviewsExportControls showExport={false} />
+                </article>
+              </section>
+              <section className="studioCard settingsStack">
+                <div className="cardHead">
+                  <div>
+                    <small>REFERENCE BUDGET</small>
+                    <h3>Scan depth</h3>
+                  </div>
+                </div>
+                <ReferenceBudgetControl embedded />
+              </section>
+              <section className="studioCard settingsStack">
+                <div className="cardHead">
+                  <div>
+                    <small>CREDITS</small>
+                    <h3>Spend monitor</h3>
+                  </div>
+                </div>
+                <CreditBalanceBar embedded />
+              </section>
             </div>
           )}
-          {err && <div className="error">{err}</div>}
-          <div className="formActions">
-            <button
-              className="primary"
-              disabled={genBusy || health.ok === false || !storageReady}
-            >
-              {genBusy
-                ? "Generating…"
-                : externalReferencesEnabled
-                  ? "Extract + rewrite source reviews →"
-                  : "Generate PDP-only QA fixtures →"}
-            </button>
-          </div>
-          {!storageReady && (
-            <div className="qaNotice">
-              <b>Supabase required for /studio.</b>
-              <span>
-                Current production store is {store}. Set Vercel env vars
-                SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then redeploy.
-              </span>
-            </div>
-          )}
-        </form>
+        </section>
+
+        <aside className="studioQueueRail">{queueRail}</aside>
       </section>
     </main>
   );

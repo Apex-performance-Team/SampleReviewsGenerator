@@ -182,4 +182,49 @@ assert.deepEqual(new Set(bulk.slice(1).map((row) => row[7])), new Set([
   "Second Product",
 ]));
 
+const bulkShuffledDates = parseCsv(
+  areviewsReviewBulkCsv(
+    {
+      products: [
+        {
+          productTitle: "Product A",
+          productUrl: "https://example.com/products/a",
+          reviews: [{ rating: 5, title: "A", body: "First review." }],
+        },
+        {
+          productTitle: "Product B",
+          productUrl: "https://example.com/products/b",
+          reviews: [{ rating: 5, title: "B", body: "Second review." }],
+        },
+        {
+          productTitle: "Product C",
+          productUrl: "https://example.com/products/c",
+          reviews: [{ rating: 5, title: "C", body: "Third review." }],
+        },
+        {
+          productTitle: "Product D",
+          productUrl: "https://example.com/products/d",
+          reviews: [{ rating: 5, title: "D", body: "Fourth review." }],
+        },
+      ],
+    },
+    {
+      startDate: "2026-08-20",
+      endDate: "2026-08-25",
+      today: "2026-08-25",
+      random: randomSequence([
+        0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08,
+        0, 0.2, 0.4, 0.99,
+        0, 0, 0,
+      ]),
+    },
+  ),
+);
+const emittedDates = bulkShuffledDates.slice(1).map((row) => row[6]);
+assert.notDeepEqual(
+  emittedDates,
+  [...emittedDates].sort(),
+  "Bulk Areviews exports should not expose a chronological date sort across mixed SKUs.",
+);
+
 console.log("Areviews export self-test passed.");
