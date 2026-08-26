@@ -985,6 +985,45 @@ export default function StudioPage() {
                 </span>
               </div>
 
+              <section className="studioCard runSettingsCard">
+                <div className="grid">
+                  <label>
+                    Fixture count
+                    <input
+                      type="number"
+                      min="5"
+                      max="250"
+                      value={f.reviewCount}
+                      onChange={(e) => set("reviewCount", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Test rating average
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      step=".1"
+                      value={f.targetAverage}
+                      onChange={(e) => set("targetAverage", e.target.value)}
+                    />
+                  </label>
+                </div>
+                <div className="generationBudget">
+                  <b>
+                    {externalReferencesEnabled
+                      ? "Output mode: Lens/Amazon simple rewrite"
+                      : "Output mode: PDP-only generator"}
+                  </b>
+                  <span>
+                    {externalReferencesEnabled
+                      ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
+                      : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
+                  </span>
+                </div>
+                <AreviewsExportControls showExport={false} />
+              </section>
+
               <section className="panel studioCard">
                 <div className="scannerHead">
                   <div>
@@ -1247,12 +1286,12 @@ export default function StudioPage() {
                 <div className="formHead">
                   <div>
                     <small>OUTPUT</small>
-                    <h2>Batch settings</h2>
+                    <h2>Product details</h2>
                   </div>
                   <span>
                     {mode === "store"
                       ? "Bulk uses the selected SKUs above."
-                      : "Single product creates one server job."}
+                      : "Scanned product context appears here before queueing."}
                   </span>
                 </div>
                 <label>
@@ -1272,56 +1311,6 @@ export default function StudioPage() {
                     required
                   />
                 </label>
-                <div className="grid">
-                  <label>
-                    Fixture count
-                    <input
-                      type="number"
-                      min="5"
-                      max="250"
-                      value={f.reviewCount}
-                      onChange={(e) => set("reviewCount", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Test rating average
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      step=".1"
-                      value={f.targetAverage}
-                      onChange={(e) => set("targetAverage", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Parallel AI
-                    <select
-                      value={concurrency}
-                      onChange={(e) => setConcurrency(+e.target.value)}
-                    >
-                      <option value="12">12 workers</option>
-                      <option value="10">10 workers</option>
-                      <option value="8">8 workers</option>
-                      <option value="6">6 workers</option>
-                      <option value="4">4 workers</option>
-                      <option value="2">2 workers</option>
-                    </select>
-                  </label>
-                </div>
-                <div className="generationBudget">
-                  <b>
-                    {externalReferencesEnabled
-                      ? "Output mode: Lens/Amazon simple rewrite"
-                      : "Output mode: PDP-only generator"}
-                  </b>
-                  <span>
-                    {externalReferencesEnabled
-                      ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
-                      : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
-                  </span>
-                </div>
-                <AreviewsExportControls showExport={false} />
                 {genBusy && mode === "product" && (
                   <div className="progressWrap">
                     <div className="progressTop">
