@@ -188,6 +188,8 @@ export default function StudioPage() {
     [progress, setProgress] = useState({ done: 0, total: 0, status: "" }),
     [concurrency, setConcurrency] = useState(12),
     [err, setErr] = useState(""),
+    [scanNotice, setScanNotice] = useState(""),
+    [scanError, setScanError] = useState(""),
     [result, setResult] = useState(null),
     [bulkResult, setBulkResult] = useState(null),
     [externalReferencesEnabled, setExternalReferencesEnabledState] =
@@ -277,19 +279,29 @@ export default function StudioPage() {
   }, []);
 
   async function scanOne(url = f.productUrl) {
+    const targetUrl = String(url || "").trim();
+    if (!targetUrl) {
+      const message = "Enter a product URL first.";
+      setErr(message);
+      setScanError(message);
+      setScanNotice("");
+      return null;
+    }
     setBusy(true);
     setErr("");
+    setScanError("");
+    setScanNotice("Scanning product page and extracting QA context…");
     try {
       const r = await fetch("/api/scan", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
-            url,
+            url: targetUrl,
             amazonListingUrl: f.amazonListingUrl,
             deferReferenceScan: true,
           }),
         }),
-        j = await r.json();
+        j = await r.json().catch(() => ({}));
       if (!r.ok) throw Error(j.error || "Scan failed");
       setF((x) => ({
         ...x,
@@ -298,27 +310,44 @@ export default function StudioPage() {
         productTitle: j.productTitle,
         productDescription: j.productDescription,
       }));
+      setScanNotice(
+        `Product scan complete: ${j.productTitle || "details loaded"}.`,
+      );
       return j;
     } catch (e) {
       setErr(e.message);
+      setScanError(e.message);
+      setScanNotice("");
       throw e;
     } finally {
       setBusy(false);
     }
   }
   async function scanStore() {
+    const normalizedStoreUrl = storeUrl.trim();
+    if (!normalizedStoreUrl) {
+      const message = "Enter a Shopify store URL first.";
+      setErr(message);
+      setScanError(message);
+      setScanNotice("");
+      return;
+    }
     setBusy(true);
     setErr("");
+    setScanError("");
+    setScanNotice("Reading the Shopify sitemap and product catalog…");
     setProducts([]);
     setMeta(null);
     try {
       const r = await fetch("/api/store-scan", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ storeUrl }),
+          body: JSON.stringify({ storeUrl: normalizedStoreUrl }),
         }),
-        j = await r.json();
+        j = await r.json().catch(() => ({}));
       if (!r.ok) throw Error(j.error || "Store discovery failed");
+      if (!Array.isArray(j.products) || !j.products.length)
+        throw Error("No Shopify products were found for that store URL.");
       const defaultReviewCount = cleanReviewCount(f.reviewCount, 100),
         rows = j.products.map((p) => ({
           ...p,
@@ -328,9 +357,24 @@ export default function StudioPage() {
         }));
       setProducts(rows);
       setMeta({ ...j, scanned: 0, failed: 0 });
+      const scanWorkers = Math.min(
+        Math.max(1, Number(concurrency) || 1),
+        rows.length,
+      );
+      setScanNotice(
+        `Found ${rows.length} products. Scanning product details with ${scanWorkers} worker${scanWorkers === 1 ? "" : "s"}…`,
+      );
+      await sleep(60);
       let cursor = 0,
         scanned = 0,
         failed = 0;
+      const updateScanProgress = () => {
+        const complete = scanned + failed;
+        setMeta((m) => ({ ...(m || j), scanned, failed }));
+        setScanNotice(
+          `Scanning product details · ${complete}/${rows.length} complete${failed ? ` · ${failed} failed` : ""}.`,
+        );
+      };
       async function worker() {
         while (true) {
           const i = cursor++;
@@ -346,7 +390,7 @@ export default function StudioPage() {
                   deferReferenceScan: true,
                 }),
               }),
-              d = await q.json();
+              d = await q.json().catch(() => ({}));
             if (!q.ok) throw Error(d.error || "Scan failed");
             rows[i] = {
               ...rows[i],
@@ -362,15 +406,18 @@ export default function StudioPage() {
             failed++;
           }
           setProducts([...rows]);
-          setMeta((m) => ({ ...m, scanned, failed }));
+          updateScanProgress();
         }
       }
-      await Promise.all(
-        Array.from({ length: Math.min(4, rows.length) }, worker),
-      );
+      await Promise.all(Array.from({ length: scanWorkers }, worker));
       setMeta((m) => ({ ...m, complete: true }));
+      setScanNotice(
+        `Store scan complete · ${scanned} product${scanned === 1 ? "" : "s"} ready${failed ? ` · ${failed} failed` : ""}.`,
+      );
     } catch (e) {
       setErr(e.message);
+      setScanError(e.message);
+      setScanNotice("");
     } finally {
       setBusy(false);
     }
@@ -981,6 +1028,14 @@ export default function StudioPage() {
                           </button>
                         </div>
                       </label>
+                      {scanNotice && (
+                        <div className="scannerNotice">{scanNotice}</div>
+                      )}
+                      {scanError && (
+                        <div className="scannerNotice scannerNoticeError">
+                          {scanError}
+                        </div>
+                      )}
                       <label>
                         Verified Amazon starting source <small>(optional)</small>
                         <div className="row">
@@ -1018,6 +1073,14 @@ export default function StudioPage() {
                           </button>
                         </div>
                       </label>
+                      {scanNotice && (
+                        <div className="scannerNotice">{scanNotice}</div>
+                      )}
+                      {scanError && (
+                        <div className="scannerNotice scannerNoticeError">
+                          {scanError}
+                        </div>
+                      )}
                       {meta && (
                         <div className="summary">
                           <div>
