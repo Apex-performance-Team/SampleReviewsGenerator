@@ -16,7 +16,7 @@ function replaceRegex(path,content,pattern,to,{skipIf}={}){
 {
   const path='app/studio/page.js';
   let s=read(path);
-  if(s.includes('ACTIVE_CATALOG_KEY')&&s.includes('startDurableCatalog')){
+  if(s.includes('startDurableCatalog')&&s.includes('/api/store-review-workflows')){
     console.log('Studio durable workflow detected; legacy browser-worker patch skipped.');
   }else{
   const cleanNumber="function cleanNumber(value, fallback){const n=Number(value);return Number.isFinite(n)?n:fallback}\n";

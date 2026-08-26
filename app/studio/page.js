@@ -20,7 +20,6 @@ const start = {
   reviewCount: 100,
   targetAverage: 4.7,
 };
-const ACTIVE_CATALOG_KEY = "srl-studio-active-catalog";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const formatAverage = (value) =>
   value != null && Number.isFinite(Number(value))
@@ -47,8 +46,118 @@ function storeWorkerCount(concurrency, referenceMode, count) {
     Math.max(1, Number(concurrency) || 1),
   );
 }
-function statusLine(run) {
-  return `${run.completedCount || 0}/${run.requestedCount || 0}${run.purgedCount ? ` · ${run.purgedCount} purged` : ""}`;
+const activeGenerationStatuses = new Set(["queued", "running"]);
+function generationTime(value) {
+  if (!value) return "";
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/New_York",
+  }).format(new Date(value));
+}
+function GenerationQueue({
+  runs,
+  loading,
+  error,
+  cancelingId,
+  onCancel,
+  onView,
+  onRefresh,
+}) {
+  const activeCount = runs.filter((run) =>
+    activeGenerationStatuses.has(run.catalog?.status),
+  ).length;
+  return (
+    <section className="generationQueue">
+      <div className="queueHead">
+        <div>
+          <span>SERVER-SIDE GENERATIONS</span>
+          <h2>Generation queue</h2>
+          <p>
+            {activeCount
+              ? `${activeCount} generation${activeCount === 1 ? "" : "s"} currently in process. You can close this tab safely.`
+              : "No generations are currently running. Recent generations remain available below."}
+          </p>
+        </div>
+        <button className="ghost" onClick={onRefresh} disabled={loading}>
+          {loading ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
+      {error && <div className="queueError">{error}</div>}
+      {!runs.length && !loading ? (
+        <div className="emptyQueue">No server generations yet.</div>
+      ) : (
+        <div className="generationJobs">
+          {runs.map((run) => {
+            const catalog = run.catalog || {},
+              progress = run.progress || {},
+              active = activeGenerationStatuses.has(catalog.status),
+              current =
+                run.children?.find((child) => child.status === "running") ||
+                run.children?.find((child) => child.status === "queued") ||
+                null,
+              label = catalog.bulk
+                ? `${progress.totalSkus || 0} SKU catalog`
+                : catalog.productTitle ||
+                  run.children?.[0]?.productTitle ||
+                  "Single product generation";
+            return (
+              <article
+                className={`generationJob ${catalog.status || "queued"}`}
+                key={catalog.id}
+              >
+                <div className="jobTop">
+                  <div>
+                    <span className="jobStatus">{catalog.status}</span>
+                    <h3>{label}</h3>
+                  </div>
+                  <strong>{progress.percent || 0}%</strong>
+                </div>
+                <p>
+                  {catalog.progressMessage ||
+                    `${progress.completeSkus || 0}/${progress.totalSkus || 0} SKUs complete`}
+                </p>
+                <div className="bar">
+                  <span
+                    style={{
+                      width: `${active ? Math.max(2, progress.percent || 0) : progress.percent || 0}%`,
+                    }}
+                  />
+                </div>
+                <footer>
+                  <span>
+                    {(progress.done || 0).toLocaleString()}/
+                    {(progress.total || 0).toLocaleString()} reviews ·{" "}
+                    {progress.completeSkus || 0}/{progress.totalSkus || 0} SKUs
+                    {current ? ` · ${current.productTitle || current.id}` : ""}
+                  </span>
+                  <span>{generationTime(catalog.createdAt)} ET</span>
+                </footer>
+                <div className="jobActions">
+                  {catalog.status === "completed" && (
+                    <button className="ghost" onClick={() => onView(run)}>
+                      View generated reviews
+                    </button>
+                  )}
+                  {active && (
+                    <button
+                      className="danger"
+                      onClick={() => onCancel(run)}
+                      disabled={cancelingId === catalog.id}
+                    >
+                      {cancelingId === catalog.id
+                        ? "Canceling…"
+                        : "Cancel whole generation"}
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
 }
 
 export default function StudioPage() {
@@ -69,9 +178,11 @@ export default function StudioPage() {
     [bulkResult, setBulkResult] = useState(null),
     [externalReferencesEnabled, setExternalReferencesEnabledState] =
       useState(true),
-    [activeRun, setActiveRun] = useState(null);
-  const form = useRef(null),
-    durablePollRef = useRef(0);
+    [catalogRuns, setCatalogRuns] = useState([]),
+    [queueLoading, setQueueLoading] = useState(true),
+    [queueError, setQueueError] = useState(""),
+    [cancelingId, setCancelingId] = useState("");
+  const form = useRef(null);
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
   const setExternalReferencesEnabled = (v) => {
     setExternalReferencesEnabledState(v);
@@ -109,11 +220,37 @@ export default function StudioPage() {
       throw e;
     }
   }, []);
+  const refreshCatalogRuns = useCallback(async () => {
+    try {
+      const response = await fetch("/api/store-review-workflows?limit=20", {
+          cache: "no-store",
+        }),
+        data = await response.json().catch(() => ({}));
+      if (!response.ok)
+        throw Error(data.error || "Could not refresh server generations.");
+      setCatalogRuns(Array.isArray(data.runs) ? data.runs : []);
+      setQueueError("");
+      return data.runs || [];
+    } catch (error) {
+      setQueueError(error.message || "Could not refresh server generations.");
+      throw error;
+    } finally {
+      setQueueLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     healthCheck();
     refreshStore().catch((e) => setErr(e.message));
   }, [refreshStore]);
+  useEffect(() => {
+    refreshCatalogRuns().catch(() => {});
+    const timer = window.setInterval(
+      () => refreshCatalogRuns().catch(() => {}),
+      2500,
+    );
+    return () => window.clearInterval(timer);
+  }, [refreshCatalogRuns]);
   useEffect(() => {
     const saved = window.localStorage.getItem("srl-reference-sourcing-enabled");
     if (saved === "off") setExternalReferencesEnabledState(false);
@@ -121,22 +258,6 @@ export default function StudioPage() {
     window.addEventListener("srl-reference-sourcing-enabled", onMode);
     return () =>
       window.removeEventListener("srl-reference-sourcing-enabled", onMode);
-  }, []);
-  useEffect(() => {
-    const saved = window.localStorage.getItem(ACTIVE_CATALOG_KEY);
-    if (saved)
-      try {
-        const active = JSON.parse(saved);
-        if (active.catalogId)
-          monitorDurableCatalog(active.catalogId, Boolean(active.bulk)).catch(
-            (error) => setErr(error.message),
-          );
-      } catch {
-        window.localStorage.removeItem(ACTIVE_CATALOG_KEY);
-      }
-    return () => {
-      durablePollRef.current++;
-    };
   }, []);
 
   async function scanOne(url = f.productUrl) {
@@ -270,113 +391,13 @@ export default function StudioPage() {
         "Supabase storage is not active on Vercel. /studio is intentionally disabled until SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set.",
       );
   }
-  async function monitorDurableCatalog(catalogId, bulk) {
-    const token = ++durablePollRef.current;
-    let maxDone = 0,
-      networkErrors = 0;
-    setGenBusy(true);
-    setResult(null);
-    setBulkResult(null);
-    while (token === durablePollRef.current) {
-      try {
-        const response = await fetch(
-            `/api/store-review-workflows/${catalogId}`,
-            { cache: "no-store" },
-          ),
-          status = await response.json().catch(() => ({}));
-        if (!response.ok)
-          throw Object.assign(
-            Error(status.error || "Could not read durable workflow status."),
-            { status: response.status },
-          );
-        networkErrors = 0;
-        maxDone = Math.max(maxDone, Number(status.progress?.done) || 0);
-        const current =
-          status.children?.find((run) => run.status === "running") ||
-          status.children?.find((run) => run.status === "queued") ||
-          status.children?.at(-1) ||
-          null;
-        setActiveRun(current);
-        setProgress({
-          done: maxDone,
-          total: Number(status.progress?.total) || 0,
-          status:
-            status.catalog?.progressMessage ||
-            `${status.progress?.completeSkus || 0}/${status.progress?.totalSkus || 0} SKUs complete`,
-        });
-        if (
-          status.catalog?.workflowStatus === "failed" &&
-          !["completed", "failed"].includes(status.catalog?.status)
-        )
-          throw Object.assign(
-            Error(
-              status.catalog?.error ||
-                "The durable workflow runtime reported a failure.",
-            ),
-            { fatal: true },
-          );
-        if (status.catalog?.status === "failed") {
-          throw Object.assign(
-            Error(status.catalog?.error || "Durable workflow failed."),
-            { fatal: true },
-          );
-        }
-        const terminal = status.catalog?.status === "completed";
-        if (terminal) {
-          const resultResponse = await fetch(
-              `/api/store-review-workflows/${catalogId}/result`,
-              { cache: "no-store" },
-            ),
-            payload = await resultResponse.json().catch(() => ({}));
-          if (!resultResponse.ok)
-            throw Error(
-              payload.error ||
-                status.catalog?.error ||
-                "Durable workflow failed.",
-            );
-          const catalogResult = payload.result,
-            total =
-              Number(status.progress?.total) ||
-              catalogResult.generatedReviewCount ||
-              0;
-          if (bulk) setBulkResult(catalogResult);
-          else setResult(catalogResult.products?.[0] || null);
-          setProgress({
-            done: Number(status.progress?.done) || 0,
-            total,
-            status: status.progress?.failedSkus
-              ? `Finished · ${status.progress.failedSkus} SKU${status.progress.failedSkus === 1 ? "" : "s"} failed`
-              : `Complete · ${(catalogResult.totalReviews || 0).toLocaleString()} final reviews`,
-          });
-          window.localStorage.removeItem(ACTIVE_CATALOG_KEY);
-          setGenBusy(false);
-          return catalogResult;
-        }
-      } catch (error) {
-        networkErrors++;
-        if (error.fatal || (error.status === 404 && networkErrors >= 3)) {
-          window.localStorage.removeItem(ACTIVE_CATALOG_KEY);
-          setGenBusy(false);
-          throw error;
-        }
-        setProgress((current) => ({
-          ...current,
-          status: `Connection interrupted (${networkErrors}) · server workflow continues; reconnecting…`,
-        }));
-      }
-      await sleep(2000);
-    }
-  }
   async function startDurableCatalog(payload, { bulk, total }) {
     const catalogId = globalThis.crypto.randomUUID(),
       body = { ...payload, catalogId, bulk };
-    window.localStorage.setItem(
-      ACTIVE_CATALOG_KEY,
-      JSON.stringify({ catalogId, bulk }),
-    );
     window.localStorage.setItem("srl-studio-last-run-id", catalogId);
     let started = false,
-      lastError;
+      lastError,
+      accepted;
     for (let attempt = 0; attempt < 5 && !started; attempt++) {
       try {
         const response = await fetch("/api/store-review-workflows", {
@@ -394,6 +415,7 @@ export default function StudioPage() {
           throw Error(data.error || "Could not start durable workflow.");
         }
         started = true;
+        accepted = data;
       } catch (error) {
         lastError = error;
         if (error.fatal) break;
@@ -407,17 +429,81 @@ export default function StudioPage() {
     }
     if (!started) {
       if (lastError?.fatal) {
-        window.localStorage.removeItem(ACTIVE_CATALOG_KEY);
         throw lastError;
       }
-      setProgress({
-        done: 0,
-        total,
-        status:
-          "The start response could not be confirmed · checking the server for the durable workflow…",
-      });
+      const probe = await fetch(`/api/store-review-workflows/${catalogId}`, {
+          cache: "no-store",
+        }),
+        status = await probe.json().catch(() => ({}));
+      if (!probe.ok)
+        throw lastError || Error("Could not confirm the durable workflow start.");
+      accepted = { catalogId, status };
     }
-    return monitorDurableCatalog(catalogId, bulk);
+    if (accepted?.status)
+      setCatalogRuns((current) => [
+        accepted.status,
+        ...current.filter((run) => run.catalog?.id !== catalogId),
+      ]);
+    setProgress({
+      done: 0,
+      total,
+      status:
+        "Generation accepted by the server. It is now visible in the queue.",
+    });
+    await refreshCatalogRuns().catch(() => {});
+    return accepted;
+  }
+  async function cancelCatalogGeneration(run) {
+    const catalog = run.catalog || {},
+      label = catalog.bulk
+        ? `${run.progress?.totalSkus || 0} SKU catalog`
+        : catalog.productTitle || "this generation";
+    if (
+      !window.confirm(
+        `Cancel the whole ${label}? Finished work will remain stored, but no additional reviews will be generated.`,
+      )
+    )
+      return;
+    setCancelingId(catalog.id);
+    setQueueError("");
+    try {
+      const response = await fetch(
+          `/api/store-review-workflows/${catalog.id}`,
+          { method: "DELETE" },
+        ),
+        data = await response.json().catch(() => ({}));
+      if (!response.ok)
+        throw Error(data.error || "Could not cancel the generation.");
+      await refreshCatalogRuns();
+      if (data.warning) setQueueError(data.warning);
+    } catch (error) {
+      setQueueError(error.message || "Could not cancel the generation.");
+    } finally {
+      setCancelingId("");
+    }
+  }
+  async function viewCatalogResult(run) {
+    const catalog = run.catalog || {};
+    setQueueError("");
+    try {
+      const response = await fetch(
+          `/api/store-review-workflows/${catalog.id}/result`,
+          { cache: "no-store" },
+        ),
+        data = await response.json().catch(() => ({}));
+      if (!response.ok)
+        throw Error(data.error || "Could not load generated reviews.");
+      if (catalog.bulk) {
+        setResult(null);
+        setBulkResult(data.result);
+      } else {
+        setBulkResult(null);
+        setResult(data.result?.products?.[0] || null);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      setQueueError(error.message || "Could not load generated reviews.");
+    }
   }
   async function generate(e) {
     e.preventDefault();
@@ -425,7 +511,6 @@ export default function StudioPage() {
     setErr("");
     setResult(null);
     setBulkResult(null);
-    setActiveRun(null);
     const input = {
         ...f,
         reviewCount: +f.reviewCount,
@@ -482,7 +567,6 @@ export default function StudioPage() {
     setErr("");
     setResult(null);
     setBulkResult(null);
-    setActiveRun(null);
     const total = selectedWithCounts.reduce(
       (n, p) => n + p.requestedReviewCount,
       0,
@@ -632,7 +716,21 @@ export default function StudioPage() {
       "text/csv;charset=utf-8",
     );
   }
-  const resultQaStatus = result?.corpusDiagnostics?.qaStatus,
+  const generationQueue = (
+      <GenerationQueue
+        runs={catalogRuns}
+        loading={queueLoading}
+        error={queueError}
+        cancelingId={cancelingId}
+        onCancel={cancelCatalogGeneration}
+        onView={viewCatalogResult}
+        onRefresh={() => {
+          setQueueLoading(true);
+          refreshCatalogRuns().catch(() => {});
+        }}
+      />
+    ),
+    resultQaStatus = result?.corpusDiagnostics?.qaStatus,
     resultQaComplete = completedQaStatuses.has(resultQaStatus),
     resultQaLabel =
       resultQaStatus === "completed_with_purge"
@@ -702,6 +800,7 @@ export default function StudioPage() {
               <AreviewsExportControls onExport={dlBulkAreviews} />
             </div>
           </div>
+          {generationQueue}
           <div className="stats">
             <article>
               <span>SKUs</span>
@@ -788,6 +887,7 @@ export default function StudioPage() {
               <AreviewsExportControls onExport={dlAreviews} />
             </div>
           </div>
+          {generationQueue}
           <div className="stats">
             <article>
               <span>Requested</span>
@@ -920,6 +1020,7 @@ export default function StudioPage() {
             synthetic and publication_allowed=false.
           </span>
         </div>
+        {generationQueue}
         <div className="hero">
           <div>
             <small>SYNTHETIC QA / MODELING DATA ONLY</small>
@@ -1238,9 +1339,8 @@ export default function StudioPage() {
                 />
               </div>
               <small>
-                {activeRun
-                  ? `Server run ${activeRun.id} · ${activeRun.status} · ${statusLine(activeRun)}`
-                  : "Starting one durable server workflow. You can safely close this tab after it starts."}
+                Starting one durable server workflow. It will remain visible in
+                the generation queue after this request is accepted.
               </small>
             </div>
           )}

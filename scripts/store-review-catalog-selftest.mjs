@@ -9,8 +9,10 @@ const children=[
 ];
 
 const status=catalogStatus(catalog,children,'completed');
-assert.deepEqual(status.progress,{done:7,total:10,percent:70,completeSkus:1,failedSkus:1,totalSkus:2});
+assert.deepEqual(status.progress,{done:7,total:10,percent:70,completeSkus:1,failedSkus:1,canceledSkus:0,totalSkus:2});
 assert.equal(status.catalog.workflowRunId,'workflow-id');
+assert.equal(status.catalog.productTitle,'');
+assert.equal(status.catalog.bulk,false);
 assert.equal(compactReviewRun(children[0]).completedCount,5);
 
 const result=buildCatalogResult(catalog,children);

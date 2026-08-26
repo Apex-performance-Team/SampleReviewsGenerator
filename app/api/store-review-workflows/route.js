@@ -3,7 +3,7 @@ export const maxDuration=180;
 
 import { createHash } from 'node:crypto';
 import { start } from 'workflow/api';
-import { claimQueuedRun,createRun,getRun,getRuns,runStoreMode,updateRun } from '../../../lib/review-run-store.mjs';
+import { claimQueuedRun,createRun,getRun,getRuns,listCatalogRuns,runStoreMode,updateRun } from '../../../lib/review-run-store.mjs';
 import { catalogStatus } from '../../../lib/store-review-catalog.mjs';
 import { publicRunRateLimit } from '../../../lib/public-run-rate-limit.mjs';
 import { storeReviewCatalogWorkflow } from '../../../workflows/store-review-catalog.js';
@@ -26,6 +26,16 @@ function productInput(product,body){
   const productUrl=clean(product.productUrl||product.url,1000),productTitle=clean(product.productTitle||product.title,240),productDescription=clean(product.productDescription,9000),reviewCount=requestedCount(product.reviewCount??product.requestedReviewCount),externalReferencesEnabled=Boolean(body.externalReferencesEnabled);
   if(!productUrl&&(!productTitle||!productDescription))throw Error('Every product needs a URL or product title/context.');
   return{productUrl,amazonListingUrl:clean(product.amazonListingUrl,1000),productTitle,productDescription,reviewCount,targetAverage:targetAverage(product.targetAverage??body.targetAverage),mode:modeFromReferences(externalReferencesEnabled),externalReferencesEnabled,referenceBudget:referenceBudget(product.referenceBudget||body.referenceBudget),existingReviewCount:product.existingReviewCount??product.extracted?.existingReviewCount??null};
+}
+
+export async function GET(req){
+  try{
+    const limit=Math.max(1,Math.min(30,Number(new URL(req.url).searchParams.get('limit'))||20)),[active,recent]=await Promise.all([listCatalogRuns(50,{statuses:['queued','running']}),listCatalogRuns(limit)]),catalogs=[...active,...recent.filter(catalog=>!active.some(item=>item.id===catalog.id))],childIds=[...new Set(catalogs.flatMap(catalog=>catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[]))],childBatches=[];
+    for(let offset=0;offset<childIds.length;offset+=100)childBatches.push(childIds.slice(offset,offset+100));
+    const children=(await Promise.all(childBatches.map(ids=>getRuns(ids)))).flat(),byId=new Map(children.map(run=>[run.id,run]));
+    const runs=catalogs.map(catalog=>catalogStatus(catalog,(catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[]).map(id=>byId.get(id)).filter(Boolean)));
+    return Response.json({runs,store:runStoreMode()},{headers:{'cache-control':'no-store'}});
+  }catch(error){return Response.json({error:error.message||'Could not list catalog workflows.'},{status:500,headers:{'cache-control':'no-store'}})}
 }
 
 export async function POST(req){
