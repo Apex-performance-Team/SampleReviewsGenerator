@@ -988,7 +988,7 @@ export default function StudioPage() {
               <section className="studioCard runSettingsCard">
                 <div className="grid">
                   <label>
-                    Fixture count
+                    Test Review Count
                     <input
                       type="number"
                       min="5"
