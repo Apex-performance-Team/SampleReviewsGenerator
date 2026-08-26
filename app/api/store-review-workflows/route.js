@@ -55,7 +55,7 @@ export async function POST(req){
       inputs=body.products.map(product=>productInput(product,body));
       children=await Promise.all(inputs.map((input,index)=>getOrCreateRun(input,childId(id,index))));
     }
-    const childRunIds=children.map(run=>run.id),total=children.reduce((n,run)=>n+(Number(run.requested_count)||0),0),sourceMode=children.some(run=>run.mode==='source_rewrite'),maxConcurrency=sourceMode?4:12,concurrency=Math.max(1,Math.min(maxConcurrency,Number(body.concurrency)||1,children.length)),bulk=body.bulk!==false&&children.length>1;
+    const childRunIds=children.map(run=>run.id),total=children.reduce((n,run)=>n+(Number(run.requested_count)||0),0),sourceMode=children.some(run=>run.mode==='source_rewrite'),maxConcurrency=12,concurrency=Math.max(1,Math.min(maxConcurrency,Number(body.concurrency)||1,children.length)),bulk=body.bulk!==false&&children.length>1;
     const catalogInput={catalogRun:true,durable:true,bulk,childRunIds,reviewCount:total,targetAverage:targetAverage(body.targetAverage??inputs[0]?.targetAverage),mode:'pdp_only',productTitle:bulk?`${children.length} SKU durable catalog`:clean(inputs[0]?.productTitle,240),productDescription:'Durable server-side review generation controller.',externalReferencesEnabled:sourceMode,concurrency,referenceBudget:referenceBudget(body.referenceBudget),resumedFromExistingRuns:Boolean(resumeIds.length)};
     let catalog=await getOrCreateRun(catalogInput,id);
     if(!catalog.input_json?.catalogRun)throw Error('catalogId is already assigned to a non-catalog run.');

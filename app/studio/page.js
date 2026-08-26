@@ -40,8 +40,8 @@ function validReviewCount(value) {
   const n = Number(value);
   return Number.isInteger(n) && n >= 5 && n <= 250;
 }
-function storeWorkerCount(concurrency, referenceMode, count) {
-  const max = referenceMode ? 4 : 12;
+function storeWorkerCount(concurrency, _referenceMode, count) {
+  const max = 12;
   return Math.min(
     Math.max(1, Number(count) || 1),
     max,
