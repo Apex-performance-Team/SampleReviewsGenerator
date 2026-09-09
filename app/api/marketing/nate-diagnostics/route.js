@@ -14,8 +14,9 @@ export async function GET(req){
    const id=p.get('id')||IDS[0];if(!IDS.includes(id))return new Response('Invalid dataset',{status:400});result=await fetchJSON('/datasets/'+id+'/metadata');
   }else if(op==='schemas'){
    result=await fetchJSON('/datasets/v3/scrapers');if(Array.isArray(result.value))result.value=result.value.filter(x=>IDS.includes(x.id)).map(x=>({...x,scrapers:Object.fromEntries(Object.entries(x.scrapers||{}).map(([k,v])=>[k,{input_schema:v.input_schema,sample_input:v.sample_input,link:v.link}]))}));
-  }else if(op==='log'){
-   const id=p.get('snapshot');const allowed=['sd_mtte3c2y1m59k361qv','sd_mttevd6010mxzfuxay','sd_mttevdse1yu1azkv9g','sd_mtteven81ix5oxneu7','sd_mtteso4435r0lb7o1'];
+  }else if(op==='snapshots')result=await fetchJSON('/datasets/v3/snapshots?dataset_id='+IDS[0]+'&limit=20');
+  else if(op==='log'){
+   const id=p.get('snapshot');const allowed=['sd_mtte3c2y1m59k361qv','sd_mttevd6010mxzfuxay','sd_mttevdse1yu1azkv9g','sd_mtteven81ix5oxneu7','sd_mtteso4435r0lb7o1','sd_mttf6qd41iuatono7w'];
    if(!allowed.includes(id))return new Response('Invalid snapshot',{status:400});result=await fetchJSON('/datasets/v3/log/'+id);
   }else if(op==='zones'){result=await fetchJSON('/zone/get_active_zones');if(Array.isArray(result.value))result.value=result.value.map(({name,type})=>({name,type}))}
   else return new Response('Invalid operation',{status:400});
