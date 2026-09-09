@@ -1,117 +1,61 @@
 import {createHash,timingSafeEqual} from 'node:crypto';
 import {WebSocket} from 'undici';
-export const runtime='nodejs';
-export const dynamic='force-dynamic';
-export const maxDuration=300;
-const HASH='8940a885ae6e50aca994e11f0fe4d53dbcf4508326238f344a4a37be740b1979';
-const EXPIRES=Date.parse('2026-09-10T12:00:00Z');
+export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=300;
+const HASH='8940a885ae6e50aca994e11f0fe4d53dbcf4508326238f344a4a37be740b1979',EXPIRES=Date.parse('2026-09-10T12:00:00Z');
 const STORE='https://plcqypajqvtpnjctdlho.supabase.co/functions/v1/blvckledge-batch-store';
-const AUTHOR='blvckledge',PID='1240448194984546305',PROFILE='https://site.twstalker.com/blvckledge',TARGET='https://site.twstalker.com/service/api',ZONE='nate_archive_browser';
-const SOURCE_JOB='blvckledge-archive-d027480bd6806441c9f0ea77e53725ab';
-const H={'cache-control':'private, no-store','x-robots-tag':'noindex','referrer-policy':'no-referrer'};
-const hash=x=>createHash('sha256').update(String(x)).digest('hex');
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const AUTHOR='blvckledge',PID='1240448194984546305',PROFILE='https://site.twstalker.com/blvckledge',TARGET='https://site.twstalker.com/service/api',ZONE='nate_archive_browser',SOURCE_JOB='blvckledge-archive-d027480bd6806441c9f0ea77e53725ab';
+const H={'cache-control':'private, no-store','x-robots-tag':'noindex','referrer-policy':'no-referrer'},hash=x=>createHash('sha256').update(String(x)).digest('hex'),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function xid(v){if(typeof v==='number'&&!Number.isSafeInteger(v))return null;const s=String(v??'');return /^\d{8,24}$/.test(s)?s:null}
 function text(v){return String(v??'').replace(/<br\s*\/?\s*>/gi,'\n').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#(\d+);/g,(m,n)=>Number(n)<=1114111?String.fromCodePoint(Number(n)):m).replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').trim()}
 function normalize(body,page){
  const entries=body?.tweets&&typeof body.tweets==='object'?Object.entries(body.tweets):[],rows=[];
- for(const[k,t] of entries){
-  const id=xid(k)||xid(t?.id_str)||xid(t?.id),author=String(t?.core?.screen_name||'').replace(/^@/,'').toLowerCase();
-  if(!id||author!==AUTHOR)continue;
-  const date=t.created_at,iso=date&&Number.isFinite(Date.parse(date))?new Date(date).toISOString():null;
-  const parent=xid(t.in_reply_to_status_id_str)||xid(t.in_reply_to_status_id),conversation=xid(t.conversation_id_str)||xid(t.conversation_id);
-  const full=[t.note_tweet?.note_tweet_results?.result?.text,t.full_text,t.text].filter(x=>typeof x==='string').sort((a,b)=>b.length-a.length)[0]||'';
-  const articles=[...new Set(JSON.stringify(t).match(/https?:\/\/(?:www\.)?(?:x|twitter)\.com\/(?:i\/article|[^/\s"\\]+\/article)\/\d+/gi)||[])];
-  rows.push({id,source_job:SOURCE_JOB,author_handle:AUTHOR,is_authored_by_target:true,content_kind:t.is_retweet?'repost':parent&&parent!==id?'reply':t.is_quote_status?'quote_post':conversation&&conversation!==id?'reply':'post',text:text(full),url:'https://x.com/'+AUTHOR+'/status/'+id,published_at:iso,parent_post_id:parent,conversation_id:conversation,article_urls:articles,raw:{...t,id_str:id,mirror_page:page,mirror_source:'twstalker_via_bright_data_browser',target:AUTHOR}});
- }
- return {entries,rows};
+ for(const[k,t] of entries){const id=xid(k)||xid(t?.id_str)||xid(t?.id),author=String(t?.core?.screen_name||'').replace(/^@/,'').toLowerCase();if(!id||author!==AUTHOR)continue;const date=t.created_at,iso=date&&Number.isFinite(Date.parse(date))?new Date(date).toISOString():null,parent=xid(t.in_reply_to_status_id_str)||xid(t.in_reply_to_status_id),conversation=xid(t.conversation_id_str)||xid(t.conversation_id),full=[t.note_tweet?.note_tweet_results?.result?.text,t.full_text,t.text].filter(x=>typeof x==='string').sort((a,b)=>b.length-a.length)[0]||'',articles=[...new Set(JSON.stringify(t).match(/https?:\/\/(?:www\.)?(?:x|twitter)\.com\/(?:i\/article|[^/\s"\\]+\/article)\/\d+/gi)||[])];rows.push({id,source_job:SOURCE_JOB,author_handle:AUTHOR,is_authored_by_target:true,content_kind:t.is_retweet?'repost':parent&&parent!==id?'reply':t.is_quote_status?'quote_post':conversation&&conversation!==id?'reply':'post',text:text(full),url:'https://x.com/'+AUTHOR+'/status/'+id,published_at:iso,parent_post_id:parent,conversation_id:conversation,article_urls:articles,raw:{...t,id_str:id,mirror_page:page,mirror_source:'twstalker_via_bright_data_browser',target:AUTHOR}})}return{entries,rows};
 }
-function pageRecord(body,page,cursor,id,transport,elapsedMs){
- const {entries,rows}=normalize(body,page),next=typeof body?.cursor==='string'?body.cursor:null,dates=rows.map(r=>r.published_at).filter(Boolean).sort();
- const request={mode:'mirror_cursor',page,cursor,profile_id:PID,url:TARGET,target:AUTHOR};
- const job={id:id||'blv_'+hash(JSON.stringify(request)).slice(0,32),request,status:'complete',record_count:entries.length,raw_records:[{response:body,transport,url:TARGET}],diagnostics:{page,transport,postCount:entries.length,authored:rows.length,postIds:entries.map(([k])=>k),cursor:next,hasMore:Boolean(next&&next!==cursor),oldest:dates[0]||null,newest:dates.at(-1)||null,fetch_elapsed_ms:elapsedMs,ingested_at:new Date().toISOString(),ingested_count:rows.length,full_history_verified:false}};
- return {job,rows};
-}
+function pageRecord(body,page,cursor,id,transport,elapsedMs){const{entries,rows}=normalize(body,page),next=typeof body?.cursor==='string'?body.cursor:null,dates=rows.map(r=>r.published_at).filter(Boolean).sort(),request={mode:'mirror_cursor',page,cursor,profile_id:PID,url:TARGET,target:AUTHOR},job={id:id||'blv_'+hash(JSON.stringify(request)).slice(0,32),request,status:'complete',record_count:entries.length,raw_records:[{response:body,transport,url:TARGET}],diagnostics:{page,transport,postCount:entries.length,authored:rows.length,postIds:entries.map(([k])=>k),cursor:next,hasMore:Boolean(next&&next!==cursor),oldest:dates[0]||null,newest:dates.at(-1)||null,fetch_elapsed_ms:elapsedMs,ingested_at:new Date().toISOString(),ingested_count:rows.length,full_history_verified:false}};return{job,rows}}
 export async function GET(req){
- const began=Date.now(),q=new URL(req.url).searchParams,token=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'')||q.get('ticket')||'';
- if(!token||Date.now()>=EXPIRES||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404,headers:H});
+ const began=Date.now(),q=new URL(req.url).searchParams,token=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'')||q.get('ticket')||'';if(!token||Date.now()>=EXPIRES||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404,headers:H});
  const op=q.get('op')||'status',want=Number(q.get('pages')||5),suffix=q.get('run_id')||'',untilDate=q.get('until_date')||'',cutoff=untilDate?Date.parse(untilDate+'T00:00:00Z'):null;
  if(!['status','run'].includes(op)||!Number.isInteger(want)||want<1||want>20||op==='run'&&!/^[a-f0-9]{32}$/.test(suffix)||untilDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(untilDate)||!Number.isFinite(cutoff)))return Response.json({error:'invalid_parameters'},{status:400,headers:H});
- const runId='blv_'+suffix,key=process.env.BRIGHT_DATA_API_KEY||'';
- let password='',ws,claimed=false,buffer=[],rowsBuffer=[],saved=0,processed=0,recovered=0,lastPage=null,lastOldest=null,totalPosts=null,crawlBegan=null,stopReason='batch_limit',pageTimings=[],pendingCDP=new Map();
+ const runId='blv_'+suffix,key=process.env.BRIGHT_DATA_API_KEY||'';let password='',ws,claimed=false,buffer=[],rowsBuffer=[],saved=0,processed=0,recovered=0,lastPage=null,lastOldest=null,totalPosts=null,crawlBegan=null,stopReason='batch_limit',pageTimings=[],pendingCDP=new Map(),startup={};
  function safe(e){let s=String(e?.message||e);for(const x of[key,password,token])if(x)s=s.split(x).join('[REDACTED]');return s.slice(0,1200)}
- async function http(url,auth,body){
-  const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+auth,'content-type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)}),cache:'no-store',signal:AbortSignal.timeout(35000)});
-  const raw=await r.text();let v;try{v=raw?JSON.parse(raw):null}catch{v={error:'non_json'}};
-  if(!r.ok)throw Error('HTTP '+r.status+': '+JSON.stringify(v).slice(0,600));return v;
- }
+ async function http(url,auth,body){const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+auth,'content-type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)}),cache:'no-store',signal:AbortSignal.timeout(35000)}),raw=await r.text();let v;try{v=raw?JSON.parse(raw):null}catch{v={error:'non_json'}}if(!r.ok)throw Error('HTTP '+r.status+': '+JSON.stringify(v).slice(0,600));return v}
  const store=(operation,payload={})=>http(STORE,token,{op:operation,payload}),bd=path=>http('https://api.brightdata.com'+path,key);
  async function flush(){if(!buffer.length)return;const out=await store('commit',{run_id:runId,pages:buffer,rows:[...new Map(rowsBuffer.map(r=>[r.id,r])).values()]});saved+=out.new_posts;totalPosts=out.stored_posts;buffer=[];rowsBuffer=[]}
- function stats(){return {runId,requestedPages:want,browserPages:processed,recoveredPages:recovered,newPosts:saved,storedPosts:totalPosts,lastPage,lastOldest,stopReason,untilDate:untilDate||null,elapsedMs:Date.now()-began,paginationMs:crawlBegan?Date.now()-crawlBegan:0,pageTimings,fullHistoryVerified:false}}
+ function stats(){return{runId,requestedPages:want,browserPages:processed,recoveredPages:recovered,newPosts:saved,storedPosts:totalPosts,lastPage,lastOldest,stopReason,untilDate:untilDate||null,elapsedMs:Date.now()-began,paginationMs:crawlBegan?Date.now()-crawlBegan:0,pageTimings,startup,fullHistoryVerified:false}}
  try{
-  if(op==='status')return Response.json(await store('checkpoint'),{headers:H});
-  if(!key)throw Error('Bright Data not configured');
-  const claim=await store('claim',{run_id:runId,pages:want});
-  if(!claim.claimed)return Response.json({status:claim.busy?'busy':'already_submitted',runId,existing:claim.existing?.diagnostics||null},{headers:H});
-  claimed=true;
+  if(op==='status')return Response.json(await store('checkpoint'),{headers:H});if(!key)throw Error('Bright Data not configured');
+  const claim=await store('claim',{run_id:runId,pages:want});if(!claim.claimed)return Response.json({status:claim.busy?'busy':'already_submitted',runId,existing:claim.existing?.diagnostics||null},{headers:H});claimed=true;
   let checkpoint=await store('checkpoint');totalPosts=checkpoint.posts;
-  for(const job of checkpoint.pending||[]){
-   if(job.request?.mode!=='mirror_cursor'||!job.diagnostics?.response_id)continue;
-   try{
-    const r=await bd('/unblocker/get_result?response_id='+encodeURIComponent(job.diagnostics.response_id));let b=r?.body??r;
-    if(typeof b==='string'){try{b=JSON.parse(b)}catch{b=null}}
-    if((r?.status_code===undefined||r.status_code===200)&&b&&typeof b==='object'&&b.tweets&&Object.keys(b.tweets).length){
-     const rec=pageRecord(b,job.request.page,job.request.cursor,job.id,'bright_data_web_unlocker_reconciled',0);buffer.push(rec.job);rowsBuffer.push(...rec.rows);await flush();recovered++;lastPage=job.request.page;lastOldest=rec.job.diagnostics.oldest;
-    }
-   }catch{/* Repair unsuccessful old jobs at the same cursor in the browser. */}
-  }
-  checkpoint=await store('checkpoint');const base=checkpoint.base;
-  if(!base)throw Error('No completed Blvckledge cursor checkpoint');
+  for(const job of checkpoint.pending||[]){if(job.request?.mode!=='mirror_cursor'||!job.diagnostics?.response_id)continue;try{const r=await bd('/unblocker/get_result?response_id='+encodeURIComponent(job.diagnostics.response_id));let b=r?.body??r;if(typeof b==='string'){try{b=JSON.parse(b)}catch{b=null}}if((r?.status_code===undefined||r.status_code===200)&&b&&typeof b==='object'&&b.tweets&&Object.keys(b.tweets).length){const rec=pageRecord(b,job.request.page,job.request.cursor,job.id,'bright_data_web_unlocker_reconciled',0);buffer.push(rec.job);rowsBuffer.push(...rec.rows);await flush();recovered++;lastPage=job.request.page;lastOldest=rec.job.diagnostics.oldest}}catch{}}
+  checkpoint=await store('checkpoint');const base=checkpoint.base;if(!base)throw Error('No completed Blvckledge cursor checkpoint');
   if(cutoff!==null&&base.diagnostics?.newest&&Date.parse(base.diagnostics.newest)<cutoff){lastPage=base.request.page;lastOldest=base.diagnostics.oldest;stopReason='date_cutoff_reached';const s=stats();await store('finish',{run_id:runId,summary:s});claimed=false;return Response.json(s,{headers:H})}
   if(!base.diagnostics?.hasMore||!base.diagnostics?.cursor){stopReason='source_exhausted';const s=stats();await store('finish',{run_id:runId,summary:s});claimed=false;return Response.json(s,{headers:H})}
   let page=Number(base.request.page)+1,cursor=base.diagnostics.cursor;
-  const account=await bd('/status'),credentials=await bd('/zone/passwords?zone='+ZONE);password=credentials.passwords?.[0]||'';
-  if(!account.customer||!password)throw Error('Configured browser zone credentials unavailable');
-  ws=new WebSocket('wss://brd.superproxy.io:9222',{headers:{Authorization:'Basic '+Buffer.from('brd-customer-'+account.customer+'-zone-'+ZONE+':'+password).toString('base64')}});
-  let seq=0;
+  const account=await bd('/status'),credentials=await bd('/zone/passwords?zone='+ZONE);password=credentials.passwords?.[0]||'';if(!account.customer||!password)throw Error('Configured browser zone credentials unavailable');
+  ws=new WebSocket('wss://brd.superproxy.io:9222',{headers:{Authorization:'Basic '+Buffer.from('brd-customer-'+account.customer+'-zone-'+ZONE+':'+password).toString('base64')}});let seq=0;
   ws.addEventListener('message',async event=>{let m;try{m=JSON.parse(typeof event.data==='string'?event.data:await event.data.text())}catch{return}if(m.id&&pendingCDP.has(m.id)){const a=pendingCDP.get(m.id);pendingCDP.delete(m.id);clearTimeout(a.timer);m.error?a.reject(Error(m.error.message)):a.resolve(m.result)}});
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('browser_connect_timeout')),25000);ws.addEventListener('open',()=>{clearTimeout(timer);resolve()},{once:true});ws.addEventListener('error',()=>{clearTimeout(timer);reject(Error('browser_connect_error'))},{once:true})});
-  const send=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const id=++seq,timer=setTimeout(()=>{pendingCDP.delete(id);reject(Error('timeout:'+method))},55000);pendingCDP.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params,...(sessionId?{sessionId}:{})}))});
+  const send=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const id=++seq,ms=method==='Page.navigate'?120000:55000,timer=setTimeout(()=>{pendingCDP.delete(id);reject(Error('timeout:'+method))},ms);pendingCDP.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params,...(sessionId?{sessionId}:{})}))});
   const target=await send('Target.createTarget',{url:'about:blank'}),attached=await send('Target.attachToTarget',{targetId:target.targetId,flatten:true}),cmd=(m,p={})=>send(m,p,attached.sessionId);
-  await cmd('Page.enable');await cmd('Runtime.enable');await cmd('Page.navigate',{url:PROFILE});
+  await cmd('Page.enable');await cmd('Runtime.enable');
+  const navBegan=Date.now();try{const nav=await cmd('Page.navigate',{url:PROFILE});if(nav.errorText)startup.navigationError=nav.errorText}catch(e){startup.navigationError=safe(e)}startup.navigationMs=Date.now()-navBegan;
   let ready=false;
-  for(let n=0;n<25;n++){
-   const ev=await cmd('Runtime.evaluate',{expression:'({origin:location.origin,id:document.querySelector(".add-nw-event")?.getAttribute("data-query")})',returnByValue:true});
-   if(ev.result?.value?.origin==='https://site.twstalker.com'&&ev.result?.value?.id===PID){ready=true;break}await sleep(600);
+  for(let n=0;n<50&&Date.now()-began<185000;n++){
+   const ev=await cmd('Runtime.evaluate',{expression:'({origin:location.origin,path:location.pathname,title:document.title,id:document.querySelector(".add-nw-event")?.getAttribute("data-query"),state:document.readyState,excerpt:document.body?.innerText?.slice(0,350)})',returnByValue:true});startup.page=ev.result?.value||{};
+   if(startup.page.origin==='https://site.twstalker.com'&&startup.page.id===PID){ready=true;break}await sleep(600);
   }
-  if(!ready)throw Error('Public Blvckledge profile did not become ready');
+  if(!ready)throw Error('Public Blvckledge profile did not become ready');delete startup.page.excerpt;
   crawlBegan=Date.now();const seen=new Set([cursor]);
   for(let n=0;n<want&&page<=2000;n++,page++){
    if(Date.now()-began>200000){stopReason='time_checkpoint';break}
-   const current=cursor,started=Date.now(),form=new URLSearchParams({page:String(page),cursor:current,data:PID,action:'profile'}).toString();
-   const expression='(async()=>{let last;for(let a=0;a<3;a++){try{const r=await fetch("/service/api",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8","X-Requested-With":"XMLHttpRequest"},body:'+JSON.stringify(form)+',signal:AbortSignal.timeout(12000)});last={status:r.status,text:await r.text()};if([200,201].includes(r.status)&&last.text.trim().startsWith("{"))return last}catch(e){last={status:0,text:"fetch_timeout"}}await new Promise(z=>setTimeout(z,1000*(a+1)))}return last})()';
-   const ev=await cmd('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(ev.exceptionDetails)throw Error('Browser request failed at page '+page);
-   const rr=ev.result?.value;if(![200,201].includes(rr?.status))throw Error('Mirror HTTP '+rr?.status+' at page '+page);
-   let body;try{body=JSON.parse(rr.text)}catch{throw Error('Invalid JSON at page '+page)}
-   if(!body||typeof body!=='object'||body.error||(!Object.hasOwn(body,'tweets')&&!Object.hasOwn(body,'cursor')))throw Error('Unrecognized page response '+page);
-   const next=typeof body.cursor==='string'?body.cursor:null,entries=body.tweets&&typeof body.tweets==='object'?Object.keys(body.tweets):[];
-   if(next&&seen.has(next)){stopReason='repeated_cursor';break}
-   if(!entries.length&&!next){stopReason='empty_source_response_unverified';break}
-   const existing=checkpoint.pending?.find(j=>j.request?.page===page&&j.request?.cursor===current);
-   const rec=pageRecord(body,page,current,existing?.id,'bright_data_browser_api_batch',Date.now()-started);
-   buffer.push(rec.job);rowsBuffer.push(...rec.rows);processed++;lastPage=page;if(rec.job.diagnostics.oldest)lastOldest=rec.job.diagnostics.oldest;
-   pageTimings.push({page,ms:Date.now()-started,posts:rec.rows.length});
-   if(buffer.length>=5)await flush();
-   // Cross the whole page, not one potentially old quoted/pinned item, before stopping.
-   if(cutoff!==null&&rec.job.diagnostics.newest&&Date.parse(rec.job.diagnostics.newest)<cutoff){stopReason='date_cutoff_reached';break}
-   if(!next){stopReason='source_exhausted';break}seen.add(next);cursor=next;
-   await sleep(150);
+   const current=cursor,started=Date.now(),form=new URLSearchParams({page:String(page),cursor:current,data:PID,action:'profile'}).toString(),expression='(async()=>{let last;for(let a=0;a<3;a++){try{const r=await fetch("/service/api",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8","X-Requested-With":"XMLHttpRequest"},body:'+JSON.stringify(form)+',signal:AbortSignal.timeout(12000)});last={status:r.status,text:await r.text()};if([200,201].includes(r.status)&&last.text.trim().startsWith("{"))return last}catch(e){last={status:0,text:"fetch_timeout"}}await new Promise(z=>setTimeout(z,1000*(a+1)))}return last})()';
+   const ev=await cmd('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(ev.exceptionDetails)throw Error('Browser request failed at page '+page);const rr=ev.result?.value;if(![200,201].includes(rr?.status))throw Error('Mirror HTTP '+rr?.status+' at page '+page);let body;try{body=JSON.parse(rr.text)}catch{throw Error('Invalid JSON at page '+page)}if(!body||typeof body!=='object'||body.error||(!Object.hasOwn(body,'tweets')&&!Object.hasOwn(body,'cursor')))throw Error('Unrecognized page response '+page);
+   const next=typeof body.cursor==='string'?body.cursor:null,entries=body.tweets&&typeof body.tweets==='object'?Object.keys(body.tweets):[];if(next&&seen.has(next)){stopReason='repeated_cursor';break}if(!entries.length&&!next){stopReason='empty_source_response_unverified';break}
+   const existing=checkpoint.pending?.find(j=>j.request?.page===page&&j.request?.cursor===current),rec=pageRecord(body,page,current,existing?.id,'bright_data_browser_api_batch',Date.now()-started);buffer.push(rec.job);rowsBuffer.push(...rec.rows);processed++;lastPage=page;if(rec.job.diagnostics.oldest)lastOldest=rec.job.diagnostics.oldest;pageTimings.push({page,ms:Date.now()-started,posts:rec.rows.length});if(buffer.length>=5)await flush();
+   if(cutoff!==null&&rec.job.diagnostics.newest&&Date.parse(rec.job.diagnostics.newest)<cutoff){stopReason='date_cutoff_reached';break}if(!next){stopReason='source_exhausted';break}seen.add(next);cursor=next;await sleep(150);
   }
   await flush();const summary=stats();await store('finish',{run_id:runId,summary});claimed=false;return Response.json(summary,{headers:H});
- }catch(e){
-  let failure=safe(e);try{await flush()}catch(err){failure+='; checkpoint error: '+safe(err)}
-  const summary=stats();if(claimed){try{await store('finish',{run_id:runId,summary,error:failure});claimed=false}catch{}}
-  return Response.json({...summary,error:failure},{status:502,headers:H});
- }finally{for(const p of pendingCDP.values())clearTimeout(p.timer);pendingCDP.clear();try{ws?.close()}catch{}}
+ }catch(e){let failure=safe(e);try{await flush()}catch(err){failure+='; checkpoint error: '+safe(err)}const summary=stats();if(claimed){try{await store('finish',{run_id:runId,summary,error:failure});claimed=false}catch{}}return Response.json({...summary,error:failure},{status:502,headers:H})}
+ finally{for(const p of pendingCDP.values())clearTimeout(p.timer);pendingCDP.clear();try{ws?.close()}catch{}}
 }
 export async function POST(req){return GET(req)}
