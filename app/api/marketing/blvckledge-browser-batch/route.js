@@ -3,8 +3,8 @@ import {WebSocket} from 'undici';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
-const HASH='9ecf0ebcecc28292ad3a5c9f2677b09a65429548066f1541f1689c83fe0b3e8f';
-const EXPIRES=Date.parse('2026-09-12T12:00:00Z');
+const HASH='8940a885ae6e50aca994e11f0fe4d53dbcf4508326238f344a4a37be740b1979';
+const EXPIRES=Date.parse('2026-09-10T12:00:00Z');
 const STORE='https://plcqypajqvtpnjctdlho.supabase.co/functions/v1/blvckledge-batch-store';
 const AUTHOR='blvckledge',PID='1240448194984546305',PROFILE='https://site.twstalker.com/blvckledge',TARGET='https://site.twstalker.com/service/api',ZONE='nate_archive_browser';
 const SOURCE_JOB='blvckledge-archive-d027480bd6806441c9f0ea77e53725ab';
@@ -34,9 +34,9 @@ function pageRecord(body,page,cursor,id,transport,elapsedMs){
 }
 export async function GET(req){
  const began=Date.now(),q=new URL(req.url).searchParams,token=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'')||q.get('ticket')||'';
- if(!token||Date.now()>=EXPIRES||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404});
- const op=q.get('op')||'status',want=Number(q.get('pages')||5),suffix=q.get('run_id')||'';
- if(!['status','run'].includes(op)||!Number.isInteger(want)||want<1||want>20||op==='run'&&!/^[a-f0-9]{32}$/.test(suffix))return Response.json({error:'invalid_parameters'},{status:400,headers:H});
+ if(!token||Date.now()>=EXPIRES||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404,headers:H});
+ const op=q.get('op')||'status',want=Number(q.get('pages')||5),suffix=q.get('run_id')||'',untilDate=q.get('until_date')||'',cutoff=untilDate?Date.parse(untilDate+'T00:00:00Z'):null;
+ if(!['status','run'].includes(op)||!Number.isInteger(want)||want<1||want>20||op==='run'&&!/^[a-f0-9]{32}$/.test(suffix)||untilDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(untilDate)||!Number.isFinite(cutoff)))return Response.json({error:'invalid_parameters'},{status:400,headers:H});
  const runId='blv_'+suffix,key=process.env.BRIGHT_DATA_API_KEY||'';
  let password='',ws,claimed=false,buffer=[],rowsBuffer=[],saved=0,processed=0,recovered=0,lastPage=null,lastOldest=null,totalPosts=null,crawlBegan=null,stopReason='batch_limit',pageTimings=[],pendingCDP=new Map();
  function safe(e){let s=String(e?.message||e);for(const x of[key,password,token])if(x)s=s.split(x).join('[REDACTED]');return s.slice(0,1200)}
@@ -47,7 +47,7 @@ export async function GET(req){
  }
  const store=(operation,payload={})=>http(STORE,token,{op:operation,payload}),bd=path=>http('https://api.brightdata.com'+path,key);
  async function flush(){if(!buffer.length)return;const out=await store('commit',{run_id:runId,pages:buffer,rows:[...new Map(rowsBuffer.map(r=>[r.id,r])).values()]});saved+=out.new_posts;totalPosts=out.stored_posts;buffer=[];rowsBuffer=[]}
- function stats(){return {runId,requestedPages:want,browserPages:processed,recoveredPages:recovered,newPosts:saved,storedPosts:totalPosts,lastPage,lastOldest,stopReason,elapsedMs:Date.now()-began,paginationMs:crawlBegan?Date.now()-crawlBegan:0,pageTimings,fullHistoryVerified:false}}
+ function stats(){return {runId,requestedPages:want,browserPages:processed,recoveredPages:recovered,newPosts:saved,storedPosts:totalPosts,lastPage,lastOldest,stopReason,untilDate:untilDate||null,elapsedMs:Date.now()-began,paginationMs:crawlBegan?Date.now()-crawlBegan:0,pageTimings,fullHistoryVerified:false}}
  try{
   if(op==='status')return Response.json(await store('checkpoint'),{headers:H});
   if(!key)throw Error('Bright Data not configured');
@@ -55,7 +55,6 @@ export async function GET(req){
   if(!claim.claimed)return Response.json({status:claim.busy?'busy':'already_submitted',runId,existing:claim.existing?.diagnostics||null},{headers:H});
   claimed=true;
   let checkpoint=await store('checkpoint');totalPosts=checkpoint.posts;
-  // Reconcile an already-paid page before creating a browser session.
   for(const job of checkpoint.pending||[]){
    if(job.request?.mode!=='mirror_cursor'||!job.diagnostics?.response_id)continue;
    try{
@@ -64,10 +63,11 @@ export async function GET(req){
     if((r?.status_code===undefined||r.status_code===200)&&b&&typeof b==='object'&&b.tweets&&Object.keys(b.tweets).length){
      const rec=pageRecord(b,job.request.page,job.request.cursor,job.id,'bright_data_web_unlocker_reconciled',0);buffer.push(rec.job);rowsBuffer.push(...rec.rows);await flush();recovered++;lastPage=job.request.page;lastOldest=rec.job.diagnostics.oldest;
     }
-   }catch{/* Unsuccessful old jobs are repaired at the same cursor in the browser. */}
+   }catch{/* Repair unsuccessful old jobs at the same cursor in the browser. */}
   }
   checkpoint=await store('checkpoint');const base=checkpoint.base;
   if(!base)throw Error('No completed Blvckledge cursor checkpoint');
+  if(cutoff!==null&&base.diagnostics?.newest&&Date.parse(base.diagnostics.newest)<cutoff){lastPage=base.request.page;lastOldest=base.diagnostics.oldest;stopReason='date_cutoff_reached';const s=stats();await store('finish',{run_id:runId,summary:s});claimed=false;return Response.json(s,{headers:H})}
   if(!base.diagnostics?.hasMore||!base.diagnostics?.cursor){stopReason='source_exhausted';const s=stats();await store('finish',{run_id:runId,summary:s});claimed=false;return Response.json(s,{headers:H})}
   let page=Number(base.request.page)+1,cursor=base.diagnostics.cursor;
   const account=await bd('/status'),credentials=await bd('/zone/passwords?zone='+ZONE);password=credentials.passwords?.[0]||'';
@@ -102,6 +102,8 @@ export async function GET(req){
    buffer.push(rec.job);rowsBuffer.push(...rec.rows);processed++;lastPage=page;if(rec.job.diagnostics.oldest)lastOldest=rec.job.diagnostics.oldest;
    pageTimings.push({page,ms:Date.now()-started,posts:rec.rows.length});
    if(buffer.length>=5)await flush();
+   // Cross the whole page, not one potentially old quoted/pinned item, before stopping.
+   if(cutoff!==null&&rec.job.diagnostics.newest&&Date.parse(rec.job.diagnostics.newest)<cutoff){stopReason='date_cutoff_reached';break}
    if(!next){stopReason='source_exhausted';break}seen.add(next);cursor=next;
    await sleep(150);
   }
