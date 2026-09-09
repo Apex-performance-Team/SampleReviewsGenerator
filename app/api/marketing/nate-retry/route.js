@@ -1,6 +1,6 @@
 import{createHash,timingSafeEqual}from'node:crypto';
 export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=120;
-const HASH='5092bf572197b3984dce0d2750cbeb059f88e517d22da0b9c668d8374facbcc6',EXPIRES=Date.parse('2026-09-12T00:00:00Z');
+const HASH='31d84302c7ac43c2b5a18bf2dab07b197fef818a943d30f2896a9f9e88aef88d',EXPIRES=Date.parse('2026-09-10T12:00:00Z');
 const STORE='https://plcqypajqvtpnjctdlho.supabase.co/functions/v1/nate-archive-store',TARGET='https://site.twstalker.com/service/api',PROFILE='https://site.twstalker.com/Nate_Google_',ZONE='synthetic_review_ebay_items',PROFILE_ID='1544391592106201091';
 const hash=x=>createHash('sha256').update(String(x)).digest('hex'),H={'cache-control':'private, no-store','x-robots-tag':'noindex','referrer-policy':'no-referrer'};
 export async function GET(req){const p=new URL(req.url).searchParams,token=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'')||p.get('ticket')||'';if(!token||Date.now()>EXPIRES||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404});const key=process.env.BRIGHT_DATA_API_KEY||'';const page=Number(p.get('page'));if(!Number.isInteger(page)||page<2||page>400)return Response.json({error:'invalid_page'},{status:400,headers:H});
