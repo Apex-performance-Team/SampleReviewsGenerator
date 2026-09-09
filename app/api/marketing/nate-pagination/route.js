@@ -1,13 +1,13 @@
 import{createHash,timingSafeEqual}from'node:crypto';
 export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=300;
-const HASH='d68e38384fa494c2acf37f5a3512a197aff0117b99fa6595cf8948a61c80b7aa';
+const HASH='31d84302c7ac43c2b5a18bf2dab07b197fef818a943d30f2896a9f9e88aef88d';
 const STORE='https://plcqypajqvtpnjctdlho.supabase.co/functions/v1/nate-archive-store';const SEED='nate_425865145ed94ddb1861b037500e29cf';
 const TARGET='https://site.twstalker.com/service/api',PROFILE='https://site.twstalker.com/Nate_Google_',ZONE='synthetic_review_ebay_items';
 const hash=x=>createHash('sha256').update(x).digest('hex');const H={'cache-control':'private, no-store','referrer-policy':'no-referrer','x-robots-tag':'noindex'};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 export async function GET(req){
  const p=new URL(req.url).searchParams,token=req.headers.get('authorization')?.replace(/^Bearer /i,'')||p.get('ticket')||'';
- if(!token||Date.now()>Date.parse('2026-09-10T00:00:00Z')||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404});
+ if(!token||Date.now()>Date.parse('2026-09-10T12:00:00Z')||!timingSafeEqual(Buffer.from(hash(token),'hex'),Buffer.from(HASH,'hex')))return new Response('Not found',{status:404});
  const key=process.env.BRIGHT_DATA_API_KEY||'';
  async function store(op,b={}){const r=await fetch(STORE,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({op,...b}),cache:'no-store',signal:AbortSignal.timeout(45000)}),t=await r.text();if(!r.ok)throw Error('Storage '+r.status+': '+t.slice(0,500));return t?JSON.parse(t):null}
  async function upstream(path,body){const r=await fetch('https://api.brightdata.com'+path,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)}),cache:'no-store',signal:AbortSignal.timeout(90000)});const text=await r.text();let value;try{value=JSON.parse(text)}catch{value=text}return{status:r.status,value}}
