@@ -1,4 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
+const requestAuth = new AsyncLocalStorage();
+const STORE_RELAY = 'https://plcqypajqvtpnjctdlho.supabase.co/functions/v1/nate-pilot-store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,7 +44,12 @@ async function request(url, options={}, timeout=20000) {
   return value;
 }
 async function db(path, {method='GET', body, prefer='return=representation'}={}) {
-  if (!storageUrl() || !storageKey()) throw new Error('storage_not_configured');
+  if (!storageUrl() || !storageKey()) {
+    const token = requestAuth.getStore();
+    if (!token) throw new Error('pilot_auth_missing');
+    const op = path.startsWith('marketing_posts?') ? (method==='POST' ? 'save_posts' : 'sample') : method==='POST' ? 'insert_job' : method==='PATCH' ? 'update_job' : 'get_job';
+    return request(STORE_RELAY,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify({op,body})},30000);
+  }
   return request(`${storageUrl()}/rest/v1/${path}`, {method, headers:{apikey:storageKey(), authorization:`Bearer ${storageKey()}`, 'content-type':'application/json', prefer}, ...(body === undefined ? {} : {body:JSON.stringify(body)})}, 30000);
 }
 const jobQuery = `marketing_ingestion_jobs?job_key=eq.${JOB}`;
@@ -112,16 +120,20 @@ async function advance() {
   job = await updateJob({status:'ingested', progress:summary, error:null});
   return {ok:true, job};
 }
-export async function GET(req) {
+async function handle(req) {
   if (!authorized(req)) return json({error:'not_found'},404);
   const op = new URL(req.url).searchParams.get('op') || 'status';
   try {
     if (op==='advance') return json(await advance());
     if (op==='sample') return json({rows:await db(`marketing_posts?source_job=eq.${JOB}&order=published_at.desc.nullslast&limit=3&select=*`)});
     if (op!=='status') return json({error:'unsupported_operation'},400);
-    return json({profile:PROFILE, maxRecords:MAX_RECORDS, configured:{brightData:Boolean(datasetKey()), storage:Boolean(storageUrl()&&storageKey())}, job:storageUrl()&&storageKey()?await getJob():null});
+    return json({profile:PROFILE, maxRecords:MAX_RECORDS, configured:{brightData:Boolean(datasetKey()), storage:true}, job:await getJob()});
   } catch (error) { return json({ok:false, error:safeError(error)},502); }
 }
 // POST is the preferred worker invocation. The temporary GET advance capability is
 // scoped to this one idempotent, explicitly approved pilot for connector execution.
+export async function GET(req) {
+  const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') || new URL(req.url).searchParams.get('ticket') || '';
+  return requestAuth.run(token, () => handle(req));
+}
 export async function POST(req) { return GET(req); }
