@@ -15,6 +15,7 @@ export async function GET(req){
  const safe=e=>String(e.message).split(key()).join('[REDACTED]');
  const mode=p.get('mode')==='profiles_array'?'profiles_array':'profile_url';
  async function run(input,limit=100,direct=false){
+  if(mode==='profiles_array'&&!direct)input=input.map(({url,...rest})=>({urls:[url],...rest}));
   const config={mode:direct?'direct':mode,input,limit};const id='nate_'+digest(JSON.stringify(config)).slice(0,32);
   const reserved=await store('reserve',{id,request:config,max:limit});if(!reserved.created)return reserved.job;
   try{
@@ -37,12 +38,17 @@ export async function GET(req){
    const end_date=month==='2026-09'?'2026-09-09':d.toISOString().slice(0,10);
    return json(await run([{url:PROFILE,start_date:month+'-01',end_date}],500));
   }
+  if(op==='window'){
+   const start_date=p.get('start'),end_date=p.get('end'),limit=Number(p.get('limit')||100);
+   if(!/^202[2-6]-\d\d-\d\d$/.test(start_date||'')||!/^202[2-6]-\d\d-\d\d$/.test(end_date||'')||start_date<'2022-07-01'||end_date>'2026-09-10'||end_date<=start_date||!Number.isInteger(limit)||limit<1||limit>6000)throw Error('Invalid bounded window');
+   return json(await run([{url:PROFILE,start_date,end_date}],limit));
+  }
   if(op==='direct'){
    const id=p.get('post');if(!/^\d{16,24}$/.test(id||''))throw Error('Invalid Nate post ID');
    return json(await run([{url:PROFILE+'/status/'+id}],5,true));
   }
   if(op==='poll'){
-   const results=[];for(const j of (await store('list')).filter(x=>x.status==='running').slice(0,6)){
+   const results=[];for(const j of (await store('list')).filter(x=>x.status==='running').slice(0,8)){
     const progress=await bright('/datasets/v3/progress/'+j.snapshot_id);
     if(progress.status==='ready'){
      const rows=await bright('/datasets/v3/snapshot/'+j.snapshot_id+'?format=json');if(!Array.isArray(rows))throw Error('Snapshot is not an array');
@@ -55,6 +61,7 @@ export async function GET(req){
    }return json(results);
   }
   if(op==='data')return json(p.get('id')?await store('get',{id:p.get('id')}):await store('legacy'));
-  return json({version:3,configured:Boolean(key()),jobs:await store('list')});
+  if(op==='details')return json(await bright('/datasets/v3/datasets/'+DATASET));
+  return json({version:4,configured:Boolean(key()),jobs:await store('list')});
  }catch(e){return json({error:safe(e)})}
 }
