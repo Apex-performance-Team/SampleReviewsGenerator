@@ -37,9 +37,9 @@ export async function POST(req){
  const b=await req.json();if(b.mode!=='trigger')throw Error('Invalid mode');
  const catalog=await bd('/datasets/list');const rows=Array.isArray(catalog.data)?catalog.data:catalog.data?.datasets||catalog.data?.data||[];
  const id=b.dataset;if(!rows.some(x=>(x.id===id||x.dataset_id===id)&&/aliexpress/i.test(JSON.stringify(x))))throw Error('Dataset must be an AliExpress scraper');
- const qs=new URLSearchParams({dataset_id:id,format:'json',include_errors:'true',limit_per_input:'10'});
+ const qs=new URLSearchParams({dataset_id:id,format:'json',include_errors:'true',limit_per_input:String(Math.min(10,Math.max(3,b.limit||5)))});
  if(b.discover_by){if(!['keyword','category_url','url'].includes(b.discover_by))throw Error('Invalid discovery type');qs.set('type','discover_new');qs.set('discover_by',b.discover_by);}
- const input=b.discover_by==='keyword'?[{keyword:QUERY,country:'US',all_variations:false}]:[{url:SEARCH,all_variations:false}];
+ const inputs=b.inputs||[{keyword:QUERY,country:'US',all_variations:false}];if(!Array.isArray(inputs)||inputs.length<1||inputs.length>30)throw Error('Invalid inputs');const input=inputs.map(x=>{if(b.discover_by==='keyword'){if(typeof x.keyword!=='string'||x.keyword.length>100)throw Error('Invalid keyword');return {keyword:x.keyword,country:'US',all_variations:false};}if(typeof x.url!=='string'||!/^https:\/\/(www\.)?aliexpress\.(com|us)\//.test(x.url))throw Error('Invalid AliExpress URL');return {url:x.url,all_variations:false};});
  return Response.json(await bd('/datasets/v3/trigger?'+qs,input));
  }catch(e){return Response.json({error:e.message},{status:502});}
 }
