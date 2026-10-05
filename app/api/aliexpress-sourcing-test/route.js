@@ -23,6 +23,7 @@ export async function GET(req){
  if(!allowed(req))return Response.json({error:'Unauthorized or expired'},{status:401});
  try{
  const q=new URL(req.url).searchParams,mode=q.get('mode')||'catalog';
+ if(mode==='zones'){const r=await bd('/zone/get_all_zones');const rows=Array.isArray(r.data)?r.data:[];return Response.json({status:r.status,zones:rows.map(x=>({name:x.name,type:x.type,plan:x.plan?.type})),error:typeof r.data==='string'?r.data.slice(0,300):undefined});}
  if(mode==='catalog'){const r=await bd('/datasets/list');const rows=Array.isArray(r.data)?r.data:r.data?.datasets||r.data?.data||[];return Response.json({status:r.status,datasets:rows.filter(x=>/aliexpress/i.test(JSON.stringify(x))),query:QUERY});}
  if(mode==='schema'){const id=q.get('dataset');if(!/^gd_[a-z0-9]+$/.test(id||''))throw Error('Invalid dataset');return Response.json(await bd('/datasets/'+id+'/metadata'));}
  const id=q.get('snapshot');if(!/^sd?_[a-zA-Z0-9]+$/.test(id||''))throw Error('Invalid snapshot');
@@ -34,7 +35,7 @@ export async function GET(req){
 export async function POST(req){
  if(!allowed(req))return Response.json({error:'Unauthorized or expired'},{status:401});
  try{
- const b=await req.json();if(b.mode!=='trigger')throw Error('Invalid mode');
+ const b=await req.json();if(b.mode==='page'){if(typeof b.zone!=='string'||!/^[a-zA-Z0-9_]+$/.test(b.zone)||typeof b.url!=='string'||!/^https:\/\/(www\.)?aliexpress\.(com|us)\//.test(b.url))throw Error('Invalid page input');const r=await fetch('https://api.brightdata.com/request',{method:'POST',headers:{authorization:'Bearer '+process.env.BRIGHT_DATA_API_KEY,'content-type':'application/json'},body:JSON.stringify({zone:b.zone,url:b.url,format:'raw',country:'us'}),signal:AbortSignal.timeout(45000)});return Response.json({status:r.status,html:(await r.text()).slice(0,1500000)});}if(b.mode!=='trigger')throw Error('Invalid mode');
  const catalog=await bd('/datasets/list');const rows=Array.isArray(catalog.data)?catalog.data:catalog.data?.datasets||catalog.data?.data||[];
  const id=b.dataset;if(!rows.some(x=>(x.id===id||x.dataset_id===id)&&/aliexpress/i.test(JSON.stringify(x))))throw Error('Dataset must be an AliExpress scraper');
  const qs=new URLSearchParams({dataset_id:id,format:'json',include_errors:'true',limit_per_input:String(Math.min(10,Math.max(3,b.limit||5)))});
