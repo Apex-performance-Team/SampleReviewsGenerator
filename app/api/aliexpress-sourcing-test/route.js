@@ -24,8 +24,8 @@ export async function GET(req){
  try{
  const q=new URL(req.url).searchParams,mode=q.get('mode')||'catalog';
  if(mode==='catalog'){const r=await bd('/datasets/list');const rows=Array.isArray(r.data)?r.data:r.data?.datasets||r.data?.data||[];return Response.json({status:r.status,datasets:rows.filter(x=>/aliexpress/i.test(JSON.stringify(x))),query:QUERY});}
- if(mode==='schema'){const id=q.get('dataset');if(!/^gd_[a-z0-9]+$/.test(id||''))throw Error('Invalid dataset');return Response.json(await bd('/datasets/'+id));}
- const id=q.get('snapshot');if(!/^s_[a-zA-Z0-9]+$/.test(id||''))throw Error('Invalid snapshot');
+ if(mode==='schema'){const id=q.get('dataset');if(!/^gd_[a-z0-9]+$/.test(id||''))throw Error('Invalid dataset');return Response.json(await bd('/datasets/'+id+'/metadata'));}
+ const id=q.get('snapshot');if(!/^sd?_[a-zA-Z0-9]+$/.test(id||''))throw Error('Invalid snapshot');
  if(mode==='progress')return Response.json(await bd('/datasets/v3/progress/'+id));
  if(mode==='snapshot')return Response.json(await bd('/datasets/v3/snapshot/'+id+'?format=json'));
  throw Error('Invalid mode');
