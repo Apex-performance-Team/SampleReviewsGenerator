@@ -39,7 +39,7 @@ export async function POST(req){
  const id=b.dataset;if(!rows.some(x=>(x.id===id||x.dataset_id===id)&&/aliexpress/i.test(JSON.stringify(x))))throw Error('Dataset must be an AliExpress scraper');
  const qs=new URLSearchParams({dataset_id:id,format:'json',include_errors:'true',limit_per_input:'10'});
  if(b.discover_by){if(!['keyword','category_url','url'].includes(b.discover_by))throw Error('Invalid discovery type');qs.set('type','discover_new');qs.set('discover_by',b.discover_by);}
- const input=b.discover_by==='keyword'?[{keyword:QUERY,country:'US'}]:[{url:SEARCH}];
+ const input=b.discover_by==='keyword'?[{keyword:QUERY,country:'US',all_variations:false}]:[{url:SEARCH,all_variations:false}];
  return Response.json(await bd('/datasets/v3/trigger?'+qs,input));
  }catch(e){return Response.json({error:e.message},{status:502});}
 }
