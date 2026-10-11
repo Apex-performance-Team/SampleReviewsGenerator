@@ -157,8 +157,12 @@ Flow:
 2. The route validates products, creates/reuses child review runs, creates a parent catalog run, and starts `storeReviewCatalogWorkflow`.
 3. `workflows/store-review-catalog.js` advances child runs in groups based on the selected concurrency.
 4. Run state is stored in Supabase `review_runs`.
-5. Studio polls `GET /api/store-review-workflows?limit=30` every 2.5 seconds.
+5. Studio polls `GET /api/store-review-workflows?limit=30` after the previous request finishes: every 5 seconds while active and 30 seconds while idle, with failure backoff up to 60 seconds. Manual refresh shares the pending request.
 6. Queue and Results render from the same catalog status payload.
+
+Queue reads select status fields only; full child `input_json` and `result_json` are fetched only for generation or opening/exporting results. Catalog list reads project workflow metadata out of `result_json`. Storage health checks perform a bounded `select=id&limit=1` request instead of only checking environment variables. Supabase requests have a 30-second deadline (10 seconds for health checks).
+
+Run `node scripts/queue-performance-selftest.mjs` to check projection, export preservation, health failures, and polling concurrency/backoff.
 
 Current durable limits:
 

@@ -36,7 +36,7 @@ startCatalogStep.maxRetries=5;
 
 async function finishCatalogStep(catalogRunId,childRunIds){
   'use step';
-  const [catalog,children]=await Promise.all([getRun(catalogRunId),getRuns(childRunIds)]),completed=children.reduce((n,run)=>n+(Number(run.completed_count)||0),0),purged=children.reduce((n,run)=>n+(Number(run.purged_count)||0),0),failed=children.filter(run=>run.status==='failed');
+  const [catalog,children]=await Promise.all([getRun(catalogRunId),getRuns(childRunIds,{summaryOnly:true})]),completed=children.reduce((n,run)=>n+(Number(run.completed_count)||0),0),purged=children.reduce((n,run)=>n+(Number(run.purged_count)||0),0),failed=children.filter(run=>run.status==='failed');
   if(catalog.status==='canceled')return{completed,failed:failed.length,total:children.length,canceled:true};
   const progressMessage=failed.length?`Finished with ${failed.length} failed SKU${failed.length===1?'':'s'}; completed results remain exportable.`:`Completed ${children.length} SKU${children.length===1?'':'s'} on the server.`;
   await updateRun(catalogRunId,{status:'completed',completed_count:completed,purged_count:purged,current_step:failed.length?'completed_with_errors':'completed',progress_message:progressMessage,error:failed.length?failed.map(run=>`${run.product_title||run.id}: ${run.error||'failed'}`).join('\n').slice(0,1000):null,result_json:{...(catalog.result_json||{}),durable:true,failedRunIds:failed.map(run=>run.id)},completed_at:new Date().toISOString()});

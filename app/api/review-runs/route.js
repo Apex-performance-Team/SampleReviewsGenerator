@@ -1,7 +1,7 @@
 export const runtime='nodejs';
 export const maxDuration=180;
 
-import{createRun,listRuns,runStoreMode}from'../../../lib/review-run-store.mjs';
+import{checkRunStore,createRun,listRuns,runStoreMode}from'../../../lib/review-run-store.mjs';
 import{publicRunRateLimit}from'../../../lib/public-run-rate-limit.mjs';
 
 function clean(value,max=1000){return String(value||'').replace(/\s+/g,' ').trim().slice(0,max)}
@@ -15,7 +15,7 @@ function inputFrom(body){
   return{productUrl,amazonListingUrl:clean(body.amazonListingUrl,1000),productTitle,productDescription,mode:mode(body.mode),reviewCount,targetAverage,referenceBudget:body.referenceBudget||'balanced',references:Array.isArray(body.references)?body.references:undefined};
 }
 export async function GET(req){
-  try{if(new URL(req.url).searchParams.get('storeOnly')==='1')return Response.json({store:runStoreMode()},{headers:{'cache-control':'no-store'}});const runs=(await listRuns(100)).filter(run=>!run.input_json?.catalogRun).slice(0,75);return Response.json({runs,store:runStoreMode()},{headers:{'cache-control':'no-store'}})}
+  try{if(new URL(req.url).searchParams.get('storeOnly')==='1')return Response.json({store:await checkRunStore()},{headers:{'cache-control':'no-store'}});const runs=(await listRuns(100)).filter(run=>!run.input_json?.catalogRun).slice(0,75);return Response.json({runs,store:runStoreMode()},{headers:{'cache-control':'no-store'}})}
   catch(error){return Response.json({error:error.message||'Could not list runs.'},{status:500,headers:{'cache-control':'no-store'}})}
 }
 export async function POST(req){

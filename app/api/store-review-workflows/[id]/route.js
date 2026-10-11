@@ -8,7 +8,7 @@ import{publicRunRateLimit}from'../../../../lib/public-run-rate-limit.mjs';
 export async function GET(req,{params}){
   try{
     const{id}=await params,catalog=await getRun(id);if(!catalog.input_json?.catalogRun)throw Error('Catalog workflow not found.');
-    const childRunIds=catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[],children=await getRuns(childRunIds),workflowRunId=catalog.result_json?.workflowRunId;
+    const childRunIds=catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[],children=await getRuns(childRunIds,{summaryOnly:true}),workflowRunId=catalog.result_json?.workflowRunId;
     let workflowStatus=null;
     if(workflowRunId)try{workflowStatus=await getWorkflowRun(workflowRunId).status}catch{}
     return Response.json({...catalogStatus(catalog,children,workflowStatus),store:runStoreMode()},{headers:{'cache-control':'no-store'}});
@@ -31,7 +31,7 @@ export async function DELETE(req,{params}){
         else workflowCanceled=status==='cancelled';
       }else warning='The Workflow run was not found, but persisted generation work was canceled.';
     }catch(error){warning=`Persisted generation work was canceled; Workflow cancellation could not be confirmed: ${String(error?.message||error).slice(0,300)}`}
-    const [updatedCatalog,children]=await Promise.all([getRun(id),getRuns(childRunIds)]);
+    const [updatedCatalog,children]=await Promise.all([getRun(id),getRuns(childRunIds,{summaryOnly:true})]);
     return Response.json({...catalogStatus(updatedCatalog,children,workflowCanceled?'cancelled':null),canceled:true,workflowCanceled,warning,store:runStoreMode()},{headers:{'cache-control':'no-store'}});
   }catch(error){return Response.json({error:error.message||'Could not cancel catalog workflow.'},{status:/not found/i.test(error.message)?404:500,headers:{'cache-control':'no-store'}})}
 }

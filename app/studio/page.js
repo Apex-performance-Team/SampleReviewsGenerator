@@ -13,6 +13,7 @@ import {
 import AreviewsExportControls from "../areviews-export-controls";
 import CreditBalanceBar from "../credit-balance-bar";
 import ReferenceBudgetControl from "../reference-budget-control";
+import { createQueuePoller } from "../../lib/queue-poller.mjs";
 
 const start = {
   productUrl: "",
@@ -238,37 +239,37 @@ export default function StudioPage() {
       throw e;
     }
   }, []);
-  const refreshCatalogRuns = useCallback(async () => {
+  const queuePoller = useMemo(() => createQueuePoller(async (signal) => {
+    setQueueLoading(true);
     try {
       const response = await fetch("/api/store-review-workflows?limit=30", {
           cache: "no-store",
+          signal,
         }),
-        data = await response.json().catch(() => ({}));
+        data = await response.json();
       if (!response.ok)
         throw Error(data.error || "Could not refresh server generations.");
       setCatalogRuns(Array.isArray(data.runs) ? data.runs : []);
       setQueueError("");
       return data.runs || [];
     } catch (error) {
-      setQueueError(error.message || "Could not refresh server generations.");
+      if (signal.reason?.name !== "AbortError")
+        setQueueError(error.message || "Could not refresh server generations.");
       throw error;
     } finally {
       setQueueLoading(false);
     }
-  }, []);
+  }), []);
+  const refreshCatalogRuns = useCallback(() => queuePoller.refresh(), [queuePoller]);
 
   useEffect(() => {
     healthCheck();
     refreshStore().catch((e) => setErr(e.message));
   }, [refreshStore]);
   useEffect(() => {
-    refreshCatalogRuns().catch(() => {});
-    const timer = window.setInterval(
-      () => refreshCatalogRuns().catch(() => {}),
-      2500,
-    );
-    return () => window.clearInterval(timer);
-  }, [refreshCatalogRuns]);
+    queuePoller.start();
+    return () => queuePoller.stop();
+  }, [queuePoller]);
   useEffect(() => {
     const saved = window.localStorage.getItem("srl-reference-sourcing-enabled");
     if (saved === "off") setExternalReferencesEnabledState(false);
@@ -882,7 +883,9 @@ export default function StudioPage() {
         : "No batch loaded",
     healthLabel = health.loading
       ? "Checking…"
-      : health.ok && storageReady
+      : queueError
+        ? "Queue unavailable · database requests are failing"
+        : health.ok && storageReady
         ? `Connected · ${health.model} · durable server workflows active`
         : !storageReady
           ? `Supabase inactive · current store: ${store}`
@@ -904,7 +907,7 @@ export default function StudioPage() {
             <small>Review operations</small>
           </div>
         </div>
-        <div className={`studioConnection ${health.ok && storageReady ? "good" : "bad"}`}>
+        <div className={`studioConnection ${health.ok && storageReady && !queueError ? "good" : "bad"}`}>
           <span />
           {healthLabel}
         </div>

@@ -32,7 +32,7 @@ export async function GET(req){
   try{
     const limit=Math.max(1,Math.min(30,Number(new URL(req.url).searchParams.get('limit'))||20)),[active,recent]=await Promise.all([listCatalogRuns(50,{statuses:['queued','running']}),listCatalogRuns(limit)]),catalogs=[...active,...recent.filter(catalog=>!active.some(item=>item.id===catalog.id))],childIds=[...new Set(catalogs.flatMap(catalog=>catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[]))],childBatches=[];
     for(let offset=0;offset<childIds.length;offset+=100)childBatches.push(childIds.slice(offset,offset+100));
-    const children=(await Promise.all(childBatches.map(ids=>getRuns(ids)))).flat(),byId=new Map(children.map(run=>[run.id,run]));
+    const children=(await Promise.all(childBatches.map(ids=>getRuns(ids,{summaryOnly:true})))).flat(),byId=new Map(children.map(run=>[run.id,run]));
     const runs=catalogs.map(catalog=>catalogStatus(catalog,(catalog.input_json?.childRunIds||catalog.result_json?.childRunIds||[]).map(id=>byId.get(id)).filter(Boolean)));
     return Response.json({runs,store:runStoreMode()},{headers:{'cache-control':'no-store'}});
   }catch(error){return Response.json({error:error.message||'Could not list catalog workflows.'},{status:500,headers:{'cache-control':'no-store'}})}
