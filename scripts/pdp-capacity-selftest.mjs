@@ -25,7 +25,7 @@ function harness({count=2000,alwaysFlag=false}={}){
     assert(Buffer.byteLength(options.body)<300000,'Each model API request stays bounded');
     if(url.endsWith('/generation-plan')){
       const start=body.previousThemes.length;
-      return{ok:true,json:async()=>({plannerModel:'test-model',plannerProvider:'mock',themes:Array.from({length:Math.max(12,Math.ceil(body.reviewCount/4))},(_,i)=>({focus:`Test focus ${start+i}`,scenarioVariants:[0,1,2,3].map(j=>`Scenario ${start+i} variant ${j}`),evidenceBoundary:'Internal test data.',allowedRatings:[1,2,3,4,5]}))})};
+      return{ok:true,json:async()=>({plannerModel:'test-model',plannerProvider:'mock',themes:Array.from({length:body.themeCount},(_,i)=>({focus:`Test focus ${start+i}`,scenarioVariants:[0,1,2,3].map(j=>`Scenario ${start+i} variant ${j}`),evidenceBoundary:'Internal test data.',allowedRatings:[1,2,3,4,5]}))})};
     }
     if(url.endsWith('/generate')){
       assert(body.planItems.length<=10);
@@ -120,7 +120,7 @@ assert.equal(h.row().completed_count,2000);assert.equal(h.row().result_json.revi
 assert.equal(h.pending.size,0);assert.equal(h.row().result_json.corpusRepairCount,667);
 assert.equal(h.row().result_json.pdpQuality.repairRounds,1,'One repair round covers all 667 flagged IDs');
 assert.equal(h.calls.filter(call=>call.url.endsWith('/generate')).length,200);
-assert.equal(h.calls.filter(call=>call.url.endsWith('/generation-plan')).length,25);
+assert.equal(h.calls.filter(call=>call.url.endsWith('/generation-plan')).length,63);
 assert.equal(h.calls.filter(call=>call.body.mode==='repair').length,28);
 assert.equal(h.row().result_json.corpusDiagnostics.count,2000);
 assert.equal(h.row().result_json.corpusDiagnostics.chunkedAssessment.chunks,80);
@@ -154,5 +154,5 @@ assert.equal(blocked.row().result_json.pdpQuality.repairRounds,3);
 assert.equal(blocked.row().result_json.corpusDiagnostics.qaStatus,'needs_review');
 await assert.rejects(blocked.step,/quality review is required/);
 assert(!blocked.row().result_json.finalResult);
-assert(26+200+4*80+3*Math.ceil(2000/24)+10<MAX_REVIEW_CHECKPOINTS,'Worst-case full repair coverage fits durable checkpoint budget');
-console.log(JSON.stringify({ok:true,count:2000,steps,planningCalls:25,generationCalls:200,qaChunksPerPass:80,repaired:667,repairBatches:28,resultPages:20,retryResume:true,blockedAfterThreeRounds:true}));
+assert(1025+200+4*80+3*Math.ceil(2000/24)+10<MAX_REVIEW_CHECKPOINTS,'Worst-case full repair coverage fits durable checkpoint budget');
+console.log(JSON.stringify({ok:true,count:2000,steps,planningCalls:63,generationCalls:200,qaChunksPerPass:80,repaired:667,repairBatches:28,resultPages:20,retryResume:true,blockedAfterThreeRounds:true}));

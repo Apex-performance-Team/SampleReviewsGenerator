@@ -149,9 +149,9 @@ function GenerationQueue({
                   <span>{generationTime(catalog.createdAt)} ET</span>
                 </footer>
                 <div className="jobActions">
-                  {catalog.status === "completed" && (
+                  {(catalog.status === "completed" || (catalog.status === "failed" && progress.done > 0)) && (
                     <button className="ghost" onClick={() => onView(run)}>
-                      {compact ? "View" : "View generated reviews"}
+                      {compact ? "View" : catalog.status === "failed" ? "View saved reviews" : "View generated reviews"}
                     </button>
                   )}
                   {active && (
