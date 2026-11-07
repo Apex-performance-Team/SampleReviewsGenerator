@@ -120,7 +120,7 @@ assert.equal(h.row().completed_count,2000);assert.equal(h.row().result_json.revi
 assert.equal(h.pending.size,0);assert.equal(h.row().result_json.corpusRepairCount,667);
 assert.equal(h.row().result_json.pdpQuality.repairRounds,1,'One repair round covers all 667 flagged IDs');
 assert.equal(h.calls.filter(call=>call.url.endsWith('/generate')).length,200);
-assert.equal(h.calls.filter(call=>call.url.endsWith('/generation-plan')).length,10);
+assert.equal(h.calls.filter(call=>call.url.endsWith('/generation-plan')).length,25);
 assert.equal(h.calls.filter(call=>call.body.mode==='repair').length,28);
 assert.equal(h.row().result_json.corpusDiagnostics.count,2000);
 assert.equal(h.row().result_json.corpusDiagnostics.chunkedAssessment.chunks,80);
@@ -152,5 +152,5 @@ assert.equal(blocked.row().result_json.pdpQuality.repairRounds,3);
 assert.equal(blocked.row().result_json.corpusDiagnostics.qaStatus,'needs_review');
 await assert.rejects(blocked.step,/quality review is required/);
 assert(!blocked.row().result_json.finalResult);
-assert(11+200+4*80+3*Math.ceil(2000/24)+10<MAX_REVIEW_CHECKPOINTS,'Worst-case full repair coverage fits durable checkpoint budget');
-console.log(JSON.stringify({ok:true,count:2000,steps,planningCalls:10,generationCalls:200,qaChunksPerPass:80,repaired:667,repairBatches:28,resultPages:20,retryResume:true,blockedAfterThreeRounds:true}));
+assert(26+200+4*80+3*Math.ceil(2000/24)+10<MAX_REVIEW_CHECKPOINTS,'Worst-case full repair coverage fits durable checkpoint budget');
+console.log(JSON.stringify({ok:true,count:2000,steps,planningCalls:25,generationCalls:200,qaChunksPerPass:80,repaired:667,repairBatches:28,resultPages:20,retryResume:true,blockedAfterThreeRounds:true}));
