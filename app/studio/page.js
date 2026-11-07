@@ -14,6 +14,7 @@ import AreviewsExportControls from "../areviews-export-controls";
 import CreditBalanceBar from "../credit-balance-bar";
 import ReferenceBudgetControl from "../reference-budget-control";
 import { PDP_REVIEW_LIMIT, reviewCountLimit } from "../../lib/review-limits.mjs";
+import { loadProductPages } from "../../lib/review-result-pages.mjs";
 import { createQueuePoller } from "../../lib/queue-poller.mjs";
 
 const start = {
@@ -561,17 +562,12 @@ export default function StudioPage() {
         throw Error(data.error || "Could not load generated reviews.");
       if (data.paginated) {
         for (let index = 0; index < data.result.products.length; index++) {
-          let offset = 0, product = null;
-          const reviews = [];
-          do {
+          data.result.products[index] = await loadProductPages(async (offset) => {
             const pageResponse = await fetch(`/api/store-review-workflows/${catalog.id}/result?product=${index}&offset=${offset}`, { cache: "no-store" });
             const page = await pageResponse.json();
             if (!pageResponse.ok) throw Error(page.error || "Could not load review page.");
-            if (page.product) product = page.product;
-            reviews.push(...page.reviews);
-            offset = page.pagination.nextOffset;
-          } while (offset !== null);
-          data.result.products[index] = { ...product, reviews };
+            return page;
+          });
         }
       }
       if (catalog.bulk) {

@@ -6,7 +6,7 @@ import * as large from '../lib/pdp-large-run.mjs';
 import {solveNaturalRatingDistribution,createPersonaProfiles,corpusQualitySignals} from '../lib/review-blueprint.mjs';
 import {reviewRatingSummary} from '../lib/review-quality-finalize.mjs';
 import {buildCatalogResult} from '../lib/store-review-catalog.mjs';
-import {resultPage,publicReviewRun,streamText} from '../lib/review-result-pages.mjs';
+import {resultPage,publicReviewRun,streamText,loadProductPages} from '../lib/review-result-pages.mjs';
 import {syntheticReviewCsv} from '../lib/synthetic-review-export.mjs';
 import {areviewsReviewCsv} from '../lib/areviews-export.mjs';
 import {reviewCountLimit,MAX_REVIEW_CHECKPOINTS} from '../lib/review-limits.mjs';
@@ -133,6 +133,8 @@ const product=buildCatalogResult({id:'test-catalog',input_json:{}},[h.row()]).pr
 let offset=0,pages=0;
 do{const page=resultPage(product,offset);assert(Buffer.byteLength(JSON.stringify(page))<4500000);loaded.push(...page.reviews);offset=page.pagination.nextOffset;pages++}while(offset!==null);
 assert.equal(pages,20);assert.deepEqual(loaded,product.reviews);assert.equal(loaded.at(-1).id,'SYN-2000');
+assert.deepEqual((await loadProductPages(async offset=>resultPage(product,offset))).reviews,product.reviews);
+await assert.rejects(()=>loadProductPages(async offset=>{const page=resultPage(product,offset);if(offset===100)page.reviews=[];return page}),/complete review result/);
 assert(Buffer.byteLength(JSON.stringify(publicReviewRun(h.row())))<4500000);
 assert.equal(h.api.csvForRun(h.row()).trim().split('\n').length,2001);
 assert.equal(h.api.areviewsCsvForRun(h.row()).trim().split('\n').length,2001);
