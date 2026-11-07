@@ -1,3 +1,4 @@
+import{streamText}from'../../../../../lib/review-result-pages.mjs';
 export const runtime = "nodejs";
 
 import { areviewsCsvForRun } from "../../../../../lib/review-run-engine.mjs";
@@ -27,7 +28,7 @@ export async function GET(req, { params }) {
       startDate: search.get("startDate") || "",
       endDate: search.get("endDate") || "",
     });
-    return new Response(csv, {
+    return new Response(streamText(csv), {
       headers: {
         "content-type": "text/csv;charset=utf-8",
         "content-disposition": `attachment; filename="areviews-${slug(run.product_title)}-${run.id.slice(0, 8)}.csv"`,

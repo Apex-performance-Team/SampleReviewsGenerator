@@ -1,3 +1,4 @@
+import{reviewCountLimit}from'../../../lib/review-limits.mjs';
 export const runtime='nodejs';
 export const maxDuration=180;
 
@@ -10,7 +11,7 @@ import { storeReviewCatalogWorkflow } from '../../../workflows/store-review-cata
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function clean(value,max=1000){return String(value||'').replace(/\s+/g,' ').trim().slice(0,max)}
-function requestedCount(value){const n=Number(value);if(!Number.isInteger(n)||n<5||n>250)throw Error('Every review count must be 5–250.');return n}
+function requestedCount(value,external){const n=Number(value),limit=reviewCountLimit(external);if(!Number.isInteger(n)||n<5||n>limit)throw Error(`Every review count must be 5–${limit}.`);return n}
 function targetAverage(value){const n=Number(value??4.7);if(!(n>=1&&n<=5))throw Error('Target average must be 1–5.');return n}
 function catalogId(value){const id=clean(value,80);if(!UUID.test(id))throw Error('A valid catalogId UUID is required.');return id}
 function childId(parentId,index){const bytes=createHash('sha256').update(`${parentId}:${index}`).digest().subarray(0,16);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const hex=bytes.toString('hex');return`${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`}
@@ -23,7 +24,7 @@ async function getOrCreateRun(input,id){
   try{return await createRun(input,{id})}catch(error){if(/\b409\b|duplicate|unique/i.test(error.message))return getRun(id);throw error}
 }
 function productInput(product,body){
-  const productUrl=clean(product.productUrl||product.url,1000),productTitle=clean(product.productTitle||product.title,240),productDescription=clean(product.productDescription,9000),reviewCount=requestedCount(product.reviewCount??product.requestedReviewCount),externalReferencesEnabled=Boolean(body.externalReferencesEnabled);
+  const productUrl=clean(product.productUrl||product.url,1000),productTitle=clean(product.productTitle||product.title,240),productDescription=clean(product.productDescription,9000),reviewCount=requestedCount(product.reviewCount??product.requestedReviewCount,Boolean(body.externalReferencesEnabled)),externalReferencesEnabled=Boolean(body.externalReferencesEnabled);
   if(!productUrl&&(!productTitle||!productDescription))throw Error('Every product needs a URL or product title/context.');
   return{productUrl,amazonListingUrl:clean(product.amazonListingUrl,1000),productTitle,productDescription,reviewCount,targetAverage:targetAverage(product.targetAverage??body.targetAverage),mode:modeFromReferences(externalReferencesEnabled),externalReferencesEnabled,referenceBudget:referenceBudget(product.referenceBudget||body.referenceBudget),existingReviewCount:product.existingReviewCount??product.extracted?.existingReviewCount??null};
 }

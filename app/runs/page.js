@@ -1,4 +1,5 @@
 "use client";
+import { reviewCountLimit } from "../../lib/review-limits.mjs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AreviewsExportControls from "../areviews-export-controls";
 
@@ -572,7 +573,7 @@ export default function RunsPage() {
                     <input
                       type="number"
                       min="5"
-                      max="250"
+                      max={reviewCountLimit(isSource)}
                       value={form.reviewCount}
                       onChange={(event) =>
                         set("reviewCount", event.target.value)

@@ -33,6 +33,7 @@ EXACT RATING DISTRIBUTION: ${JSON.stringify(distribution.by)}
 VERIFIED EXTERNAL REFERENCE SUMMARIES (optional inspiration; never copy wording or anecdotes):
 ${JSON.stringify(references)}
 
+Previously allocated theme focuses (do not repeat or merely rephrase these): ${JSON.stringify((Array.isArray(input.previousThemes)?input.previousThemes:[]).slice(0,500).map(x=>clean(x,180)))}
 Return exactly ${themeCount} materially distinct review themes. Each theme must have four concise scenario variants so parallel generators receive different corpus roles. Cover the realistic breadth of what consumers might discuss for this specific product: different use stages, contexts, priorities, tradeoffs, outcomes, and rating-appropriate limitations. Do not let setup, one headline feature, or marketing copy dominate the plan.
 
 Rules:

@@ -1,9 +1,10 @@
+import{MAX_REVIEW_CHECKPOINTS}from'../lib/review-limits.mjs';
 import{FatalError,RetryableError}from'workflow';
 import{advanceRun}from'../lib/review-run-engine.mjs';
 import{compactReviewRun}from'../lib/store-review-catalog.mjs';
 import{getRun,getRuns,updateRun}from'../lib/review-run-store.mjs';
 
-const MAX_CHECKPOINTS=140;
+const MAX_CHECKPOINTS=MAX_REVIEW_CHECKPOINTS;
 
 function messageFrom(error){return String(error?.message||error||'Unknown workflow error').slice(0,1000)}
 function permanentFailure(message){return /must be|is required|not found|not configured|invalid run|zero final reviews|no source review bodies|product url or product title/i.test(message)}

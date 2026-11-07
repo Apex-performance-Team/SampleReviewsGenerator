@@ -61,8 +61,9 @@ function applyRepairs(reviews,ai,requestedIds=null){
 }
 export async function POST(req){
   try{
-    const input=await req.json(),mode=input.mode==='assess'?'assess':'repair',productTitle=String(input.productTitle||'').replace(/\s+/g,' ').trim().slice(0,240),productDescription=String(input.productDescription||'').trim().slice(0,9000),reviews=(Array.isArray(input.reviews)?input.reviews:[]).slice(0,250).map(cleanReview).filter(review=>review.id&&review.body.length>=10);
+    const input=await req.json(),mode=input.mode==='assess'?'assess':'repair',productTitle=String(input.productTitle||'').replace(/\s+/g,' ').trim().slice(0,240),productDescription=String(input.productDescription||'').trim().slice(0,9000),reviews=(Array.isArray(input.reviews)?input.reviews:[]).map(cleanReview).filter(review=>review.id&&review.body.length>=10);
     if(!productTitle||!productDescription)throw Error('Product title and product context are required.');
+    if(reviews.length>250)throw Error('Corpus QA accepts at most 250 reviews per request; use the durable workflow for larger corpora.');
     if(reviews.length<5)throw Error('At least 5 reviews are required for corpus QA.');
     let repairIds=null;
     if(mode==='repair'&&input.repairIds!==undefined){
