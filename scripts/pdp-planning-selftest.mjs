@@ -52,7 +52,7 @@ const route=readFileSync(new URL('../app/api/generation-plan/route.js',import.me
 function routeHarness(gateway){const dependencies={gateway,MODEL:'test',sanitizeThemes,PDP_REVIEW_LIMIT,...policy};return new Function(...Object.keys(dependencies),route+'\nreturn POST;')(...Object.values(dependencies))}
 for(const count of [1,2,4,8]){
   let prompt;
-  const post=routeHarness(async(req,text,timeout)=>{prompt=text;assert.equal(timeout,75000);return{text:JSON.stringify({themes:Array.from({length:count},(_,i)=>theme(i))}),provider:'test'}});
+  const post=routeHarness(async(req,text,timeout)=>{prompt=text;assert.equal(timeout,120000);return{text:JSON.stringify({themes:Array.from({length:count},(_,i)=>theme(i))}),provider:'test'}});
   const response=await post({json:async()=>({planningMode:'theme_batch',themeCount:count,reviewCount:2000,productTitle:'Test',productDescription:'Test context.'})});
   const body=await response.json();assert.equal(response.status,200);assert.equal(body.themes.length,count);assert.equal(body.items,undefined);assert(prompt.includes(`Plan exactly ${count}`));
 }

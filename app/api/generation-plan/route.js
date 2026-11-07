@@ -80,7 +80,7 @@ Return this exact shape:
 {"themes":[{"id":"THEME-01","focus":"distinct consumer focus","scenarioVariants":["variant 1","variant 2","variant 3","variant 4"],"evidenceBoundary":"facts or claims that must not be exceeded","allowedRatings":[1,2,3,4,5]}]}`;
     let planned=null,themes=null,plannerProvider=null,plannerModel=MODEL,plannerFallbackReason=null;
     try{
-      planned=await gateway(req,prompt,75000);
+      planned=await gateway(req,prompt,PDP_PLANNING_TIMEOUT_MS);
       plannerProvider=planned.provider;
       themes=parseObject(planned.text)?.themes;
     }catch(error){
