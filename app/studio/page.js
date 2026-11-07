@@ -13,6 +13,8 @@ import {
 import AreviewsExportControls from "../areviews-export-controls";
 import CreditBalanceBar from "../credit-balance-bar";
 import ReferenceBudgetControl from "../reference-budget-control";
+import { PDP_REVIEW_LIMIT, reviewCountLimit } from "../../lib/review-limits.mjs";
+import { loadProductPages } from "../../lib/review-result-pages.mjs";
 import { createQueuePoller } from "../../lib/queue-poller.mjs";
 
 const start = {
@@ -32,14 +34,14 @@ const completedQaStatuses = new Set(["completed", "completed_with_purge"]);
 
 function cleanReviewCount(value, fallback = 100) {
   const n = Math.round(Number(value));
-  return Number.isFinite(n) ? Math.max(5, Math.min(250, n)) : fallback;
+  return Number.isFinite(n) ? Math.max(5, Math.min(PDP_REVIEW_LIMIT, n)) : fallback;
 }
 function reviewCountValue(product, fallback = 100) {
   return product?.reviewCount ?? cleanReviewCount(fallback, 100);
 }
-function validReviewCount(value) {
+function validReviewCount(value, external = false) {
   const n = Number(value);
-  return Number.isInteger(n) && n >= 5 && n <= 250;
+  return Number.isInteger(n) && n >= 5 && n <= reviewCountLimit(external);
 }
 function storeWorkerCount(concurrency, _referenceMode, count) {
   const max = 12;
@@ -558,6 +560,16 @@ export default function StudioPage() {
         data = await response.json().catch(() => ({}));
       if (!response.ok)
         throw Error(data.error || "Could not load generated reviews.");
+      if (data.paginated) {
+        for (let index = 0; index < data.result.products.length; index++) {
+          data.result.products[index] = await loadProductPages(async (offset) => {
+            const pageResponse = await fetch(`/api/store-review-workflows/${catalog.id}/result?product=${index}&offset=${offset}`, { cache: "no-store" });
+            const page = await pageResponse.json();
+            if (!pageResponse.ok) throw Error(page.error || "Could not load review page.");
+            return page;
+          });
+        }
+      }
       if (catalog.bulk) {
         setResult(null);
         setBulkResult(data.result);
@@ -621,11 +633,11 @@ export default function StudioPage() {
       requestedReviewCount: Number(p.reviewCount ?? defaultCount),
     }));
     const invalid = selectedWithCounts.find(
-      (p) => !validReviewCount(p.requestedReviewCount),
+      (p) => !validReviewCount(p.requestedReviewCount, externalReferencesEnabled),
     );
     if (invalid) {
       setErr(
-        `Review count for ${invalid.productTitle || invalid.title || "one product"} must be 5–250.`,
+        `Review count for ${invalid.productTitle || invalid.title || "one product"} must be 5–${reviewCountLimit(externalReferencesEnabled)}.`,
       );
       return;
     }
@@ -690,7 +702,7 @@ export default function StudioPage() {
       const count = Number(
         p.reviewCount ?? cleanReviewCount(f.reviewCount, 100),
       );
-      return n + (validReviewCount(count) ? count : 0);
+      return n + (validReviewCount(count, externalReferencesEnabled) ? count : 0);
     }, 0);
   const enabled = products.filter((x) => x.enabled).length,
     allOn = products.length > 0 && enabled === products.length;
@@ -995,7 +1007,7 @@ export default function StudioPage() {
                     <input
                       type="number"
                       min="5"
-                      max="250"
+                      max={reviewCountLimit(externalReferencesEnabled)}
                       value={f.reviewCount}
                       onChange={(e) => set("reviewCount", e.target.value)}
                     />
@@ -1245,7 +1257,7 @@ export default function StudioPage() {
                                 <input
                                   type="number"
                                   min="5"
-                                  max="250"
+                                  max={reviewCountLimit(externalReferencesEnabled)}
                                   value={reviewCountValue(p, f.reviewCount)}
                                   onChange={(e) =>
                                     setProductReviewCount(
