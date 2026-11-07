@@ -1,5 +1,8 @@
 import {readFileSync} from 'node:fs';
 import * as helper from '../lib/pdp-corpus-repair.mjs';
+import * as policy from '../lib/pdp-quality-policy.mjs';
+import * as large from '../lib/pdp-large-run.mjs';
+import {createHash} from 'node:crypto';
 
 const engineSource=readFileSync(new URL('../lib/review-run-engine.mjs',import.meta.url),'utf8');
 const qaSource=readFileSync(new URL('../app/api/corpus-qa/route.js',import.meta.url),'utf8');
@@ -8,17 +11,18 @@ function assert(condition,message){if(!condition)throw Error(message)}
 function equal(actual,expected,message){assert(JSON.stringify(actual)===JSON.stringify(expected),message+': '+JSON.stringify(actual))}
 async function rejects(work,pattern){let error;try{await work()}catch(caught){error=caught}assert(error&&pattern.test(error.message),'Expected rejection '+pattern)}
 function executable(source){return source.replace(/^import[^\n]*\n/gm,'').replace(/^export /gm,'')}
-function fixtures(count=40){return Array.from({length:count},(_,i)=>({id:'SYN-'+String(i+1).padStart(4,'0'),rating:i%5+1,title:'Fixture '+i,body:'Internal synthetic fixture body for assignment '+i+'.',personaId:'PERSONA-'+i,personaProfile:{signature:'profile-'+i},blueprint:{themeId:'THEME-'+i},date:'2026-01-01',syntheticFixture:true,publicationAllowed:false}))}
-function harness({flagged=38,alwaysFlag=false,failAssessment=false,canceled=false}={}){
+function fixtures(count=40){return Array.from({length:count},(_,i)=>({id:'SYN-'+String(i+1).padStart(4,'0'),rating:i%5+1,title:'Fixture '+i,body:Array.from({length:16},(_,j)=>createHash('sha256').update(i+':'+j).digest('hex').slice(0,10)).join(' '),personaId:'PERSONA-'+i,personaProfile:{signature:'profile-'+i},blueprint:{themeId:'THEME-'+i},date:'2026-01-01',syntheticFixture:true,publicationAllowed:false}))}
+function harness({flagged=38,alwaysFlag=false,failAssessment=false,canceled=false,legacy=false}={}){
   let row={id:'test-run',status:canceled?'canceled':'running',mode:'pdp_only',requested_count:40,completed_count:40,input_json:{productTitle:'Internal QA fixture',productDescription:'Synthetic test data only.',targetAverage:3},result_json:{plan:{items:[]},reviews:fixtures(),steps:[]}};
+  if(legacy){row.result_json.pdpQuality={phase:'blocked',repairRounds:3,remainingRepairIds:['SYN-0001']};row.result_json.corpusRepairCount=300;}
   const pending=new Set(row.result_json.reviews.slice(0,flagged).map(review=>review.id)),calls=[];
   const getRun=async()=>structuredClone(row),updateRun=async(id,patch)=>{row={...row,...structuredClone(patch)};return structuredClone(row)};
   const fetch=async(url,options)=>{
     const payload=JSON.parse(options.body);calls.push(payload);
     if(payload.mode==='assess'){
       if(failAssessment)throw Error('Assessment provider unavailable');
-      const ids=alwaysFlag?['SYN-0001']:[...pending].slice(0,30);
-      return{ok:true,json:async()=>({model:'test-model',diagnostics:{count:payload.reviews.length,recommendedRepairIds:ids,exactDuplicateGroups:[],duplicateTitleGroups:[],overallDiversityScore:ids.length?42:90}})};
+      const ids=(alwaysFlag?['SYN-0001']:[...pending]).filter(id=>(payload.assessmentIds||payload.reviews.map(r=>r.id)).includes(id));
+      return{ok:true,json:async()=>({model:'test-model',diagnostics:{count:payload.reviews.length,policyVersion:policy.PDP_QUALITY_POLICY,materialIssues:ids.map(id=>({id,kind:'off_product',relatedIds:[]})),recommendedRepairIds:ids,exactDuplicateGroups:[],duplicateTitleGroups:[],overallDiversityScore:ids.length?42:90}})};
     }
     assert(payload.mode==='repair','Only assessment and repair endpoints are expected');
     assert(payload.repairIds.length<=24,'Repair batch exceeded 24');
@@ -30,7 +34,8 @@ function harness({flagged=38,alwaysFlag=false,failAssessment=false,canceled=fals
     });
     return{ok:true,json:async()=>({reviews,repairCount:requested.size})};
   };
-  const api=new Function('getRun','updateRun','reviewRatingSummary','syntheticReviewCsv','areviewsReviewCsv','PDP_REPAIR_BATCH_SIZE','PDP_MAX_REPAIR_ROUNDS','pdpRepairIds','mergePdpRepairs','fetch',executable(engineSource)+'\nreturn {advanceRun};')(getRun,updateRun,()=>({distribution:{},actualAverage:3}),()=>'',()=>'',helper.PDP_REPAIR_BATCH_SIZE,helper.PDP_MAX_REPAIR_ROUNDS,helper.pdpRepairIds,helper.mergePdpRepairs,fetch);
+  const dependencies={getRun,updateRun,reviewRatingSummary:()=>({distribution:{},actualAverage:3}),syntheticReviewCsv:()=>'',areviewsReviewCsv:()=>'',...helper,...policy,...large,fetch};
+  const api=new Function(...Object.keys(dependencies),executable(engineSource)+'\nreturn {advanceRun};')(...Object.values(dependencies));
   return{step:()=>api.advanceRun(row.id,'https://internal-test.invalid'),row:()=>row,calls};
 }
 const tests=[];
@@ -39,7 +44,7 @@ async function check(name,work){await work();tests.push(name)}
 await check('38 flagged reviews are repaired in bounded batches, reassessed, and exported with metadata',async()=>{
   const h=harness(),before=fixtures();
   for(let i=0;i<10&&h.row().status!=='completed';i++)await h.step();
-  equal(h.calls.map(call=>call.mode),['assess','repair','assess','repair','assess'],'Repair/recheck sequence');
+  equal(h.calls.map(call=>call.mode),['assess','repair','repair','assess','assess'],'Repair/recheck sequence');
   equal(h.calls.filter(call=>call.mode==='repair').map(call=>call.repairIds.length),[24,14],'Repair batches');
   equal(h.row().status,'completed','Completion status');
   equal(h.row().result_json.finalResult.corpusRepairCount,38,'Exported repair count');
@@ -53,6 +58,13 @@ await check('38 flagged reviews are repaired in bounded batches, reassessed, and
   equal(h.row().result_json.reviews.slice(38),before.slice(38),'Unflagged reviews untouched');
   const calls=h.calls.length;await h.step();equal(h.calls.length,calls,'Completed runs do not run repair again');
 });
+await check('old blocked checkpoints are reassessed before any repair and retain saved work',async()=>{
+  const h=harness({flagged:0,legacy:true}),before=structuredClone(h.row().result_json.reviews);
+  await h.step();equal(h.calls.length,0,'Policy migration does not spend');equal(h.row().result_json.pdpQuality.phase,'assess','Fresh assessment required');
+  equal(h.row().result_json.corpusRepairCount,300,'Historical cost count retained');equal(h.row().result_json.reviews,before,'Saved bodies retained');
+  await h.step();equal(h.calls.map(call=>call.mode),['assess'],'No old repair IDs replayed');
+  await h.step();equal(h.row().status,'completed','Only fresh assessment can finalize');
+});
 await check('clean assessment skips repair',async()=>{
   const h=harness({flagged:0});await h.step();await h.step();
   equal(h.row().status,'completed','Clean corpus completes');
@@ -65,7 +77,7 @@ await check('QA failure cannot finalize a job',async()=>{
 });
 await check('unresolved quality is persisted and blocked after three repair rounds',async()=>{
   const h=harness({alwaysFlag:true});
-  for(let i=0;i<7;i++)await h.step();
+  for(let i=0;i<20&&h.row().result_json.pdpQuality?.phase!=='blocked';i++)await h.step();
   equal(h.row().result_json.pdpQuality.phase,'blocked','Bounded repair limit');
   equal(h.row().result_json.corpusDiagnostics.qaStatus,'needs_review','Needs review recorded');
   await rejects(h.step,/quality review is required/);
@@ -87,7 +99,8 @@ const fakeResponse={json:(body,options={})=>({status:options.status||200,body})}
 function qaHarness(modelOutput){
   let calls=0,prompt='';
   const gateway=async(req,input)=>{calls++;prompt=input;return{text:JSON.stringify(modelOutput)}};
-  const api=new Function('gateway','MODEL','Response',executable(qaSource)+'\nreturn {POST};')(gateway,'test-model',fakeResponse);
+  const dependencies={gateway,MODEL:'test-model',Response:fakeResponse,...policy};
+  const api=new Function(...Object.keys(dependencies),executable(qaSource)+'\nreturn {POST};')(...Object.values(dependencies));
   return{post:input=>api.POST({json:async()=>input}),calls:()=>calls,prompt:()=>prompt};
 }
 const qaInput={mode:'repair',productTitle:'Internal fixture',productDescription:'Synthetic test context.',reviews:fixtures(5),repairIds:['SYN-0001'],repairDiagnostics:{recommendedRepairIds:['SYN-0001']}};
