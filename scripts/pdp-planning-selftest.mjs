@@ -64,4 +64,13 @@ for(const [message,status,code] of [['AI Gateway timeout',504,'PLANNER_TIMEOUT']
 checks.push('The API returns typed failures rather than disguising them as successful fallback plans');
 const invalid=routeHarness(async()=>{throw Error('Must not call model for invalid input')});
 assert.equal((await invalid({json:async()=>({planningMode:'theme_batch',themeCount:20,reviewCount:2000,productTitle:'Test',productDescription:'Context'})})).status,400);
+const workflowSource=readFileSync(new URL('../workflows/store-review-catalog.js',import.meta.url),'utf8').replace(/^import[^\n]*\n/gm,'').replace(/^export /gm,'');
+class FatalError extends Error{}
+class RetryableError extends Error{constructor(message,options){super(message);this.options=options}}
+for(const code of ['PLANNER_BLOCKED','PLANNER_BILLING','PLANNER_AUTH','PLANNER_INPUT','PLANNER_RATE_LIMIT']){
+  const advanceRun=async()=>{const error=new Error('Model request stopped');error.code=code;throw error};
+  const step=new Function('MAX_REVIEW_CHECKPOINTS','FatalError','RetryableError','advanceRun',workflowSource+'\nreturn advanceReviewRunStep;')(2000,FatalError,RetryableError,advanceRun);
+  await assert.rejects(()=>step('run','origin'),error=>code==='PLANNER_RATE_LIMIT'?error instanceof RetryableError&&error.options.retryAfter==='30s':error instanceof FatalError);
+}
+checks.push('Durable workflow stops terminal planner errors immediately and backs off rate limits');
 console.log(JSON.stringify({ok:true,checks}));
