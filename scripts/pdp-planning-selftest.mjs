@@ -69,7 +69,7 @@ class FatalError extends Error{}
 class RetryableError extends Error{constructor(message,options){super(message);this.options=options}}
 for(const code of ['PLANNER_BLOCKED','PLANNER_BILLING','PLANNER_AUTH','PLANNER_INPUT','PLANNER_RATE_LIMIT']){
   const advanceRun=async()=>{const error=new Error('Model request stopped');error.code=code;throw error};
-  const step=new Function('MAX_REVIEW_CHECKPOINTS','FatalError','RetryableError','advanceRun',workflowSource+'\nreturn advanceReviewRunStep;')(2000,FatalError,RetryableError,advanceRun);
+  const step=new Function('MAX_REVIEW_CHECKPOINTS','FatalError','RetryableError','advanceRun','compactReviewRun',workflowSource+'\nreturn advanceReviewRunStep;')(2000,FatalError,RetryableError,advanceRun,run=>run);
   await assert.rejects(()=>step('run','origin'),error=>code==='PLANNER_RATE_LIMIT'?error instanceof RetryableError&&error.options.retryAfter==='30s':error instanceof FatalError);
 }
 checks.push('Durable workflow stops terminal planner errors immediately and backs off rate limits');
