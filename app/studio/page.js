@@ -30,7 +30,7 @@ const formatAverage = (value) =>
   value != null && Number.isFinite(Number(value))
     ? Number(value).toFixed(2)
     : "—";
-const completedQaStatuses = new Set(["completed", "completed_with_purge"]);
+const completedQaStatuses = new Set(["completed", "completed_with_purge", "server_completed"]);
 
 function cleanReviewCount(value, fallback = 100) {
   const n = Math.round(Number(value));
@@ -848,7 +848,7 @@ export default function StudioPage() {
     resultQaLabel =
       resultQaStatus === "completed_with_purge"
         ? "Passed · purged"
-        : resultQaStatus === "completed"
+        : (resultQaStatus === "completed" || resultQaStatus === "server_completed")
           ? "Passed"
           : resultQaStatus === "warning"
             ? "Review"
@@ -856,8 +856,10 @@ export default function StudioPage() {
     resultQaDetail =
       resultQaStatus === "completed_with_purge"
         ? `${result?.purgedReviewCount || 0} unresolved fixture${result?.purgedReviewCount === 1 ? " was" : "s were"} removed from the final output`
-        : resultQaStatus === "completed"
-          ? "AI semantic-diversity assessment completed"
+        : (resultQaStatus === "completed" || resultQaStatus === "server_completed")
+          ? result?.corpusDiagnostics?.policyVersion === "material-defects-v1"
+            ? "Material-quality checks passed: no unresolved serious defects or duplicates"
+            : "AI semantic-diversity assessment completed"
           : resultQaStatus === "warning"
             ? `Semantic diversity score ${result?.corpusDiagnostics?.overallDiversityScore ?? "—"}/100 is below the advisory 80-point threshold`
             : "Deterministic checks completed; AI semantic assessment was unavailable",

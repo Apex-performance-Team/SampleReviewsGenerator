@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import * as repair from '../lib/pdp-corpus-repair.mjs';
 import * as large from '../lib/pdp-large-run.mjs';
+import * as policy from '../lib/pdp-quality-policy.mjs';
 import {solveNaturalRatingDistribution,createPersonaProfiles,corpusQualitySignals} from '../lib/review-blueprint.mjs';
 import {reviewRatingSummary} from '../lib/review-quality-finalize.mjs';
 import {buildCatalogResult} from '../lib/store-review-catalog.mjs';
@@ -35,16 +36,16 @@ function harness({count=2000,alwaysFlag=false}={}){
     assert(body.reviews.length>=5&&body.reviews.length<=50,'QA payload contains 5–50 reviews');
     if(body.mode==='assess'){
       if(failNextAssessment){failNextAssessment=false;throw Error('Injected retryable QA failure')}
-      const ids=body.reviews.filter(review=>pending.has(review.id)).map(review=>review.id).slice(0,20);
+      const ids=body.reviews.filter(review=>pending.has(review.id)&&(body.assessmentIds||body.reviews.map(r=>r.id)).includes(review.id)).map(review=>review.id).slice(0,20);
       assert(ids.length<=20,'Mock assessor respects its 20-ID limit');
-      return{ok:true,json:async()=>({diagnostics:{count:body.reviews.length,recommendedRepairIds:ids,overallDiversityScore:ids.length?40:92}})};
+      return{ok:true,json:async()=>({diagnostics:{count:body.reviews.length,policyVersion:policy.PDP_QUALITY_POLICY,materialIssues:ids.map(id=>({id,kind:'off_product',relatedIds:[]})),recommendedRepairIds:ids,overallDiversityScore:ids.length?40:92}})};
     }
     assert(body.repairIds.length<=24);
     const wanted=new Set(body.repairIds);
     if(!alwaysFlag)for(const id of wanted)pending.delete(id);
     return{ok:true,json:async()=>({reviews:body.reviews.map(review=>wanted.has(review.id)?{...review,title:review.title+' updated',body:uniqueText(review.id,'repair '+calls.length)}:review)})};
   };
-  const dependencies={getRun:async()=>row,updateRun,reviewRatingSummary,syntheticReviewCsv,areviewsReviewCsv,...repair,...large,fetch};
+  const dependencies={getRun:async()=>row,updateRun,reviewRatingSummary,syntheticReviewCsv,areviewsReviewCsv,...repair,...policy,...large,fetch};
   const api=new Function(...Object.keys(dependencies),source+'\nreturn {advanceRun,csvForRun,areviewsCsvForRun};')(...Object.values(dependencies));
   return{step:()=>api.advanceRun(row.id,'https://capacity-test.invalid'),row:()=>row,calls,api,pending,failAssessment:()=>{failNextAssessment=true}};
 }
@@ -123,7 +124,8 @@ assert.equal(h.calls.filter(call=>call.url.endsWith('/generate')).length,200);
 assert.equal(h.calls.filter(call=>call.url.endsWith('/generation-plan')).length,63);
 assert.equal(h.calls.filter(call=>call.body.mode==='repair').length,28);
 assert.equal(h.row().result_json.corpusDiagnostics.count,2000);
-assert.equal(h.row().result_json.corpusDiagnostics.chunkedAssessment.chunks,80);
+assert.equal(h.row().result_json.corpusDiagnostics.chunkedAssessment.chunks,28);
+assert.equal(h.row().result_json.corpusDiagnostics.chunkedAssessment.targeted,true);
 assert.equal(h.row().result_json.plan.items.length,0,'Completed generation sheds redundant assignments');
 assert.equal(h.row().result_json.finalResult.reviews,undefined,'Stored final result does not duplicate 2,000 reviews');
 assert.equal(h.row().result_json.finalResult.actualAverage,4.7);
