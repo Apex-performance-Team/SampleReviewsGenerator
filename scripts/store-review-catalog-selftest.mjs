@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import {buildCatalogResult,catalogStatus,compactReviewRun} from '../lib/store-review-catalog.mjs';
+import {buildCatalogResult,catalogStatus,compactReviewRun,catalogCompletion} from '../lib/store-review-catalog.mjs';
 
 const catalog={id:'catalog-id',status:'completed',mode:'pdp_only',requested_count:10,completed_count:7,purged_count:1,current_step:'completed_with_errors',progress_message:'Finished with 1 failed SKU.',error:'Second product: failed',created_at:'2026-01-01T00:00:00.000Z',updated_at:'2026-01-01T00:01:00.000Z',input_json:{catalogRun:true,targetAverage:4.7},result_json:{workflowRunId:'workflow-id'}};
 const children=[
@@ -24,3 +24,9 @@ assert.equal(result.products[1].runStatus,'failed');
 assert.equal(result.products[1].reviews.length,2);
 
 console.log(JSON.stringify({ok:true,progress:status.progress,totalReviews:result.totalReviews}));
+
+assert.equal(catalogCompletion([children[1]]).status,'failed');
+assert.equal(catalogCompletion(children).status,'completed');
+assert.equal(catalogCompletion(children).currentStep,'completed_with_errors');
+assert.equal(catalogStatus(catalog,[children[1]]).catalog.status,'failed');
+assert.equal(catalogStatus({...catalog,status:'canceled'},[children[1]]).catalog.status,'canceled');

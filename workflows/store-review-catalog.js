@@ -1,7 +1,7 @@
 import{MAX_REVIEW_CHECKPOINTS}from'../lib/review-limits.mjs';
 import{FatalError,RetryableError}from'workflow';
 import{advanceRun}from'../lib/review-run-engine.mjs';
-import{compactReviewRun}from'../lib/store-review-catalog.mjs';
+import{compactReviewRun,catalogCompletion}from'../lib/store-review-catalog.mjs';
 import{getRun,getRuns,updateRun}from'../lib/review-run-store.mjs';
 
 const MAX_CHECKPOINTS=MAX_REVIEW_CHECKPOINTS;
@@ -14,8 +14,8 @@ async function advanceReviewRunStep(runId,origin){
   try{return compactReviewRun(await advanceRun(runId,origin))}
   catch(error){
     const message=messageFrom(error);
-    if(permanentFailure(message))throw new FatalError(message);
-    if(/\b429\b|rate.?limit|too many requests/i.test(message))throw new RetryableError(message,{retryAfter:'30s'});
+    if(['PLANNER_BILLING','PLANNER_AUTH','PLANNER_INPUT','PLANNER_BLOCKED'].includes(error.code)||permanentFailure(message))throw new FatalError(message);
+    if(error.code==='PLANNER_RATE_LIMIT'||/\b429\b|rate.?limit|too many requests/i.test(message))throw new RetryableError(message,{retryAfter:'30s'});
     throw error;
   }
 }
@@ -39,8 +39,8 @@ async function finishCatalogStep(catalogRunId,childRunIds){
   'use step';
   const [catalog,children]=await Promise.all([getRun(catalogRunId),getRuns(childRunIds,{summaryOnly:true})]),completed=children.reduce((n,run)=>n+(Number(run.completed_count)||0),0),purged=children.reduce((n,run)=>n+(Number(run.purged_count)||0),0),failed=children.filter(run=>run.status==='failed');
   if(catalog.status==='canceled')return{completed,failed:failed.length,total:children.length,canceled:true};
-  const progressMessage=failed.length?`Finished with ${failed.length} failed SKU${failed.length===1?'':'s'}; completed results remain exportable.`:`Completed ${children.length} SKU${children.length===1?'':'s'} on the server.`;
-  await updateRun(catalogRunId,{status:'completed',completed_count:completed,purged_count:purged,current_step:failed.length?'completed_with_errors':'completed',progress_message:progressMessage,error:failed.length?failed.map(run=>`${run.product_title||run.id}: ${run.error||'failed'}`).join('\n').slice(0,1000):null,result_json:{...(catalog.result_json||{}),durable:true,failedRunIds:failed.map(run=>run.id)},completed_at:new Date().toISOString()});
+  const outcome=catalogCompletion(children);
+  await updateRun(catalogRunId,{status:outcome.status,completed_count:completed,purged_count:purged,current_step:outcome.currentStep,progress_message:outcome.progressMessage,error:failed.length?failed.map(run=>`${run.product_title||run.id}: ${run.error||'failed'}`).join('\n').slice(0,1000):null,result_json:{...(catalog.result_json||{}),durable:true,failedRunIds:failed.map(run=>run.id)},completed_at:new Date().toISOString()});
   return{completed,failed:failed.length,total:children.length};
 }
 finishCatalogStep.maxRetries=5;
