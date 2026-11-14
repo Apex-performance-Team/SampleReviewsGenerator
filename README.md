@@ -17,7 +17,7 @@ The working UI is `/studio`. The app is now organized around four operator scree
 
 | Screen | Purpose | Main files |
 | --- | --- | --- |
-| Generate | Configure run settings, scan one product or a Shopify store, then queue generation. | `app/studio/page.js`, `app/globals.css` |
+| Generate | Choose and scan a product or Shopify store, configure review counts and dates, then queue generation. | `app/studio/page.js`, `app/globals.css` |
 | Queue | Always-visible server queue with active jobs, progress, view, refresh, resume, and cancel. | `app/studio/page.js`, `app/api/store-review-workflows/*` |
 | Results | Completed batch archive with pagination, preview, JSON/CSV exports, and Areviews export. | `app/studio/page.js`, `lib/synthetic-review-export.mjs`, `lib/areviews-export.mjs` |
 | Settings | Reference mode, Areviews date defaults, scan budget, and credit monitor. | `app/studio/page.js`, `app/areviews-export-controls.js`, `app/reference-budget-control.js`, `app/credit-balance-bar.js` |
@@ -26,17 +26,17 @@ The Generate screen order is intentional:
 
 1. Hero
 2. Synthetic QA warning
-3. Run settings card
-   - `Test Review Count`
+3. Source input card
+   - Single product scan
+   - Whole Shopify store scan
+4. Run settings card
+   - Fixed review count or whole-store random range
    - `Test rating average`
    - Output mode notice
    - Areviews export date range
-4. Source input card
-   - Single product scan
-   - Whole Shopify store scan
 5. Product details form and queue button
 
-Keep the run settings above Source input. Store mode uses `Test Review Count` as the default review count for every discovered SKU, so it needs to be visible before the user scans a store.
+Keep Source input above the review count and date settings in both single-product and whole-store mode. Whole-store range controls appear after selecting Whole Shopify store.
 
 ## Local development
 
@@ -283,10 +283,10 @@ node - <<'NODE'
 const fs=require('fs');
 const html=fs.readFileSync('.next/server/app/studio.html','utf8');
 console.log({
-  settingsBeforeSource:
+  sourceBeforeSettings:
     html.indexOf('Test Review Count') > -1 &&
     html.indexOf('SOURCE') > -1 &&
-    html.indexOf('Test Review Count') < html.indexOf('SOURCE')
+    html.indexOf('SOURCE') < html.indexOf('Test Review Count')
 });
 NODE
 ```
@@ -395,7 +395,7 @@ For small copy-only changes, `git diff --check` and `npm run build --silent` are
 Before calling the app good after a UI change:
 
 - `/studio` loads.
-- Run settings appear above Source input.
+- Source input appears above the review count and date settings.
 - Label says `Test Review Count`.
 - Whole-store scan button shows immediate status and discovers products.
 - Product detail scans show progress and per-row statuses.
