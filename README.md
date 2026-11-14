@@ -18,7 +18,7 @@ The working UI is `/studio`. The app is now organized around four operator scree
 | Screen | Purpose | Main files |
 | --- | --- | --- |
 | Generate | Configure run settings, scan one product or a Shopify store, then queue generation. | `app/studio/page.js`, `app/globals.css` |
-| Queue | Always-visible server queue with active jobs, progress, view, refresh, and cancel. | `app/studio/page.js`, `app/api/store-review-workflows/*` |
+| Queue | Always-visible server queue with active jobs, progress, view, refresh, resume, and cancel. | `app/studio/page.js`, `app/api/store-review-workflows/*` |
 | Results | Completed batch archive with pagination, preview, JSON/CSV exports, and Areviews export. | `app/studio/page.js`, `lib/synthetic-review-export.mjs`, `lib/areviews-export.mjs` |
 | Settings | Reference mode, Areviews date defaults, scan budget, and credit monitor. | `app/studio/page.js`, `app/areviews-export-controls.js`, `app/reference-budget-control.js`, `app/credit-balance-bar.js` |
 
@@ -188,6 +188,17 @@ The Queue has a whole-generation cancel button.
 - Storage: `cancelRuns()` in `lib/review-run-store.mjs`
 
 Cancel marks queued/running parent and child runs as canceled. Completed work remains stored/exportable when available.
+
+### Resume flow
+
+Failed jobs show **Resume** in both the Queue screen and server queue rail. Mixed batches resume only failed SKUs; a failure during QA remains resumable even when the review count has reached 100%. Completed and canceled children are never restarted.
+
+- UI: `resumeCatalogGeneration()` and `lib/catalog-resume.mjs`
+- API: `POST /api/store-review-workflows/[id]/resume`
+- Recovery selection: `lib/resume-catalog-handler.mjs`
+- Check: `npm run test:catalog-resume`
+
+Recovery reuses child IDs, plans, saved reviews, and QA checkpoints under a new durable catalog. Concurrent requests for the same failed checkpoints share a deterministic catalog ID and the existing atomic queued-run claim. A later failure can be resumed again. Existing active recoveries are returned instead of starting overlapping work. The old billing error is cleared as the child resumes. Credit failures show a reminder to replenish AI Gateway credits before pressing Resume.
 
 ### Results and exports
 

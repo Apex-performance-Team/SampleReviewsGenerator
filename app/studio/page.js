@@ -16,6 +16,7 @@ import ReferenceBudgetControl from "../reference-budget-control";
 import { PDP_REVIEW_LIMIT, reviewCountLimit } from "../../lib/review-limits.mjs";
 import { loadProductPages } from "../../lib/review-result-pages.mjs";
 import { createQueuePoller } from "../../lib/queue-poller.mjs";
+import { resumableChildren, resumeGuidance } from "../../lib/catalog-resume.mjs";
 
 const start = {
   productUrl: "",
@@ -65,7 +66,10 @@ function GenerationQueue({
   loading,
   error,
   cancelingId,
+  resumingId,
+  resumeError,
   onCancel,
+  onResume,
   onView,
   onRefresh,
   variant = "full",
@@ -107,6 +111,7 @@ function GenerationQueue({
             const catalog = run.catalog || {},
               progress = run.progress || {},
               active = activeGenerationStatuses.has(catalog.status),
+              recoverable = resumableChildren(run, runs),
               current =
                 run.children?.find((child) => child.status === "running") ||
                 run.children?.find((child) => child.status === "queued") ||
@@ -149,6 +154,15 @@ function GenerationQueue({
                   <span>{generationTime(catalog.createdAt)} ET</span>
                 </footer>
                 <div className="jobActions">
+                  {recoverable.length > 0 && (
+                    <button
+                      className="primary"
+                      onClick={() => onResume(run)}
+                      disabled={Boolean(resumingId)}
+                    >
+                      {resumingId === catalog.id ? "Resuming…" : "Resume"}
+                    </button>
+                  )}
                   {(catalog.status === "completed" || (catalog.status === "failed" && progress.done > 0)) && (
                     <button className="ghost" onClick={() => onView(run)}>
                       {compact ? "View" : catalog.status === "failed" ? "View saved reviews" : "View generated reviews"}
@@ -168,6 +182,8 @@ function GenerationQueue({
                     </button>
                   )}
                 </div>
+                {recoverable.length > 0 && <p className="jobResumeHint">{resumeGuidance(run)}</p>}
+                {resumeError?.id === catalog.id && <div className="queueError" role="alert">{resumeError.message}</div>}
               </article>
             );
           })}
@@ -201,9 +217,12 @@ export default function StudioPage() {
     [queueLoading, setQueueLoading] = useState(true),
     [queueError, setQueueError] = useState(""),
     [cancelingId, setCancelingId] = useState(""),
+    [resumingId, setResumingId] = useState(""),
+    [resumeError, setResumeError] = useState(null),
     [screen, setScreen] = useState("generate"),
     [resultsPage, setResultsPage] = useState(1);
   const form = useRef(null);
+  const resumeInFlight = useRef(false);
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
   const setExternalReferencesEnabled = (v) => {
     setExternalReferencesEnabledState(v);
@@ -520,6 +539,32 @@ export default function StudioPage() {
     setScreen("queue");
     return accepted;
   }
+  async function resumeCatalogGeneration(run) {
+    if (resumeInFlight.current) return;
+    resumeInFlight.current = true;
+    const id = run.catalog.id;
+    setResumingId(id);
+    setResumeError(null);
+    try {
+      const response = await fetch(`/api/store-review-workflows/${id}/resume`, {
+        method: "POST",
+        signal: AbortSignal.timeout(60000),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw Error(data.error || "Could not resume the generation. Try again; saved progress is safe.");
+      if (data.status) setCatalogRuns(current => [data.status, ...current.filter(item => item.catalog?.id !== data.catalogId)]);
+      try { window.localStorage.setItem("srl-studio-last-run-id", data.catalogId); } catch {}
+      setScreen("queue");
+    } catch (error) {
+      setResumeError({ id, message: error.name === "TimeoutError"
+        ? "The resume request took too long to confirm. Refresh the queue or try Resume again; saved progress is safe."
+        : error.message || "Could not resume the generation." });
+    } finally {
+      await refreshCatalogRuns().catch(() => {});
+      resumeInFlight.current = false;
+      setResumingId("");
+    }
+  }
   async function cancelCatalogGeneration(run) {
     const catalog = run.catalog || {},
       label = catalog.bulk
@@ -820,6 +865,9 @@ export default function StudioPage() {
         loading={queueLoading}
         error={queueError}
         cancelingId={cancelingId}
+        resumingId={resumingId}
+        resumeError={resumeError}
+        onResume={resumeCatalogGeneration}
         onCancel={cancelCatalogGeneration}
         onView={viewCatalogResult}
         onRefresh={() => {
@@ -834,6 +882,9 @@ export default function StudioPage() {
         loading={queueLoading}
         error={queueError}
         cancelingId={cancelingId}
+        resumingId={resumingId}
+        resumeError={resumeError}
+        onResume={resumeCatalogGeneration}
         onCancel={cancelCatalogGeneration}
         onView={viewCatalogResult}
         onRefresh={() => {
