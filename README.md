@@ -139,6 +139,18 @@ Whole store scan:
 
 Do not move scan errors back into the lower form. Errors need to appear beside the control the user clicked, or the button feels dead.
 
+### Whole-store review counts
+
+Whole-store mode offers **Fixed count** or **Random range** under Reviews per product in Run settings. A range uses inclusive integer minimum/maximum values, respecting the current generation mode limit (250 for reference mode, 2,000 for PDP-only).
+
+Each discovered product receives one random sample during scanning. The range maps that sample to an assigned count shown in the product row; the Queue button displays the exact selected total. Editing a range updates those previews, but rendering, filtering, selection changes, and queue retries do not reroll them. Range counts are read-only; switching back to Fixed count restores the editable per-product values. Single-product generation keeps its fixed count.
+
+The queued payload contains concrete per-product counts. The existing durable store and Resume flow retain them without rerandomizing. Blank, fractional, reversed, and out-of-limit ranges block scanning/queueing and show an inline validation message.
+
+- Count logic: `lib/store-review-counts.mjs`
+- UI: `app/studio/page.js`
+- Check: `npm run test:store-counts`
+
 ### Durable generation flow
 
 Generation is server-side and durable. Closing the browser tab should not kill a queued/running generation.
