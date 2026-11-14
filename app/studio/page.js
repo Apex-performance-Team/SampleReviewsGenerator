@@ -17,6 +17,7 @@ import { PDP_REVIEW_LIMIT, reviewCountLimit } from "../../lib/review-limits.mjs"
 import { loadProductPages } from "../../lib/review-result-pages.mjs";
 import { createQueuePoller } from "../../lib/queue-poller.mjs";
 import { resumableChildren, resumeGuidance } from "../../lib/catalog-resume.mjs";
+import { prepareStoreBatch, storeRangeError, storeReviewCount } from "../../lib/store-review-counts.mjs";
 
 const start = {
   productUrl: "",
@@ -198,6 +199,9 @@ export default function StudioPage() {
     [health, setHealth] = useState({ loading: true }),
     [store, setStore] = useState("checking"),
     [mode, setMode] = useState("product"),
+    [storeCountMode, setStoreCountMode] = useState("fixed"),
+    [storeCountMin, setStoreCountMin] = useState(100),
+    [storeCountMax, setStoreCountMax] = useState(200),
     [storeUrl, setStoreUrl] = useState(""),
     [products, setProducts] = useState([]),
     [meta, setMeta] = useState(null),
@@ -237,6 +241,16 @@ export default function StudioPage() {
     } catch {}
   };
   const storageReady = store === "supabase";
+  const storeCountSettings = {
+    mode: storeCountMode,
+    min: storeCountMin,
+    max: storeCountMax,
+    fixedCount: cleanReviewCount(f.reviewCount, 100),
+    externalReferencesEnabled,
+  };
+  const storeCountError = storeCountMode === "range"
+    ? storeRangeError(storeCountMin, storeCountMax, externalReferencesEnabled)
+    : "";
 
   async function healthCheck() {
     setHealth({ loading: true });
@@ -346,6 +360,10 @@ export default function StudioPage() {
     }
   }
   async function scanStore() {
+    if (storeCountError) {
+      setScanError(storeCountError);
+      return;
+    }
     const normalizedStoreUrl = storeUrl.trim();
     if (!normalizedStoreUrl) {
       const message = "Enter a Shopify store URL first.";
@@ -376,6 +394,7 @@ export default function StudioPage() {
           enabled: true,
           status: "queued",
           reviewCount: defaultReviewCount,
+          reviewCountSample: Math.random(),
         }));
       setProducts(rows);
       setMeta({ ...j, scanned: 0, failed: 0 });
@@ -459,7 +478,7 @@ export default function StudioPage() {
       productUrl: p.url,
       productTitle: p.productTitle,
       productDescription: p.productDescription,
-      reviewCount: reviewCountValue(p, x.reviewCount),
+      reviewCount: storeReviewCount(p, storeCountSettings) ?? x.reviewCount,
     }));
     form.current?.scrollIntoView({ behavior: "smooth" });
   }
@@ -666,34 +685,20 @@ export default function StudioPage() {
     }
   }
   async function generateStore() {
-    const selected = products.filter((x) => x.enabled && x.status === "done");
-    if (!selected.length) {
-      setErr("Select at least one successfully scanned product.");
+    let batch;
+    try {
+      batch = prepareStoreBatch(products, storeCountSettings);
+    } catch (error) {
+      setErr(error.message);
       return;
     }
     const target = +f.targetAverage,
-      defaultCount = cleanReviewCount(f.reviewCount, 100);
-    const selectedWithCounts = selected.map((p) => ({
-      ...p,
-      requestedReviewCount: Number(p.reviewCount ?? defaultCount),
-    }));
-    const invalid = selectedWithCounts.find(
-      (p) => !validReviewCount(p.requestedReviewCount, externalReferencesEnabled),
-    );
-    if (invalid) {
-      setErr(
-        `Review count for ${invalid.productTitle || invalid.title || "one product"} must be 5–${reviewCountLimit(externalReferencesEnabled)}.`,
-      );
-      return;
-    }
+      selectedWithCounts = batch.products,
+      total = batch.total;
     setGenBusy(true);
     setErr("");
     setResult(null);
     setBulkResult(null);
-    const total = selectedWithCounts.reduce(
-      (n, p) => n + p.requestedReviewCount,
-      0,
-    );
     try {
       await ensureSupabase();
       const workerCount = storeWorkerCount(
@@ -744,9 +749,7 @@ export default function StudioPage() {
       (x) => x.enabled && x.status === "done",
     ),
     storeRequestedTotal = selectedStoreProducts.reduce((n, p) => {
-      const count = Number(
-        p.reviewCount ?? cleanReviewCount(f.reviewCount, 100),
-      );
+      const count = storeReviewCount(p, storeCountSettings);
       return n + (validReviewCount(count, externalReferencesEnabled) ? count : 0);
     }, 0);
   const enabled = products.filter((x) => x.enabled).length,
@@ -1054,17 +1057,49 @@ export default function StudioPage() {
               </div>
 
               <section className="studioCard runSettingsCard">
-                <div className="grid">
-                  <label>
-                    Test Review Count
-                    <input
-                      type="number"
-                      min="5"
-                      max={reviewCountLimit(externalReferencesEnabled)}
-                      value={f.reviewCount}
-                      onChange={(e) => set("reviewCount", e.target.value)}
-                    />
+                {mode === "store" && (
+                  <label className="storeCountMode">
+                    Reviews per product
+                    <select
+                      aria-label="Store review count mode"
+                      value={storeCountMode}
+                      onChange={(e) => setStoreCountMode(e.target.value)}
+                      disabled={busy || genBusy}
+                    >
+                      <option value="fixed">Fixed count</option>
+                      <option value="range">Random range</option>
+                    </select>
                   </label>
+                )}
+                <div className="grid">
+                  {mode === "store" && storeCountMode === "range" ? (
+                    <div className="storeReviewRange">
+                      <label>
+                        Minimum reviews
+                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
+                          value={storeCountMin} onChange={(e) => setStoreCountMin(e.target.value)} disabled={busy || genBusy}
+                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
+                      </label>
+                      <label>
+                        Maximum reviews
+                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
+                          value={storeCountMax} onChange={(e) => setStoreCountMax(e.target.value)} disabled={busy || genBusy}
+                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
+                      </label>
+                    </div>
+                  ) : (
+                    <label>
+                      {mode === "store" ? "Default reviews per product" : "Test Review Count"}
+                      <input
+                        type="number"
+                        min="5"
+                        max={reviewCountLimit(externalReferencesEnabled)}
+                        value={f.reviewCount}
+                        onChange={(e) => set("reviewCount", e.target.value)}
+                        disabled={mode === "store" && (busy || genBusy)}
+                      />
+                    </label>
+                  )}
                   <label>
                     Test rating average
                     <input
@@ -1077,6 +1112,13 @@ export default function StudioPage() {
                     />
                   </label>
                 </div>
+                {mode === "store" && (
+                  <p id="store-review-count-help" className={storeCountError ? "scannerNotice scannerNoticeError" : "storeCountHelp"} role={storeCountError ? "alert" : undefined}>
+                    {storeCountError || (storeCountMode === "range"
+                      ? "Each product gets a random count within this range, including both limits. Assigned counts appear below and stay the same when queued or resumed."
+                      : "Newly scanned products start with this count. You can edit individual counts below.")}
+                  </p>
+                )}
                 <div className="generationBudget">
                   <b>
                     {externalReferencesEnabled
@@ -1174,7 +1216,7 @@ export default function StudioPage() {
                           <button
                             type="button"
                             onClick={scanStore}
-                            disabled={busy}
+                            disabled={busy || genBusy || Boolean(storeCountError)}
                           >
                             {busy ? "Scanning…" : "Scan whole store"}
                           </button>
@@ -1236,6 +1278,8 @@ export default function StudioPage() {
                               onClick={generateStore}
                               disabled={
                                 genBusy ||
+                                busy ||
+                                Boolean(storeCountError) ||
                                 !storageReady ||
                                 !products.some(
                                   (x) => x.enabled && x.status === "done",
@@ -1244,6 +1288,7 @@ export default function StudioPage() {
                             >
                               {genBusy
                                 ? "Starting…"
+                                : storeCountError ? "Fix review range to queue"
                                 : `Queue ${selectedStoreProducts.length} SKUs / ${storeRequestedTotal.toLocaleString()} reviews →`}
                             </button>
                           </div>
@@ -1311,7 +1356,9 @@ export default function StudioPage() {
                                   type="number"
                                   min="5"
                                   max={reviewCountLimit(externalReferencesEnabled)}
-                                  value={reviewCountValue(p, f.reviewCount)}
+                                  value={storeCountMode === "range" ? storeReviewCount(p, storeCountSettings) ?? "" : reviewCountValue(p, f.reviewCount)}
+                                  readOnly={storeCountMode === "range"}
+                                  aria-label={`Reviews for ${p.productTitle || p.title}`}
                                   onChange={(e) =>
                                     setProductReviewCount(
                                       p.index,
@@ -1320,6 +1367,7 @@ export default function StudioPage() {
                                   }
                                   disabled={busy || genBusy}
                                 />
+                                {storeCountMode === "range" && <small>Assigned from range</small>}
                                 <small>
                                   Live:{" "}
                                   {p.status === "done"
