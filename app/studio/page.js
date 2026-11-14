@@ -483,8 +483,9 @@ export default function StudioPage() {
     form.current?.scrollIntoView({ behavior: "smooth" });
   }
   function setProductReviewCount(index, value) {
+    const key = storeCountMode === "range" ? "reviewCountOverride" : "reviewCount";
     setProducts((a) =>
-      a.map((x) => (x.index === index ? { ...x, reviewCount: value } : x)),
+      a.map((x) => (x.index === index ? { ...x, [key]: value } : x)),
     );
   }
 
@@ -747,6 +748,9 @@ export default function StudioPage() {
   }, [products, filter]);
   const selectedStoreProducts = products.filter(
       (x) => x.enabled && x.status === "done",
+    ),
+    hasInvalidStoreCounts = selectedStoreProducts.some(
+      (p) => !validReviewCount(storeReviewCount(p, storeCountSettings), externalReferencesEnabled),
     ),
     storeRequestedTotal = selectedStoreProducts.reduce((n, p) => {
       const count = storeReviewCount(p, storeCountSettings);
@@ -1202,6 +1206,7 @@ export default function StudioPage() {
                                 genBusy ||
                                 busy ||
                                 Boolean(storeCountError) ||
+                                hasInvalidStoreCounts ||
                                 !storageReady ||
                                 !products.some(
                                   (x) => x.enabled && x.status === "done",
@@ -1211,6 +1216,7 @@ export default function StudioPage() {
                               {genBusy
                                 ? "Starting…"
                                 : storeCountError ? "Fix review range to queue"
+                                : hasInvalidStoreCounts ? "Fix product counts to queue"
                                 : `Queue ${selectedStoreProducts.length} SKUs / ${storeRequestedTotal.toLocaleString()} reviews →`}
                             </button>
                           </div>
@@ -1278,9 +1284,11 @@ export default function StudioPage() {
                                   type="number"
                                   min="5"
                                   max={reviewCountLimit(externalReferencesEnabled)}
-                                  value={storeCountMode === "range" ? storeReviewCount(p, storeCountSettings) ?? "" : reviewCountValue(p, f.reviewCount)}
-                                  readOnly={storeCountMode === "range"}
+                                  step="1"
+                                  value={storeCountMode === "range" ? p.reviewCountOverride ?? storeReviewCount(p, storeCountSettings) ?? "" : reviewCountValue(p, f.reviewCount)}
                                   aria-label={`Reviews for ${p.productTitle || p.title}`}
+                                  aria-invalid={!validReviewCount(storeReviewCount(p, storeCountSettings), externalReferencesEnabled)}
+                                  aria-describedby={`review-count-help-${p.index}`}
                                   onChange={(e) =>
                                     setProductReviewCount(
                                       p.index,
@@ -1289,7 +1297,24 @@ export default function StudioPage() {
                                   }
                                   disabled={busy || genBusy}
                                 />
-                                {storeCountMode === "range" && <small>Assigned from range</small>}
+                                <small id={`review-count-help-${p.index}`}>
+                                  {!storeCountError && !validReviewCount(storeReviewCount(p, storeCountSettings), externalReferencesEnabled)
+                                    ? `Enter a whole number from 5 to ${reviewCountLimit(externalReferencesEnabled).toLocaleString()}.`
+                                    : storeCountMode === "range"
+                                      ? p.reviewCountOverride != null ? "Custom count" : "Assigned from range"
+                                      : "Reviews to generate"}
+                                </small>
+                                {storeCountMode === "range" && p.reviewCountOverride != null && (
+                                  <button
+                                    type="button"
+                                    className="ghost resetReviewCount"
+                                    aria-label={`Use range for ${p.productTitle || p.title}`}
+                                    onClick={() => setProductReviewCount(p.index, null)}
+                                    disabled={busy || genBusy}
+                                  >
+                                    Use range
+                                  </button>
+                                )}
                                 <small>
                                   Live:{" "}
                                   {p.status === "done"
@@ -1379,7 +1404,7 @@ export default function StudioPage() {
                 {mode === "store" && (
                   <p id="store-review-count-help" className={storeCountError ? "scannerNotice scannerNoticeError" : "storeCountHelp"} role={storeCountError ? "alert" : undefined}>
                     {storeCountError || (storeCountMode === "range"
-                      ? "Each product gets a random count within this range, including both limits. Assigned counts appear in the product list and stay the same when queued or resumed."
+                      ? "Each product gets a random count within this range. Edit any product's count in the list to customize it, including outside the range. Custom counts stay fixed when the range changes; Use range restores that product's assigned count. Queued and resumed jobs keep these counts."
                       : "Newly scanned products start with this count. You can edit individual counts in the product list.")}
                   </p>
                 )}

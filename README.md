@@ -143,7 +143,9 @@ Do not move scan errors back into the lower form. Errors need to appear beside t
 
 Whole-store mode offers **Fixed count** or **Random range** under Reviews per product in Run settings. A range uses inclusive integer minimum/maximum values, respecting the current generation mode limit (250 for reference mode, 2,000 for PDP-only).
 
-Each discovered product receives one random sample during scanning. The range maps that sample to an assigned count shown in the product row; the Queue button displays the exact selected total. Editing a range updates those previews, but rendering, filtering, selection changes, and queue retries do not reroll them. Range counts are read-only; switching back to Fixed count restores the editable per-product values. Single-product generation keeps its fixed count.
+Each discovered product receives one random sample during scanning. The range maps that sample to an editable count shown in the product row; the Queue button displays the exact selected total. Editing a product's count in range mode stores a `reviewCountOverride` for that product only and marks it **Custom count**. Custom counts may be outside the selected range, within the generation mode's 5–250/2,000 limits. They survive range edits, filtering, selection changes, and mode switches. **Use range** clears only that product's override and restores its count from the same sample and current range. Fixed mode keeps its separate editable per-product values. Single-product generation keeps its fixed count.
+
+Editing the range updates only products without a custom count. Rendering and queue retries never reroll counts. Blank, fractional, or out-of-limit product counts show an inline message and block queueing while that product is selected.
 
 The queued payload contains concrete per-product counts. The existing durable store and Resume flow retain them without rerandomizing. Blank, fractional, reversed, and out-of-limit ranges block scanning/queueing and show an inline validation message.
 
