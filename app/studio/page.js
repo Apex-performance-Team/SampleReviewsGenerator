@@ -1056,84 +1056,6 @@ export default function StudioPage() {
                 </span>
               </div>
 
-              <section className="studioCard runSettingsCard">
-                {mode === "store" && (
-                  <label className="storeCountMode">
-                    Reviews per product
-                    <select
-                      aria-label="Store review count mode"
-                      value={storeCountMode}
-                      onChange={(e) => setStoreCountMode(e.target.value)}
-                      disabled={busy || genBusy}
-                    >
-                      <option value="fixed">Fixed count</option>
-                      <option value="range">Random range</option>
-                    </select>
-                  </label>
-                )}
-                <div className="grid">
-                  {mode === "store" && storeCountMode === "range" ? (
-                    <div className="storeReviewRange">
-                      <label>
-                        Minimum reviews
-                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
-                          value={storeCountMin} onChange={(e) => setStoreCountMin(e.target.value)} disabled={busy || genBusy}
-                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
-                      </label>
-                      <label>
-                        Maximum reviews
-                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
-                          value={storeCountMax} onChange={(e) => setStoreCountMax(e.target.value)} disabled={busy || genBusy}
-                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
-                      </label>
-                    </div>
-                  ) : (
-                    <label>
-                      {mode === "store" ? "Default reviews per product" : "Test Review Count"}
-                      <input
-                        type="number"
-                        min="5"
-                        max={reviewCountLimit(externalReferencesEnabled)}
-                        value={f.reviewCount}
-                        onChange={(e) => set("reviewCount", e.target.value)}
-                        disabled={mode === "store" && (busy || genBusy)}
-                      />
-                    </label>
-                  )}
-                  <label>
-                    Test rating average
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      step=".1"
-                      value={f.targetAverage}
-                      onChange={(e) => set("targetAverage", e.target.value)}
-                    />
-                  </label>
-                </div>
-                {mode === "store" && (
-                  <p id="store-review-count-help" className={storeCountError ? "scannerNotice scannerNoticeError" : "storeCountHelp"} role={storeCountError ? "alert" : undefined}>
-                    {storeCountError || (storeCountMode === "range"
-                      ? "Each product gets a random count within this range, including both limits. Assigned counts appear below and stay the same when queued or resumed."
-                      : "Newly scanned products start with this count. You can edit individual counts below.")}
-                  </p>
-                )}
-                <div className="generationBudget">
-                  <b>
-                    {externalReferencesEnabled
-                      ? "Output mode: Lens/Amazon simple rewrite"
-                      : "Output mode: PDP-only generator"}
-                  </b>
-                  <span>
-                    {externalReferencesEnabled
-                      ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
-                      : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
-                  </span>
-                </div>
-                <AreviewsExportControls showExport={false} />
-              </section>
-
               <section className="panel studioCard">
                 <div className="scannerHead">
                   <div>
@@ -1396,6 +1318,84 @@ export default function StudioPage() {
                     </>
                   )}
                 </div>
+              </section>
+
+              <section className="studioCard runSettingsCard">
+                {mode === "store" && (
+                  <label className="storeCountMode">
+                    Reviews per product
+                    <select
+                      aria-label="Store review count mode"
+                      value={storeCountMode}
+                      onChange={(e) => setStoreCountMode(e.target.value)}
+                      disabled={busy || genBusy}
+                    >
+                      <option value="fixed">Fixed count</option>
+                      <option value="range">Random range</option>
+                    </select>
+                  </label>
+                )}
+                <div className="grid">
+                  {mode === "store" && storeCountMode === "range" ? (
+                    <div className="storeReviewRange">
+                      <label>
+                        Minimum reviews
+                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
+                          value={storeCountMin} onChange={(e) => setStoreCountMin(e.target.value)} disabled={busy || genBusy}
+                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
+                      </label>
+                      <label>
+                        Maximum reviews
+                        <input type="number" min="5" max={reviewCountLimit(externalReferencesEnabled)} step="1"
+                          value={storeCountMax} onChange={(e) => setStoreCountMax(e.target.value)} disabled={busy || genBusy}
+                          aria-invalid={Boolean(storeCountError)} aria-describedby="store-review-count-help" />
+                      </label>
+                    </div>
+                  ) : (
+                    <label>
+                      {mode === "store" ? "Default reviews per product" : "Test Review Count"}
+                      <input
+                        type="number"
+                        min="5"
+                        max={reviewCountLimit(externalReferencesEnabled)}
+                        value={f.reviewCount}
+                        onChange={(e) => set("reviewCount", e.target.value)}
+                        disabled={mode === "store" && (busy || genBusy)}
+                      />
+                    </label>
+                  )}
+                  <label>
+                    Test rating average
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      step=".1"
+                      value={f.targetAverage}
+                      onChange={(e) => set("targetAverage", e.target.value)}
+                    />
+                  </label>
+                </div>
+                {mode === "store" && (
+                  <p id="store-review-count-help" className={storeCountError ? "scannerNotice scannerNoticeError" : "storeCountHelp"} role={storeCountError ? "alert" : undefined}>
+                    {storeCountError || (storeCountMode === "range"
+                      ? "Each product gets a random count within this range, including both limits. Assigned counts appear in the product list and stay the same when queued or resumed."
+                      : "Newly scanned products start with this count. You can edit individual counts in the product list.")}
+                  </p>
+                )}
+                <div className="generationBudget">
+                  <b>
+                    {externalReferencesEnabled
+                      ? "Output mode: Lens/Amazon simple rewrite"
+                      : "Output mode: PDP-only generator"}
+                  </b>
+                  <span>
+                    {externalReferencesEnabled
+                      ? "Reference mode On · the durable server workflow pulls source reviews, rewrites only what the source review says, and purges mismatches or failed rewrites."
+                      : "Reference mode Off · the durable server workflow generates every fixture from Shopify PDP context with the PDP quality/repair logic."}
+                  </span>
+                </div>
+                <AreviewsExportControls showExport={false} />
               </section>
 
               <form ref={form} onSubmit={generate} className="generationForm">
